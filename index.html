@@ -1,121 +1,70 @@
 <!doctype html>
-<html lang="ko">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 아기방 Room Planner V2</title>
+<html lang="ko"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>또복이 Family Room Planner V3</title>
+<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#6d7d66">
 <style>
 :root{--bg:#f5f4f0;--card:#fff;--ink:#20231f;--muted:#73776f;--line:#d7d8d2;--accent:#6d7d66;--bad:#b8473f}
-*{box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink)}
-header{padding:14px 16px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
-h1{font-size:18px;margin:0 0 4px}.sub{font-size:12px;color:var(--muted)}
-.app{display:grid;grid-template-columns:310px 1fr;min-height:calc(100vh - 64px)}
-aside{background:#fff;border-right:1px solid var(--line);padding:14px;overflow:auto}.stageWrap{padding:16px;overflow:auto;display:flex;justify-content:center;align-items:flex-start}
-.card{border:1px solid var(--line);border-radius:12px;padding:12px;margin-bottom:12px;background:var(--card)}
-.card h2{font-size:14px;margin:0 0 9px}.row{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
-button,input{font:inherit}button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;cursor:pointer}
-button.primary{background:var(--accent);color:white;border-color:var(--accent)} button.danger{color:var(--bad)}
-input{width:84px;border:1px solid var(--line);border-radius:8px;padding:7px}.small{font-size:11px;color:var(--muted)}
-.item{display:grid;grid-template-columns:1fr auto;gap:4px;padding:9px 0;border-top:1px solid #eee}.item:first-of-type{border-top:0}
-.item b{font-size:13px}.item span{font-size:11px;color:var(--muted)}
-#room{position:relative;width:min(72vw,540px);aspect-ratio:2700/3590;background:#fbfaf7;border:5px solid #424640;box-shadow:0 8px 28px #0001;touch-action:none}
-.window{position:absolute;left:0;bottom:-5px;width:79.63%;height:8px;background:#9cc7d4;border-top:2px solid white}
-.windowLabel{position:absolute;left:30%;bottom:8px;font-size:10px;color:#57818d}
-.doorGap{position:absolute;right:0;top:-5px;width:29.63%;height:10px;background:#fbfaf7}
-.doorLeaf{position:absolute;right:0;top:0;width:29.63%;height:2px;background:#8f806e;transform-origin:right top;transform:rotate(-90deg)}
-.doorArc{position:absolute;right:0;top:0;width:29.63%;aspect-ratio:1;border-left:1px dashed #b5a997;border-bottom:1px dashed #b5a997;border-radius:0 0 0 100%}
-.doorLabel{position:absolute;right:3px;top:7px;font-size:10px;color:#8f806e}
-.furn{position:absolute;border:2px solid #697867;background:#dce6d8cc;border-radius:5px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:700;user-select:none;touch-action:none;padding:3px;overflow:hidden}
-.furn.selected{outline:3px solid #899c82;z-index:5}.furn.bad{border-color:var(--bad);background:#f0c7c4cc}
-.dimX,.dimY{position:absolute;font-size:9px;color:#777;pointer-events:none}.dimX{top:-16px;left:50%;transform:translateX(-50%)}.dimY{right:-38px;top:50%;transform:translateY(-50%) rotate(90deg)}
-#status{font-size:12px;line-height:1.55}.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}
-.toolbar{position:sticky;bottom:8px;background:#ffffffee;backdrop-filter:blur(8px);border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;gap:6px;justify-content:center;margin-top:12px}
-@media(max-width:760px){.app{display:block}.stageWrap{padding:10px 8px 190px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:176px;border:0;border-top:1px solid var(--line);padding:10px;overflow:auto}.card{margin-bottom:8px;padding:9px}.card.roomcfg,.card.save{display:none}#room{width:min(92vw,430px)}header{padding:10px 12px}.item{padding:6px 0}}
-</style>
-<link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#6d7d66">
-<style>.syncbar{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:6px;font-size:11px}.syncdot{width:8px;height:8px;border-radius:50%;background:#aaa;display:inline-block}.syncdot.on{background:#4f8b57}.syncdot.err{background:#b8473f}</style></head>
-<body>
-<header><h1>또복이 아기방 Room Planner <small style="font-size:11px;color:#73776f">V2</small></h1><div class="sub">도면 기준 2,700 × 3,590 mm · 가구 추가/제거 · 드래그 · 회전 · 충돌 확인</div><div class="syncbar"><span id="syncDot" class="syncdot"></span><span id="syncText">로컬 모드</span><button id="loginBtn">Google 로그인</button><button id="shareBtn">가족 코드</button></div></header>
-<div class="app">
-<aside>
- <div class="card roomcfg"><h2>방 설정</h2><div class="row">가로 <input id="rw" type="number" value="2700"> 세로 <input id="rh" type="number" value="3590"><button onclick="applyRoom()">적용</button></div><div class="small">도면의 작은방 2 기준값입니다. 실측값이 생기면 여기서 바로 수정할 수 있습니다.</div></div>
- <div class="card"><h2>가구 보관함</h2><div id="catalog"></div>
- <hr style="border:0;border-top:1px solid #eee"><div class="small">직접 추가 (가로×깊이 mm)</div><div class="row"><input id="nn" placeholder="가구명" style="width:110px"><input id="nw" type="number" placeholder="가로"><input id="nd" type="number" placeholder="깊이"><button onclick="addCustom()">＋</button></div></div>
- <div class="card"><h2>선택 가구</h2><div id="status">가구를 선택하세요.</div></div>
- <div class="card save"><h2>배치안 저장</h2><div class="row"><button onclick="saveSlot('A')">A 저장</button><button onclick="loadSlot('A')">A 불러오기</button><button onclick="saveSlot('B')">B 저장</button><button onclick="loadSlot('B')">B 불러오기</button><button onclick="saveSlot('C')">C 저장</button><button onclick="loadSlot('C')">C 불러오기</button></div></div>
-</aside>
-<main class="stageWrap"><div>
- <div id="room">
-  <div class="window"></div><div class="windowLabel">창호 약 2,150 mm</div>
-  <div class="doorGap"></div><div class="doorLeaf"></div><div class="doorArc"></div><div class="doorLabel">출입문 약 800 mm</div>
- </div>
- <div class="toolbar"><button onclick="rotateSel()">↻ 90° 회전</button><button onclick="duplicateSel()">＋ 복제</button><button class="danger" onclick="removeSel()">× 제거</button><button onclick="clearAll()">전체 비우기</button></div>
- <div class="small" style="text-align:center">가구를 눌러 선택한 뒤 끌어서 이동하세요. 빨간색은 벽/가구/문 열림 영역과 충돌입니다.</div>
-</div></main>
-</div>
-<script>window.scheduleCloudSave=()=>{};</script><script>
-let roomW=2700, roomH=3590, selected=null, seq=1;
-const catalog=[
- {name:'일룸 쿠시노 코지 범퍼형 SS',w:1200,d:2150,note:'치수 확인/수정 가능'},
- {name:'한샘 샘키즈 수납장 1305',w:1305,d:335,note:'1305 × 335 mm'},
- {name:'한샘 샘키즈 책장 1305',w:1277,d:335,note:'1277 × 335 mm'},
- {name:'한샘 샘키즈 키큰옷장 서랍형 800',w:800,d:600,note:'깊이 현장/제품 옵션 확인 권장'},
- {name:'기저귀갈이대',w:800,d:500,note:'후보 기본값 · 수정 가능'},
- {name:'수유의자',w:800,d:850,note:'후보 기본값 · 수정 가능'}
-];
-function renderCatalog(){
- const c=document.getElementById('catalog'); c.innerHTML='';
- catalog.forEach((x,i)=>{let e=document.createElement('div');e.className='item';e.innerHTML=`<div><b>${x.name}</b><br><span>${x.w} × ${x.d} mm · ${x.note}</span></div><button onclick="addFurniture(${i})">＋ 방에 추가</button>`;c.appendChild(e)})
-}
-function scale(){return room.clientWidth/roomW}
-function addFurniture(i){let x=catalog[i];createF(x.name,x.w,x.d,80+seq*35,120+seq*45,0)}
-function addCustom(){let n=nn.value||'사용자 가구',w=+nw.value,d=+nd.value;if(!w||!d)return alert('가로와 깊이를 입력해주세요.');catalog.push({name:n,w,d,note:'사용자 추가'});renderCatalog();createF(n,w,d,80,100,0)}
-function createF(name,w,d,x,y,rot,id){
- let e=document.createElement('div');e.className='furn';e.dataset.id=id||seq++;e.dataset.name=name;e.dataset.w=w;e.dataset.d=d;e.dataset.rot=rot||0;e.dataset.x=x;e.dataset.y=y;
- e.innerHTML=`<span>${name}</span><i class="dimX"></i><i class="dimY"></i>`;room.appendChild(e);bindDrag(e);select(e);updateAll()
-}
-function dims(e){let rot=+e.dataset.rot%180;return rot?{w:+e.dataset.d,d:+e.dataset.w}:{w:+e.dataset.w,d:+e.dataset.d}}
-function place(e){let s=scale(),q=dims(e);e.style.width=q.w*s+'px';e.style.height=q.d*s+'px';e.style.left=(+e.dataset.x*s)+'px';e.style.top=(+e.dataset.y*s)+'px';e.querySelector('.dimX').textContent=q.w+' mm';e.querySelector('.dimY').textContent=q.d+' mm'}
-function bindDrag(e){
- e.onpointerdown=ev=>{select(e);e.setPointerCapture(ev.pointerId);let sx=ev.clientX,sy=ev.clientY,ox=+e.dataset.x,oy=+e.dataset.y;
- e.onpointermove=v=>{e.dataset.x=Math.round(ox+(v.clientX-sx)/scale());e.dataset.y=Math.round(oy+(v.clientY-sy)/scale());updateAll()};
- e.onpointerup=()=>{e.onpointermove=null;e.onpointerup=null;updateAll()}}
-}
-function select(e){if(selected)selected.classList.remove('selected');selected=e;e.classList.add('selected');updateStatus()}
-function rect(e){let q=dims(e);return{x:+e.dataset.x,y:+e.dataset.y,w:q.w,h:q.d}}
-function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
-function doorCollision(r){ // top-right 800x800 swing envelope
- return overlap(r,{x:roomW-800,y:0,w:800,h:800})
-}
-function updateAll(){
- [...room.querySelectorAll('.furn')].forEach(place);
- let fs=[...room.querySelectorAll('.furn')];fs.forEach(e=>e.classList.remove('bad'));
- fs.forEach((e,i)=>{let a=rect(e),bad=a.x<0||a.y<0||a.x+a.w>roomW||a.y+a.h>roomH||doorCollision(a);for(let j=0;j<fs.length;j++)if(i!=j&&overlap(a,rect(fs[j])))bad=true;if(bad)e.classList.add('bad')});
- updateStatus(); window.scheduleCloudSave();
-}
-function updateStatus(){if(!selected){status.innerHTML='가구를 선택하세요.';return}let r=rect(selected),left=Math.round(r.x),right=Math.round(roomW-r.x-r.w),top=Math.round(r.y),bottom=Math.round(roomH-r.y-r.h);
- status.innerHTML=`<b>${selected.dataset.name}</b><br>${r.w} × ${r.h} mm<br><span class="badge">왼쪽 ${left} mm</span><span class="badge">오른쪽 ${right} mm</span><span class="badge">위 ${top} mm</span><span class="badge">아래 ${bottom} mm</span><br>${selected.classList.contains('bad')?'<b style="color:#b8473f">⚠ 충돌/영역 이탈</b>':'✓ 배치 가능'}`}
-function rotateSel(){if(!selected)return;selected.dataset.rot=(+selected.dataset.rot+90)%180;updateAll()}
-function removeSel(){if(!selected)return;let e=selected;selected=null;e.remove();updateAll()}
-function duplicateSel(){if(!selected)return;createF(selected.dataset.name,+selected.dataset.w,+selected.dataset.d,+selected.dataset.x+100,+selected.dataset.y+100,+selected.dataset.rot)}
-function clearAll(){if(confirm('배치된 가구를 모두 비울까요?')){[...room.querySelectorAll('.furn')].forEach(x=>x.remove());selected=null;updateStatus()}}
-function applyRoom(){roomW=+rw.value||2700;roomH=+rh.value||3590;room.style.aspectRatio=roomW+'/'+roomH;updateAll()}
-function data(){return [...room.querySelectorAll('.furn')].map(e=>({name:e.dataset.name,w:+e.dataset.w,d:+e.dataset.d,x:+e.dataset.x,y:+e.dataset.y,rot:+e.dataset.rot}))}
-function saveSlot(s){localStorage.setItem('babyroom_'+s,JSON.stringify({roomW,roomH,items:data()}));alert(s+' 배치안을 저장했습니다.')}
-function loadSlot(s){let z=JSON.parse(localStorage.getItem('babyroom_'+s)||'null');if(!z)return alert('저장된 '+s+' 배치안이 없습니다.');[...room.querySelectorAll('.furn')].forEach(x=>x.remove());selected=null;roomW=z.roomW;roomH=z.roomH;rw.value=roomW;rh.value=roomH;room.style.aspectRatio=roomW+'/'+roomH;z.items.forEach(a=>createF(a.name,a.w,a.d,a.x,a.y,a.rot));updateAll()}
-window.addEventListener('resize',updateAll);renderCatalog();updateAll();
-</script><script src="firebase-config.js"></script>
-<script type="module">
-const cfg=window.TTOBOK_FIREBASE_CONFIG, dot=document.getElementById('syncDot'),txt=document.getElementById('syncText'),login=document.getElementById('loginBtn'),share=document.getElementById('shareBtn');
-let auth,db,user,familyId=localStorage.getItem('ttobok_family_id')||'',unsub,timer,applying=false,mods;
-window.scheduleCloudSave=()=>{if(applying||!db||!user||!familyId)return;clearTimeout(timer);timer=setTimeout(save,600)};
-async function init(){if(!cfg){txt.textContent='로컬 모드 · Firebase 설정 필요';return}try{
- const app=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'),a=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js'),f=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js');mods={a,f};
- const x=app.initializeApp(cfg);auth=a.getAuth(x);db=f.getFirestore(x);a.onAuthStateChanged(auth,u=>{user=u;if(u){dot.className='syncdot on';login.textContent='로그아웃';txt.textContent=familyId?'공동 동기화':'로그인됨 · 가족 코드 설정';if(familyId)listen()}else{dot.className='syncdot';login.textContent='Google 로그인';txt.textContent='로그인 필요'}})
-}catch(e){dot.className='syncdot err';txt.textContent='Firebase 연결 오류'}}
-login.onclick=async()=>{if(!auth)return alert('firebase-config.js에 Firebase 설정을 넣어주세요.');if(user)await mods.a.signOut(auth);else await mods.a.signInWithPopup(auth,new mods.a.GoogleAuthProvider())};
-share.onclick=()=>{let v=prompt('두 분이 동일하게 사용할 가족 코드를 입력하세요.',familyId||'ttobok-home');if(!v)return;familyId=v.trim();localStorage.setItem('ttobok_family_id',familyId);if(user)listen()};
-async function save(){const f=mods.f;await f.setDoc(f.doc(db,'families',familyId,'rooms','smallroom2'),{roomW,roomH,items:data(),updatedAt:f.serverTimestamp(),updatedBy:user.displayName||user.email||user.uid},{merge:true})}
-function listen(){const f=mods.f;if(unsub)unsub();unsub=f.onSnapshot(f.doc(db,'families',familyId,'rooms','smallroom2'),s=>{if(!s.exists()||!s.data().items)return;let z=s.data();applying=true;[...room.querySelectorAll('.furn')].forEach(x=>x.remove());selected=null;roomW=z.roomW||2700;roomH=z.roomH||3590;rw.value=roomW;rh.value=roomH;room.style.aspectRatio=roomW+'/'+roomH;z.items.forEach(a=>createF(a.name,a.w,a.d,a.x,a.y,a.rot));applying=false;updateAll();txt.textContent='공동 동기화 · '+(z.updatedBy||'가족')},()=>{dot.className='syncdot err';txt.textContent='권한/동기화 오류'})}
-init();
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink)}
+header{padding:12px 16px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
+h1{font-size:18px;margin:0 0 4px}.small,.sub{font-size:11px;color:var(--muted)}.app{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 70px)}
+aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto}.stage{padding:16px;overflow:auto;display:flex;justify-content:center}
+.card{border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:10px;background:#fff}.card h2{font-size:14px;margin:0 0 8px}
+.row,.sync{display:flex;gap:7px;align-items:center;flex-wrap:wrap}button,input,select{font:inherit}button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px}
+input,select{border:1px solid var(--line);border-radius:8px;padding:7px;background:#fff}input{width:82px}.sync{margin-top:6px;font-size:11px}.dot{width:8px;height:8px;border-radius:50%;background:#aaa}.dot.on{background:#4f8b57}.dot.err{background:var(--bad)}
+.item{display:grid;grid-template-columns:1fr auto;gap:5px;padding:8px 0;border-top:1px solid #eee}.item:first-child{border-top:0}.item b{font-size:13px}.item span{font-size:11px;color:var(--muted)}
+#room{position:relative;width:min(72vw,540px);background:#fbfaf7;border:5px solid #424640;box-shadow:0 8px 28px #0001;touch-action:none}
+.window{position:absolute;bottom:-5px;height:8px;background:#9cc7d4;border-top:2px solid white}.doorGap{position:absolute;top:-5px;height:10px;background:#fbfaf7}
+.doorLeaf{position:absolute;top:0;height:2px;background:#8f806e;transform-origin:left top;transform:rotate(90deg)}
+.doorArc{position:absolute;top:0;aspect-ratio:1;border-right:1px dashed #b5a997;border-bottom:1px dashed #b5a997;border-radius:0 0 100% 0}
+.label{position:absolute;font-size:10px;pointer-events:none}.winLabel{bottom:8px;color:#57818d}.doorLabel{top:7px;color:#8f806e}
+.furn{position:absolute;border:2px solid #697867;background:#dce6d8cc;border-radius:5px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:700;user-select:none;touch-action:none;padding:3px}
+.furn.sel{outline:3px solid #899c82;z-index:5}.furn.bad{border-color:var(--bad);background:#f0c7c4cc}.toolbar{position:sticky;bottom:8px;background:#ffffffee;border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;gap:6px;justify-content:center;margin-top:12px}
+.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}#status{font-size:12px;line-height:1.55}
+@media(max-width:760px){.app{display:block}.stage{padding:10px 8px 210px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:195px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:none}#room{width:min(92vw,430px)}}
+</style></head><body>
+<header><h1>또복이 Family Room Planner <small>V3</small></h1><div id="summary" class="sub"></div>
+<div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div></header>
+<div class="app"><aside>
+<div class="card"><h2>방 선택 · 도면 편집</h2>
+<select id="roomSel"><option value="smallroom2">작은방 2 · 아기방</option><option value="smallroom1">작은방 1</option><option value="master">안방</option><option value="living">거실·주방</option></select>
+<div class="row" style="margin-top:7px">가로 <input id="rw" type="number"> 세로 <input id="rh" type="number"><button id="applyRoom">적용</button></div>
+<details style="margin-top:8px"><summary>✏️ 문·창 치수 편집</summary><div class="small">상단 문 / 하단 창 기준, mm</div>
+<div class="row">문 시작 <input id="dp" type="number"> 폭 <input id="dw" type="number"></div>
+<div class="row">창 시작 <input id="wp" type="number"> 폭 <input id="ww" type="number"><button id="applyOpen">적용</button></div></details>
+<div id="note" class="small" style="margin-top:6px"></div><button id="reset" style="margin-top:6px">기본 도면값 복원</button></div>
+<div class="card"><h2>가구 보관함</h2><div id="catalog"></div><div class="small">사용자 가구</div><div class="row"><input id="nn" placeholder="가구명" style="width:110px"><input id="nw" type="number" placeholder="가로"><input id="nd" type="number" placeholder="깊이"><button id="addCustom">＋</button></div></div>
+<div class="card"><h2>선택 가구</h2><div id="status">가구를 선택하세요.</div></div>
+<div class="card save"><h2>배치안</h2><div class="row"><button onclick="saveSlot('A')">A 저장</button><button onclick="loadSlot('A')">A 불러오기</button><button onclick="saveSlot('B')">B 저장</button><button onclick="loadSlot('B')">B 불러오기</button><button onclick="saveSlot('C')">C 저장</button><button onclick="loadSlot('C')">C 불러오기</button></div></div>
+</aside><main class="stage"><div><div id="room"><div id="window" class="window"></div><div id="winLabel" class="label winLabel"></div><div id="doorGap" class="doorGap"></div><div id="doorLeaf" class="doorLeaf"></div><div id="doorArc" class="doorArc"></div><div id="doorLabel" class="label doorLabel"></div></div>
+<div class="toolbar"><button id="rot">↻ 90°</button><button id="dup">＋ 복제</button><button id="del">× 제거</button><button id="clear">전체 비우기</button></div><div class="small" style="text-align:center">가구를 끌어 이동하세요. 빨간색은 충돌/영역 이탈입니다.</div></div></main></div>
+<script>window.scheduleCloudSave=()=>{};</script>
+<script>
+const D={smallroom2:{name:'작은방 2 · 아기방',w:2700,h:3590,dp:1900,dw:800,wp:0,ww:2150,note:'원본 평면도 기준. 문 위치/폭은 실측 후 수정 가능합니다.'},smallroom1:{name:'작은방 1',w:2700,h:3195,dp:0,dw:800,wp:0,ww:2185,note:'도면 기반 초기값. 실측 후 수정 권장.'},master:{name:'안방',w:3820,h:3900,dp:3020,dw:800,wp:0,ww:2610,note:'배치용 초기 영역. 붙박이장/요철은 추후 세분화 가능.'},living:{name:'거실·주방',w:4680,h:6050,dp:0,dw:0,wp:0,ww:3155,note:'개방형 공간 배치용 초기 영역. 세부 경계는 수정 가능.'}};
+const CAT=[['일룸 쿠시노 범퍼형 SS',1114,2065],['한샘 샘키즈 수납장 1305',1277,335],['한샘 샘키즈 책장 1305',1277,335],['한샘 샘키즈 키큰옷장 서랍형 800',800,620],['기저귀갈이대',850,550],['수유의자',800,800]];
+const $=x=>document.getElementById(x),room=$('room');let rid='smallroom2',sel=null,seq=1,cloud=false,G=JSON.parse(localStorage.getItem('ttobok_geom_v3')||'{}');
+function geom(){return G[rid]||structuredClone(D[rid])}function setGeom(x){G[rid]=x;localStorage.setItem('ttobok_geom_v3',JSON.stringify(G))}
+function key(s='cur'){return `ttobok_v3_${rid}_${s}`}function sc(){return room.clientWidth/geom().w}
+function drawGeom(){let g=geom();room.style.aspectRatio=g.w+'/'+g.h;$('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp;$('dw').value=g.dw;$('wp').value=g.wp;$('ww').value=g.ww;$('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('note').textContent=g.note;
+for(let id of ['doorGap','doorLeaf','doorArc']){$(id).style.left=g.dp/g.w*100+'%';$(id).style.width=g.dw/g.w*100+'%'}$('doorLabel').style.left=g.dp/g.w*100+'%';$('doorLabel').textContent=g.dw?`문 ${g.dw} mm`:'';$('window').style.left=g.wp/g.w*100+'%';$('window').style.width=g.ww/g.w*100+'%';$('winLabel').style.left=g.wp/g.w*100+'%';$('winLabel').textContent=g.ww?`창호 ${g.ww} mm`:''}
+function dims(e){return +e.dataset.r%180?{w:+e.dataset.d,h:+e.dataset.w}:{w:+e.dataset.w,h:+e.dataset.d}}function rect(e){let q=dims(e);return{x:+e.dataset.x,y:+e.dataset.y,w:q.w,h:q.h}}function ov(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
+function add(n,w,d,x=100,y=120,r=0){let e=document.createElement('div');e.className='furn';Object.assign(e.dataset,{n,w,d,x,y,r,id:seq++});e.textContent=n;room.appendChild(e);bind(e);select(e);update()}
+function bind(e){e.onpointerdown=v=>{select(e);e.setPointerCapture(v.pointerId);let sx=v.clientX,sy=v.clientY,ox=+e.dataset.x,oy=+e.dataset.y;e.onpointermove=m=>{e.dataset.x=Math.round(ox+(m.clientX-sx)/sc());e.dataset.y=Math.round(oy+(m.clientY-sy)/sc());update()};e.onpointerup=()=>{e.onpointermove=null;e.onpointerup=null;update()}}}
+function select(e){if(sel)sel.classList.remove('sel');sel=e;e.classList.add('sel');status()}
+function data(){return [...room.querySelectorAll('.furn')].map(e=>({n:e.dataset.n,w:+e.dataset.w,d:+e.dataset.d,x:+e.dataset.x,y:+e.dataset.y,r:+e.dataset.r}))}
+function update(){let g=geom(),fs=[...room.querySelectorAll('.furn')],s=sc();fs.forEach(e=>{let q=dims(e);e.style.cssText+=`;width:${q.w*s}px;height:${q.h*s}px;left:${+e.dataset.x*s}px;top:${+e.dataset.y*s}px`;e.classList.remove('bad')});fs.forEach((e,i)=>{let a=rect(e),bad=a.x<0||a.y<0||a.x+a.w>g.w||a.y+a.h>g.h||(g.dw&&ov(a,{x:g.dp,y:0,w:g.dw,h:g.dw}));fs.forEach((b,j)=>{if(i!=j&&ov(a,rect(b)))bad=true});if(bad)e.classList.add('bad')});status();if(!cloud)localStorage.setItem(key(),JSON.stringify({items:data()}));window.scheduleCloudSave()}
+function status(){if(!sel||!sel.isConnected){sel=null;$('status').textContent='가구를 선택하세요.';return}let a=rect(sel),g=geom();$('status').innerHTML=`<b>${sel.dataset.n}</b><br>${a.w} × ${a.h} mm<br><span class="badge">좌 ${a.x}</span><span class="badge">우 ${Math.round(g.w-a.x-a.w)}</span><span class="badge">상 ${a.y}</span><span class="badge">하 ${Math.round(g.h-a.y-a.h)}</span><br>${sel.classList.contains('bad')?'<b style="color:#b8473f">⚠ 충돌/이탈</b>':'✓ 배치 가능'}`}
+function wipe(){[...room.querySelectorAll('.furn')].forEach(e=>e.remove());sel=null}function loadLocal(){wipe();let z=JSON.parse(localStorage.getItem(key())||'null');(z?.items||[]).forEach(a=>add(a.n,a.w,a.d,a.x,a.y,a.r));update()}
+function saveSlot(s){localStorage.setItem(key(s),JSON.stringify({geometry:geom(),items:data()}));alert(s+' 저장 완료')}function loadSlot(s){let z=JSON.parse(localStorage.getItem(key(s))||'null');if(!z)return alert('저장된 배치안이 없습니다.');if(z.geometry)setGeom(z.geometry);drawGeom();wipe();z.items.forEach(a=>add(a.n,a.w,a.d,a.x,a.y,a.r));update()}
+$('roomSel').onchange=e=>{rid=e.target.value;drawGeom();loadLocal();window.restartCloudRoom?.()};$('applyRoom').onclick=()=>{setGeom({...geom(),w:+$('rw').value||geom().w,h:+$('rh').value||geom().h});drawGeom();update()};$('applyOpen').onclick=()=>{setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom();update()};
+$('reset').onclick=()=>{if(confirm('기본 도면값으로 복원할까요?')){delete G[rid];localStorage.setItem('ttobok_geom_v3',JSON.stringify(G));drawGeom();update()}};$('rot').onclick=()=>{if(sel){sel.dataset.r=(+sel.dataset.r+90)%180;update()}};$('dup').onclick=()=>{if(sel)add(sel.dataset.n,+sel.dataset.w,+sel.dataset.d,+sel.dataset.x+100,+sel.dataset.y+100,+sel.dataset.r)};$('del').onclick=()=>{if(sel){let e=sel;sel=null;e.remove();update()}};$('clear').onclick=()=>{if(confirm('현재 방 가구를 모두 비울까요?')){wipe();update()}};$('addCustom').onclick=()=>{if(+$('nw').value&&+$('nd').value)add($('nn').value||'사용자 가구',+$('nw').value,+$('nd').value)};
+CAT.forEach(x=>{let e=document.createElement('div');e.className='item';e.innerHTML=`<div><b>${x[0]}</b><br><span>${x[1]} × ${x[2]} mm</span></div><button>＋ 추가</button>`;e.querySelector('button').onclick=()=>add(...x);$('catalog').appendChild(e)});window.addEventListener('resize',update);drawGeom();loadLocal();
 </script>
-<script>if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js');</script></body></html>
+<script src="firebase-config.js"></script><script type="module">
+const cfg=window.TTOBOK_FIREBASE_CONFIG,dot=$('dot'),txt=$('syncText');let auth,db,user,fid=localStorage.getItem('ttobok_family_id')||'',unsub,timer,M;
+window.scheduleCloudSave=()=>{if(cloud||!db||!user||!fid)return;clearTimeout(timer);timer=setTimeout(save,700)};window.restartCloudRoom=()=>{if(user&&fid)listen()};
+async function init(){try{const app=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js'),a=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js'),f=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js');M={a,f};let x=app.initializeApp(cfg);auth=a.getAuth(x);db=f.getFirestore(x);a.onAuthStateChanged(auth,u=>{user=u;if(u){dot.className='dot on';$('login').textContent='로그아웃';txt.textContent=fid?'공동 동기화':'가족 코드 설정';if(fid)listen()}else{dot.className='dot';$('login').textContent='Google 로그인';txt.textContent='로그인 필요'}})}catch(e){dot.className='dot err';txt.textContent='Firebase 연결 오류'}}
+$('login').onclick=async()=>user?M.a.signOut(auth):M.a.signInWithPopup(auth,new M.a.GoogleAuthProvider());$('family').onclick=()=>{let v=prompt('가족 코드',fid||'parks-family');if(v){fid=v.trim();localStorage.setItem('ttobok_family_id',fid);if(user)listen()}};
+async function save(){let f=M.f;await f.setDoc(f.doc(db,'families',fid,'rooms',rid),{geometry:geom(),items:data(),updatedAt:f.serverTimestamp(),updatedBy:user.displayName||user.email||user.uid},{merge:true})}
+function listen(){let f=M.f;if(unsub)unsub();let id=rid;unsub=f.onSnapshot(f.doc(db,'families',fid,'rooms',id),s=>{if(id!==rid||!s.exists())return;let z=s.data();cloud=true;if(z.geometry){setGeom(z.geometry);drawGeom()}wipe();(z.items||[]).forEach(a=>add(a.n||a.name,a.w,a.d,a.x,a.y,a.r??a.rot??0));cloud=false;update();txt.textContent='공동 동기화 · '+(z.updatedBy||'가족')},()=>{dot.className='dot err';txt.textContent='권한/동기화 오류'})}init();
+</script><script>if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js');</script></body></html>
