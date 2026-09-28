@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.2</title>
+<title>또복이 Family Room Planner V3.3</title>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#6d7d66">
 <style>
 :root{--bg:#f5f4f0;--card:#fff;--ink:#20231f;--muted:#73776f;--line:#d7d8d2;--accent:#6d7d66;--bad:#b8473f;--measure:#8b806f}
@@ -23,7 +23,7 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:7px;backgrou
 .badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}#status{font-size:12px;line-height:1.55}.shapeHint{margin-top:7px;padding:7px 8px;border-radius:8px;background:#f5f4f0;font-size:11px;color:var(--muted)}#polyText{width:100%;min-height:58px;margin-top:5px;font-size:11px}
 @media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:28px 34px 18px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:205px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:none}#room{width:430px}}
 </style></head><body>
-<header><h1>또복이 Family Room Planner <small>V3.2</small></h1><div id="summary" class="sub"></div>
+<header><h1>또복이 Family Room Planner <small>V3.3</small></h1><div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div></header>
 <div class="app"><aside>
 <div class="card"><h2>방 선택 · 도면 편집</h2>
@@ -34,8 +34,8 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:7px;backgrou
 <div class="row">창 시작 <input id="wp" type="number"> 폭 <input id="ww" type="number"><button id="applyOpen">적용</button></div></details>
 <div id="note" class="small" style="margin-top:6px"></div>
 <div id="shapeHint" class="shapeHint"></div>
-<details style="margin-top:8px"><summary>📐 벽체 형상 편집</summary>
-<div class="small">방 좌상단을 0,0으로 한 꼭짓점 좌표(mm)입니다. 시계방향으로 입력하세요. 예: 0,0 / 2700,0 / 2700,3590 / 0,3590</div>
+<details style="margin-top:8px"><summary>📐 내측 벽선 형상 편집</summary>
+<div class="small">가구가 닿는 내측 마감선만 사용합니다. 방 좌상단을 0,0으로 한 꼭짓점 좌표(mm)입니다. 시계방향으로 입력하세요. 예: 0,0 / 2700,0 / 2700,3590 / 0,3590</div>
 <textarea id="polyText"></textarea>
 <div class="row"><button id="applyPoly">벽체 형상 적용</button><button id="rectPoly">현재 가로·세로로 직사각형</button></div>
 </details>
@@ -48,7 +48,7 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:7px;backgrou
 <script>window.scheduleCloudSave=()=>{};</script>
 <script>
 const D={
-smallroom2:{name:'작은방 2 · 아기방',w:2700,h:3590,dp:1900,dw:800,wp:0,ww:2150,poly:[[0,0],[2700,0],[2700,3590],[0,3590]],note:'원본 평면도 기준: 2,700 × 3,590 mm, 하단 창호 2,150 mm. 작은방2 외곽은 도면상 직사각형으로 판독됩니다.'},
+smallroom2:{name:'작은방 2 · 아기방',w:2700,h:3590,dp:0,dw:900,wp:0,ww:2150,poly:[[0,0],[2700,0],[2700,3195],[2150,3195],[2150,3590],[0,3590]],note:'내측 마감선 기준: 폭 2,700 mm · 좌측 깊이 3,590 mm · 우측 직선 3,195 mm · 하단 유효구간 2,150 mm · 출입문 900 mm. 벽 두께/외측 2,840 mm는 배치영역 계산에서 제외합니다.'},
 smallroom1:{name:'작은방 1',w:2700,h:3195,dp:0,dw:800,wp:0,ww:2185,poly:[[0,0],[2700,0],[2700,3195],[0,3195]],note:'⚠ 도면 판독 기반 임시 외곽입니다. 문·창 및 세부 벽체는 실측 확인 후 꼭짓점 편집에서 수정해 주세요.'},
 master:{name:'안방',w:3820,h:3900,dp:3020,dw:800,wp:0,ww:2610,poly:[[0,0],[3820,0],[3820,3900],[0,3900]],note:'⚠ 원본에 붙박이장/요철이 보이는 공간입니다. 다각형 엔진은 적용했지만 불명확한 꼭짓점 치수는 임의로 확정하지 않았습니다.'},
 living:{name:'거실·주방',w:4680,h:6050,dp:0,dw:0,wp:0,ww:3155,poly:[[0,0],[4680,0],[4680,6050],[0,6050]],note:'⚠ 개방형·비정형 공간입니다. 다각형 엔진은 적용했으며 실제 경계 좌표는 도면/실측값 확인 후 수정해 주세요.'}
@@ -64,7 +64,7 @@ function insideShape(a,g){let p=normPoly(g),pts=[[a.x,a.y],[a.x+a.w,a.y],[a.x+a.
 function parsePoly(t){let p=t.split('/').map(v=>v.trim()).filter(Boolean).map(v=>v.split(',').map(Number));if(p.length<3||p.some(v=>v.length!==2||!Number.isFinite(v[0])||!Number.isFinite(v[1])))throw Error('꼭짓점 형식을 확인해주세요.');return p}
 function polyText(p){return p.map(v=>v[0]+','+v[1]).join(' / ')}
 function isRect(g){let p=normPoly(g);return p.length===4&&[[0,0],[g.w,0],[g.w,g.h],[0,g.h]].every(q=>p.some(v=>v[0]===q[0]&&v[1]===q[1]))}
-function drawShape(g){let p=normPoly(g);$('roomShape').setAttribute('viewBox',`0 0 ${g.w} ${g.h}`);$('wallPoly').setAttribute('points',p.map(v=>v.join(',')).join(' '));$('polyText').value=polyText(p);$('shapeHint').textContent=isRect(g)?'벽체 형상: 직사각형 · 다각형 충돌 엔진 사용 중':'벽체 형상: 비정형 다각형 · 들어간 벽/돌출부까지 가구 충돌 판정';let m=$('measures');m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`}
+function drawShape(g){let p=normPoly(g);$('roomShape').setAttribute('viewBox',`0 0 ${g.w} ${g.h}`);$('wallPoly').setAttribute('points',p.map(v=>v.join(',')).join(' '));$('polyText').value=polyText(p);$('shapeHint').textContent=isRect(g)?'내측 벽선: 직사각형 · 다각형 충돌 엔진 사용 중':'내측 벽선: 비정형 다각형 · 우하단 들어간 부분까지 가구 충돌 판정';let m=$('measures');m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`}
 function key(s='cur'){return `ttobok_v3_${rid}_${s}`}function sc(){return room.clientWidth/geom().w}function setZoom(v){zoom=Math.max(.45,Math.min(1.8,v));localStorage.setItem('ttobok_zoom_v31',zoom);room.style.width=(540*zoom)+'px';$('zoomVal').textContent=Math.round(zoom*100)+'%';update()}function fitZoom(){let stage=document.querySelector('.stage'),avail=Math.max(260,stage.clientWidth-100),z=Math.min(1.25,avail/540);setZoom(z)}
 function drawGeom(){let g=geom();room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';drawShape(g);$('zoomVal').textContent=Math.round(zoom*100)+'%';$('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp;$('dw').value=g.dw;$('wp').value=g.wp;$('ww').value=g.ww;$('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('note').textContent=g.note;
 for(let id of ['doorGap','doorLeaf','doorArc']){$(id).style.left=g.dp/g.w*100+'%';$(id).style.width=g.dw/g.w*100+'%'}$('doorLabel').style.left=g.dp/g.w*100+'%';$('doorLabel').textContent=g.dw?`문 ${g.dw} mm`:'';$('window').style.left=g.wp/g.w*100+'%';$('window').style.width=g.ww/g.w*100+'%';$('winLabel').style.left=g.wp/g.w*100+'%';$('winLabel').textContent=g.ww?`창호 ${g.ww} mm`:''}
