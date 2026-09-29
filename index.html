@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.15</title>
+<title>또복이 Family Room Planner V3.16</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -39,7 +39,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 </head>
 <body>
 <header>
-<h1>또복이 Family Room Planner <small>V3.15</small></h1>
+<h1>또복이 Family Room Planner <small>V3.16</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
 </header>
@@ -126,7 +126,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 const ROOM_DEFAULTS={
  smallroom2:{roomId:'smallroom2',name:'작은방 2 · 아기방',w:2700,h:3590,dp:0,dw:900,wp:0,ww:2150,trw:440,trd:310,brw:550,brd:85,shapeVersion:'small2-v37',note:'내측선 기준. 폭 2,700 · 좌측 3,590 · 우측 직선 3,195 · 하단 유효폭 2,150 · 상단 좌측 문 900 mm. 우측 상/하단 꺾임은 현재 도면 판독 초기값이며 실측 시 수정 가능합니다.'},
  smallroom1:{roomId:'smallroom1',name:'작은방 1',w:2700,h:3590,dp:0,dw:900,doorSide:'top',doorHinge:'left',wp:0,ww:2185,shapeVersion:'small1-v311',note:'가구 배치용 내측 기준: 폭 2,700 mm / 깊이 3,590 mm. 외곽 구조치수는 배치영역 치수와 분리해서 표시하지 않습니다. 상단은 문 900 + 벽/여유 510 + 붙박이장 전면 1,290. 에어드레서는 DF10A9500CG 실제 바닥점유 595(W) × 632(D) mm, 높이 1,960 mm로 반영합니다.'},
- master:{roomId:'master',name:'안방',w:3600,h:3900,dp:2010,dw:890,doorNominalW:1000,doorNominalH:2200,doorSide:'top',doorHinge:'right',wp:990,ww:2610,shapeVersion:'master-v314',note:'원본 도면 기준: 안방 내측 약 3,600 × 3,900 mm. 상단은 좌측 벽 2,010 mm 뒤에 문 개구 약 890 mm가 오며, 도어 표기는 1,000 × 2,200 mm입니다. 문은 우측 문틀에 힌지가 고정되고 그 지점에서 문짝이 아래쪽으로 내려오며 실내 방향으로 개폐합니다. 하단 2,610 mm 창호/개구와 좌측 붙박이장은 기존 위치를 유지합니다.'},
+ master:{roomId:'master',name:'안방',w:3600,h:3900,dp:2710,dw:890,doorNominalW:1000,doorNominalH:2200,doorSide:'top',doorHinge:'right',wp:990,ww:2610,shapeVersion:'master-v316',note:'안방 내측 약 3,600 × 3,900 mm. 문 개구 약 890 mm는 상단 우측 벽 끝에 붙여 표시합니다. 힌지는 우측 벽 상단에 고정하고 문짝은 그 지점에서 아래 방향으로 내려오며 실내로 개폐합니다. 도어 표기는 1,000 × 2,200 mm입니다. 좌측 붙박이장과 하단 2,610 mm 창호/개구는 유지합니다.'},
  living:{roomId:'living',name:'거실·주방',w:4680,h:6050,dp:0,dw:0,wp:0,ww:3155,shapeVersion:'living-v37',note:'⚠ 개방형 공간의 임시 배치 영역입니다. 실제 내측 경계 확인 후 수정합니다.'}
 };
 const FURNITURE_CATALOG=[
@@ -180,7 +180,7 @@ function normalizeGeom(roomId,input){
  let b=clone(ROOM_DEFAULTS[roomId]),g=input?clone(input):{};
  if(roomId!=='smallroom2'&&(g.trw!=null||g.brd!=null||String(g.shapeVersion||'').startsWith('small2')))g={};
  if(roomId==='smallroom1'&&String(g.shapeVersion||'')!=='small1-v311')g={};
- if(roomId==='master'&&String(g.shapeVersion||'')!=='master-v314')g={};
+ if(roomId==='master'&&String(g.shapeVersion||'')!=='master-v316')g={};
  let out={...b,...g,roomId,name:b.name};
  if(roomId==='smallroom2'){
    if(out.trw==null)out.trw=b.trw;if(out.trd==null)out.trd=b.trd;if(out.brw==null)out.brw=b.brw;if(out.brd==null)out.brd=b.brd;
@@ -188,7 +188,7 @@ function normalizeGeom(roomId,input){
  }else{
    if(roomId==='smallroom1'&&String(out.shapeVersion||'')!=='small1-v311'){out={...b,roomId,name:b.name,poly:defaultPoly(b)}}
    if(roomId==='master'){
-     out.w=3600;out.h=3900;out.dp=2010;out.dw=890;out.doorNominalW=1000;out.doorNominalH=2200;out.doorSide='top';out.doorHinge='right';out.wp=990;out.ww=2610;out.shapeVersion='master-v314';
+     out.w=3600;out.h=3900;out.dp=2710;out.dw=890;out.doorNominalW=1000;out.doorNominalH=2200;out.doorSide='top';out.doorHinge='right';out.wp=990;out.ww=2610;out.shapeVersion='master-v316';
    }
    if(!Array.isArray(out.poly)||out.poly.length<3)out.poly=defaultPoly(out);
  }
@@ -246,8 +246,7 @@ function drawShape(g){
   <line class="measureLine" x1="1410" y1="-110" x2="2700" y2="-110"/><text class="measureText" x="2055" y="-135" text-anchor="middle">붙박이장 1290</text>`;
  }
  if(rid==='master'){
-  m.innerHTML+=`<line class="measureLine" x1="0" y1="-135" x2="2010" y2="-135"/><text class="measureText" x="1005" y="-160" text-anchor="middle">상단 벽 2010</text>
-  <line class="measureLine" x1="2010" y1="-135" x2="2900" y2="-135"/><text class="measureText" x="2455" y="-160" text-anchor="middle">문 개구 890</text>
+  m.innerHTML+=`<line class="measureLine" x1="${g.w-890}" y1="-135" x2="${g.w}" y2="-135"/><text class="measureText" x="${g.w-445}" y="-160" text-anchor="middle">문 개구 890</text>
   <line class="measureLine" x1="990" y1="${g.h+115}" x2="${g.w}" y2="${g.h+115}"/><text class="measureText" x="${990+(g.w-990)/2}" y="${g.h+175}" text-anchor="middle">하단 개구 2610</text>`;
  }
 }
@@ -301,7 +300,12 @@ function drawOpenings(g){
    arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M ${R} 0 C ${R} ${k} ${k} ${R} 0 ${R}"/></svg>`;
    dot.style.cssText=`display:block;left:${hx}px;top:0`;
   }
-  $('doorLabel').style.cssText=`left:${dp*ss+4}px;top:8px`;$('doorLabel').textContent=doorText;
+  if(hinge==='right'){
+   $('doorLabel').style.cssText=`left:${(dp+dw)*ss-28}px;top:14px;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap`;
+  }else{
+   $('doorLabel').style.cssText=`left:${dp*ss+4}px;top:8px`;
+  }
+  $('doorLabel').textContent=doorText;
  }
  $('window').style.cssText=`left:${wp*ss}px;bottom:-5px;width:${ww*ss}px`;
  $('winLabel').style.cssText=`left:${wp*ss}px;bottom:8px`;$('winLabel').textContent=ww?`창호 ${ww} mm`:'';
@@ -309,7 +313,7 @@ function drawOpenings(g){
 }
 function drawGeom(){
  let g=geom();room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';$('zoomVal').textContent=Math.round(zoom*100)+'%';
- $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 내측 2700×3590 · 문900 + 벽510 + 붙박이장1290 · 에어드레서는 가전 목록':rid==='smallroom2'?'작은방2: 원본 도면 + 사용자 확인값':rid==='master'?'안방: 내측 3600×3900 · 상단벽2010 + 문개구890 · 우측힌지 · 도어1000×2200':'도면 판독 임시값';
+ $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 내측 2700×3590 · 문900 + 벽510 + 붙박이장1290 · 에어드레서는 가전 목록':rid==='smallroom2'?'작은방2: 원본 도면 + 사용자 확인값':rid==='master'?'안방: 내측 3600×3900 · 문개구890은 우측벽 끝 · 우측힌지 · 문짝 아래방향 · 도어1000×2200':'도면 판독 임시값';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
  $('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
  if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;$('rightClearInfo').textContent=`우측 직선 ${(g.h-g.trd-g.brd).toLocaleString()} mm (도면 3,195)`;}
