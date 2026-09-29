@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.14</title>
+<title>또복이 Family Room Planner V3.15</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -26,7 +26,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 .wallPoly{fill:#fbfaf7;stroke:#424640;stroke-width:5;vector-effect:non-scaling-stroke}
 .measureLine{stroke:var(--measure);stroke-width:1;stroke-dasharray:6 5;vector-effect:non-scaling-stroke}.measureText{fill:var(--measure);font-size:48px}
 .window{position:absolute;height:8px;background:#9cc7d4;border-top:2px solid #fff}.doorGap{position:absolute;height:10px;background:#fbfaf7}
-.doorLeaf{position:absolute;height:2px;background:#8f806e;transform-origin:left top}.doorArc{position:absolute;aspect-ratio:1;border-right:1px dashed #b5a997;border-bottom:1px dashed #b5a997;border-radius:0 0 100% 0}
+.doorLeaf{position:absolute;height:2px;background:#8f806e;transform-origin:left top}.doorArc{position:absolute;overflow:visible;pointer-events:none}.doorArc svg{display:block;overflow:visible}.doorArc path{fill:none;stroke:#b5a997;stroke-width:1;stroke-dasharray:4 3}.doorHingeDot{position:absolute;width:6px;height:6px;border-radius:50%;background:#8f806e;transform:translate(-3px,-3px);pointer-events:none;z-index:4}
 .label{position:absolute;font-size:10px;pointer-events:none}.winLabel{color:#57818d}.doorLabel{color:#8f806e}
 .furn{position:absolute;border:2px solid #697867;background:#dce6d8cc;border-radius:5px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:700;user-select:none;touch-action:none;padding:3px;overflow:hidden}
 .furn.sel{outline:3px solid #899c82;z-index:5}.furn.bad{border-color:var(--bad);background:#f0c7c4cc}.fixedObs{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:10px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.fixedObs small{display:block;font-weight:400}.edgeFixture{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:10px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.edgeFixture small{display:block;font-weight:400}
@@ -39,7 +39,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 </head>
 <body>
 <header>
-<h1>또복이 Family Room Planner <small>V3.14</small></h1>
+<h1>또복이 Family Room Planner <small>V3.15</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
 </header>
@@ -111,7 +111,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 <div id="room">
 <svg id="roomShape" class="roomShape" viewBox="0 0 2700 3590" preserveAspectRatio="none"><polygon id="wallPoly" class="wallPoly"></polygon><g id="measures"></g></svg>
 <div id="window" class="window"></div><div id="winLabel" class="label winLabel"></div>
-<div id="doorGap" class="doorGap"></div><div id="doorLeaf" class="doorLeaf"></div><div id="doorArc" class="doorArc"></div><div id="doorLabel" class="label doorLabel"></div><div id="edgeLayer"></div><div id="fixedLayer"></div>
+<div id="doorGap" class="doorGap"></div><div id="doorLeaf" class="doorLeaf"></div><div id="doorArc" class="doorArc"></div><div id="doorHingeDot" class="doorHingeDot"></div><div id="doorLabel" class="label doorLabel"></div><div id="edgeLayer"></div><div id="fixedLayer"></div>
 </div>
 <div class="toolbar">
 <button id="zoomOut">－ 축소</button><span id="zoomVal" class="zoomVal">100%</span><button id="zoomIn">＋ 확대</button><button id="fit">화면 기준</button>
@@ -126,7 +126,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 const ROOM_DEFAULTS={
  smallroom2:{roomId:'smallroom2',name:'작은방 2 · 아기방',w:2700,h:3590,dp:0,dw:900,wp:0,ww:2150,trw:440,trd:310,brw:550,brd:85,shapeVersion:'small2-v37',note:'내측선 기준. 폭 2,700 · 좌측 3,590 · 우측 직선 3,195 · 하단 유효폭 2,150 · 상단 좌측 문 900 mm. 우측 상/하단 꺾임은 현재 도면 판독 초기값이며 실측 시 수정 가능합니다.'},
  smallroom1:{roomId:'smallroom1',name:'작은방 1',w:2700,h:3590,dp:0,dw:900,doorSide:'top',doorHinge:'left',wp:0,ww:2185,shapeVersion:'small1-v311',note:'가구 배치용 내측 기준: 폭 2,700 mm / 깊이 3,590 mm. 외곽 구조치수는 배치영역 치수와 분리해서 표시하지 않습니다. 상단은 문 900 + 벽/여유 510 + 붙박이장 전면 1,290. 에어드레서는 DF10A9500CG 실제 바닥점유 595(W) × 632(D) mm, 높이 1,960 mm로 반영합니다.'},
- master:{roomId:'master',name:'안방',w:3600,h:3900,dp:2010,dw:890,doorNominalW:1000,doorNominalH:2200,doorSide:'top',doorHinge:'right',wp:990,ww:2610,shapeVersion:'master-v314',note:'원본 도면 기준: 안방 내측 약 3,600 × 3,900 mm. 상단은 좌측 벽 2,010 mm 뒤에 문 개구 약 890 mm가 오며, 도어 표기는 1,000 × 2,200 mm입니다. 문은 우측 힌지로 실내 방향 개폐합니다. 하단 2,610 mm 창호/개구와 좌측 붙박이장은 기존 위치를 유지합니다.'},
+ master:{roomId:'master',name:'안방',w:3600,h:3900,dp:2010,dw:890,doorNominalW:1000,doorNominalH:2200,doorSide:'top',doorHinge:'right',wp:990,ww:2610,shapeVersion:'master-v314',note:'원본 도면 기준: 안방 내측 약 3,600 × 3,900 mm. 상단은 좌측 벽 2,010 mm 뒤에 문 개구 약 890 mm가 오며, 도어 표기는 1,000 × 2,200 mm입니다. 문은 우측 문틀에 힌지가 고정되고 그 지점에서 문짝이 아래쪽으로 내려오며 실내 방향으로 개폐합니다. 하단 2,610 mm 창호/개구와 좌측 붙박이장은 기존 위치를 유지합니다.'},
  living:{roomId:'living',name:'거실·주방',w:4680,h:6050,dp:0,dw:0,wp:0,ww:3155,shapeVersion:'living-v37',note:'⚠ 개방형 공간의 임시 배치 영역입니다. 실제 내측 경계 확인 후 수정합니다.'}
 };
 const FURNITURE_CATALOG=[
@@ -271,23 +271,37 @@ function drawOpenings(g){
  let ss=scale(),dp=+g.dp||0,dw=+g.dw||0,wp=+g.wp||0,ww=+g.ww||0,side=g.doorSide||'top',hinge=g.doorHinge||'left';
  let nominalW=+g.doorNominalW||dw,nominalH=+g.doorNominalH||0;
  let doorText=dw?(nominalH?`문 ${nominalW}×${nominalH} mm${nominalW!==dw?` · 개구 ${dw} mm`:''}`:`문 ${nominalW} mm`):'';
+ let arc=$('doorArc'),dot=$('doorHingeDot');arc.innerHTML='';dot.style.display=dw?'block':'none';
+
  if(side==='left'){
   $('doorGap').style.cssText=`left:-5px;top:${dp*ss}px;width:10px;height:${dw*ss}px`;
+  // 좌측 벽 문: 위쪽 힌지에서 오른쪽으로 열리는 기존 방식 유지
   $('doorLeaf').style.cssText=`left:0;top:${dp*ss}px;width:${dw*ss}px;height:2px;transform-origin:left top;transform:rotate(0deg)`;
-  $('doorArc').style.cssText=`left:0;top:${dp*ss}px;width:${dw*ss}px;transform:rotate(0deg)`;
+  arc.style.cssText=`left:0;top:${dp*ss}px;width:${dw*ss}px;height:${dw*ss}px`;
+  let R=dw*ss,k=.55228475*R;
+  arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C ${k} 0 ${R} ${R-k} ${R} ${R}"/></svg>`;
+  dot.style.cssText=`display:block;left:0;top:${dp*ss}px`;
   $('doorLabel').style.cssText=`left:8px;top:${dp*ss+4}px`;$('doorLabel').textContent=doorText;
  }else{
   $('doorGap').style.cssText=`left:${dp*ss}px;top:-5px;width:${dw*ss}px;height:10px`;
+  let R=dw*ss,k=.55228475*R;
+  arc.style.cssText=`left:${dp*ss}px;top:0;width:${R}px;height:${R}px`;
+
   if(hinge==='right'){
-   $('doorLeaf').style.cssText=`left:${dp*ss}px;top:0;width:${dw*ss}px;height:2px;transform-origin:right top;transform:rotate(-90deg)`;
-   $('doorArc').style.cssText=`left:${dp*ss}px;top:0;width:${dw*ss}px;transform:scaleX(-1)`;
-   $('doorLabel').style.cssText=`left:${dp*ss+4}px;top:8px`;
+   // 핵심: 오른쪽 문틀(dp+dw)에 힌지를 고정하고 문짝이 정확히 아래로 내려오게 한다.
+   let hx=(dp+dw)*ss;
+   $('doorLeaf').style.cssText=`left:${hx}px;top:0;width:${R}px;height:2px;transform-origin:left top;transform:rotate(90deg)`;
+   // 닫힌 자유단(왼쪽 상단) -> 열린 자유단(오른쪽 아래) 궤적
+   arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C 0 ${k} ${R-k} ${R} ${R} ${R}"/></svg>`;
+   dot.style.cssText=`display:block;left:${hx}px;top:0`;
   }else{
-   $('doorLeaf').style.cssText=`left:${dp*ss}px;top:0;width:${dw*ss}px;height:2px;transform-origin:left top;transform:rotate(90deg)`;
-   $('doorArc').style.cssText=`left:${dp*ss}px;top:0;width:${dw*ss}px;transform:none`;
-   $('doorLabel').style.cssText=`left:${dp*ss+4}px;top:8px`;
+   // 왼쪽 문틀(dp)에 힌지, 아래로 개방
+   let hx=dp*ss;
+   $('doorLeaf').style.cssText=`left:${hx}px;top:0;width:${R}px;height:2px;transform-origin:left top;transform:rotate(90deg)`;
+   arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M ${R} 0 C ${R} ${k} ${k} ${R} 0 ${R}"/></svg>`;
+   dot.style.cssText=`display:block;left:${hx}px;top:0`;
   }
-  $('doorLabel').textContent=doorText;
+  $('doorLabel').style.cssText=`left:${dp*ss+4}px;top:8px`;$('doorLabel').textContent=doorText;
  }
  $('window').style.cssText=`left:${wp*ss}px;bottom:-5px;width:${ww*ss}px`;
  $('winLabel').style.cssText=`left:${wp*ss}px;bottom:8px`;$('winLabel').textContent=ww?`창호 ${ww} mm`:'';
