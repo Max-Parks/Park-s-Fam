@@ -1,7 +1,7 @@
 <!doctype html>
 <html lang="ko"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.4</title>
+<title>또복이 Family Room Planner V3.5</title>
 <link rel="manifest" href="manifest.webmanifest"><meta name="theme-color" content="#6d7d66">
 <style>
 :root{--bg:#f5f4f0;--card:#fff;--ink:#20231f;--muted:#73776f;--line:#d7d8d2;--accent:#6d7d66;--bad:#b8473f;--measure:#8b806f}
@@ -23,7 +23,7 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:7px;backgrou
 .badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}#status{font-size:12px;line-height:1.55}.shapeHint{margin-top:7px;padding:7px 8px;border-radius:8px;background:#f5f4f0;font-size:11px;color:var(--muted)}#polyText{width:100%;min-height:58px;margin-top:5px;font-size:11px}
 @media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:28px 34px 18px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:205px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:none}#room{width:430px}}
 </style></head><body>
-<header><h1>또복이 Family Room Planner <small>V3.4</small></h1><div id="summary" class="sub"></div>
+<header><h1>또복이 Family Room Planner <small>V3.5</small></h1><div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div></header>
 <div class="app"><aside>
 <div class="card"><h2>방 선택 · 도면 편집</h2>
@@ -34,6 +34,12 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:7px;backgrou
 <div class="row">창 시작 <input id="wp" type="number"> 폭 <input id="ww" type="number"><button id="applyOpen">적용</button></div></details>
 <div id="note" class="small" style="margin-top:6px"></div>
 <div id="shapeHint" class="shapeHint"></div>
+<details id="small2RecessEditor" style="margin-top:8px"><summary>↳ 작은방2 우측 꺾임 치수</summary>
+<div class="small" style="margin:5px 0">가구가 닿는 내측선 기준(mm)입니다.</div>
+<div class="row">우상단 가로 <input id="trw" type="number"> 깊이 <input id="trd" type="number"></div>
+<div class="row" style="margin-top:5px">우하단 가로 <input id="brw" type="number"> 깊이 <input id="brd" type="number"></div>
+<div class="row" style="margin-top:5px"><button id="applyRecess">꺾임 적용</button><span id="rightClearInfo" class="small"></span></div>
+</details>
 <details style="margin-top:8px"><summary>📐 내측 벽선 형상 편집 · 작은방2 문은 상단 좌측</summary>
 <div class="small">가구가 닿는 내측 마감선만 사용합니다. 방 좌상단을 0,0으로 한 꼭짓점 좌표(mm)입니다. 시계방향으로 입력하세요. 예: 0,0 / 2700,0 / 2700,3590 / 0,3590</div>
 <textarea id="polyText"></textarea>
@@ -48,15 +54,17 @@ input,select{border:1px solid var(--line);border-radius:8px;padding:7px;backgrou
 <script>window.scheduleCloudSave=()=>{};</script>
 <script>
 const D={
-smallroom2:{name:'작은방 2 · 아기방',w:2700,h:3590,dp:0,dw:900,doorSide:'top',doorHinge:'left',wp:0,ww:2150,poly:[[0,0],[2700,0],[2700,3195],[2150,3195],[2150,3590],[0,3590]],note:'내측 마감선 기준: 폭 2,700 mm · 좌측 깊이 3,590 mm · 우측 직선 3,195 mm · 하단 유효구간 2,150 mm · 출입문 900 mm는 상단 왼쪽 벽에 붙음. 외측/벽 두께는 배치 계산에서 제외.'},
+smallroom2:{name:'작은방 2 · 아기방',w:2700,h:3590,dp:0,dw:900,doorSide:'top',doorHinge:'left',wp:0,ww:2150,trw:440,trd:310,brw:550,brd:85,rightClear:3195,shapeVersion:'small2-v35',poly:[[0,0],[2260,0],[2260,310],[2700,310],[2700,3505],[2150,3505],[2150,3590],[0,3590]],note:'내측선 기준. 확정 표기: 폭 2,700 · 좌측 3,590 · 우측 직선 3,195 · 하단 유효폭 2,150 · 문 900 mm(상단 좌측). 우상단 내측 꺾임은 도면 구조 580×450 및 벽체 70+70을 내측선으로 환산한 440×310 mm, 우하단은 폭 550 mm / 깊이 85 mm(3,590−310−3,195) 초기값입니다. 실측 시 수정 가능합니다.'},
 smallroom1:{name:'작은방 1',w:2700,h:3195,dp:0,dw:800,wp:0,ww:2185,poly:[[0,0],[2700,0],[2700,3195],[0,3195]],note:'⚠ 도면 판독 기반 임시 외곽입니다. 문·창 및 세부 벽체는 실측 확인 후 꼭짓점 편집에서 수정해 주세요.'},
 master:{name:'안방',w:3820,h:3900,dp:3020,dw:800,wp:0,ww:2610,poly:[[0,0],[3820,0],[3820,3900],[0,3900]],note:'⚠ 원본에 붙박이장/요철이 보이는 공간입니다. 다각형 엔진은 적용했지만 불명확한 꼭짓점 치수는 임의로 확정하지 않았습니다.'},
 living:{name:'거실·주방',w:4680,h:6050,dp:0,dw:0,wp:0,ww:3155,poly:[[0,0],[4680,0],[4680,6050],[0,6050]],note:'⚠ 개방형·비정형 공간입니다. 다각형 엔진은 적용했으며 실제 경계 좌표는 도면/실측값 확인 후 수정해 주세요.'}
 };
 const CAT=[['일룸 쿠시노 범퍼형 SS',1114,2065],['한샘 샘키즈 수납장 1305',1277,335],['한샘 샘키즈 책장 1305',1277,335],['한샘 샘키즈 키큰옷장 서랍형 800',800,620],['기저귀갈이대',850,550],['수유의자',800,800]];
 const $=x=>document.getElementById(x),room=$('room');let rid='smallroom2',sel=null,seq=1,cloud=false,zoom=+(localStorage.getItem('ttobok_zoom_v31')||1),G=JSON.parse(localStorage.getItem('ttobok_geom_v3')||'{}');
-function geom(){let g=G[rid]||structuredClone(D[rid]);if(!g.poly||g.poly.length<3)g.poly=[[0,0],[g.w,0],[g.w,g.h],[0,g.h]];return g}
-function setGeom(x){if(!x.poly||x.poly.length<3)x.poly=[[0,0],[x.w,0],[x.w,x.h],[0,x.h]];G[rid]=x;localStorage.setItem('ttobok_geom_v3',JSON.stringify(G))}
+function small2Poly(g){let trw=Math.max(0,Math.min(g.w-1,+g.trw||0)),trd=Math.max(0,Math.min(g.h-1,+g.trd||0)),brw=Math.max(0,Math.min(g.w-1,+g.brw||0)),brd=Math.max(0,Math.min(g.h-trd-1,+g.brd||0));return [[0,0],[g.w-trw,0],[g.w-trw,trd],[g.w,trd],[g.w,g.h-brd],[g.w-brw,g.h-brd],[g.w-brw,g.h],[0,g.h]]}
+function normalizeGeom(g,id=rid){g=structuredClone(g);if(id==='smallroom2'){if(g.shapeVersion!=='small2-v35'){g.trw=440;g.trd=310;g.brw=550;g.brd=85;g.rightClear=3195;g.dp=0;g.dw=900;g.wp=0;g.ww=2150;g.shapeVersion='small2-v35'}g.poly=small2Poly(g)}else if(!g.poly||g.poly.length<3)g.poly=[[0,0],[g.w,0],[g.w,g.h],[0,g.h]];return g}
+function geom(){return normalizeGeom(G[rid]||D[rid],rid)}
+function setGeom(x){x=normalizeGeom(x,rid);G[rid]=x;localStorage.setItem('ttobok_geom_v3',JSON.stringify(G))}
 function normPoly(g){return (g.poly&&g.poly.length>=3)?g.poly:[[0,0],[g.w,0],[g.w,g.h],[0,g.h]]}
 function onSeg(x,y,a,b){let cross=(x-a[0])*(b[1]-a[1])-(y-a[1])*(b[0]-a[0]);if(Math.abs(cross)>.01)return false;return x>=Math.min(a[0],b[0])-.01&&x<=Math.max(a[0],b[0])+.01&&y>=Math.min(a[1],b[1])-.01&&y<=Math.max(a[1],b[1])+.01}
 function pointInPoly(x,y,p){for(let i=0;i<p.length;i++)if(onSeg(x,y,p[i],p[(i+1)%p.length]))return true;let inside=false;for(let i=0,j=p.length-1;i<p.length;j=i++){let xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];let hit=((yi>y)!=(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi);if(hit)inside=!inside}return inside}
@@ -64,9 +72,21 @@ function insideShape(a,g){let p=normPoly(g),pts=[[a.x,a.y],[a.x+a.w,a.y],[a.x+a.
 function parsePoly(t){let p=t.split('/').map(v=>v.trim()).filter(Boolean).map(v=>v.split(',').map(Number));if(p.length<3||p.some(v=>v.length!==2||!Number.isFinite(v[0])||!Number.isFinite(v[1])))throw Error('꼭짓점 형식을 확인해주세요.');return p}
 function polyText(p){return p.map(v=>v[0]+','+v[1]).join(' / ')}
 function isRect(g){let p=normPoly(g);return p.length===4&&[[0,0],[g.w,0],[g.w,g.h],[0,g.h]].every(q=>p.some(v=>v[0]===q[0]&&v[1]===q[1]))}
-function drawShape(g){let p=normPoly(g);$('roomShape').setAttribute('viewBox',`0 0 ${g.w} ${g.h}`);$('wallPoly').setAttribute('points',p.map(v=>v.join(',')).join(' '));$('polyText').value=polyText(p);$('shapeHint').textContent=isRect(g)?'내측 벽선: 직사각형 · 다각형 충돌 엔진 사용 중':'내측 벽선: 비정형 다각형 · 우하단 들어간 부분까지 가구 충돌 판정';let m=$('measures');m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`;if(rid==='smallroom2')m.innerHTML+=`<line class="measureLine" x1="2150" y1="3130" x2="2700" y2="3130"/><text class="measureText" x="2425" y="3070" text-anchor="middle">550 mm</text><line class="measureLine" x1="2080" y1="3195" x2="2080" y2="3590"/><text class="measureText" x="2020" y="3392" text-anchor="middle" transform="rotate(-90 2020 3392)">395 mm</text>`}
-function key(s='cur'){return `ttobok_v3_${rid}_${s}`}function sc(){return room.clientWidth/geom().w}function setZoom(v){zoom=Math.max(.45,Math.min(1.8,v));localStorage.setItem('ttobok_zoom_v31',zoom);room.style.width=(540*zoom)+'px';$('zoomVal').textContent=Math.round(zoom*100)+'%';update()}function fitZoom(){let stage=document.querySelector('.stage'),avail=Math.max(260,stage.clientWidth-100),z=Math.min(1.25,avail/540);setZoom(z)}
+function drawShape(g){
+ let p=normPoly(g);$('roomShape').setAttribute('viewBox',`0 0 ${g.w} ${g.h}`);$('wallPoly').setAttribute('points',p.map(v=>v.join(',')).join(' '));$('polyText').value=polyText(p);
+ $('shapeHint').textContent=isRect(g)?'내측 벽선: 직사각형 · 다각형 충돌 엔진 사용 중':'내측 벽선: 비정형 다각형 · 우측 상단/하단 꺾임까지 충돌 판정';
+ let m=$('measures');m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`;
+ if(rid==='smallroom2'){
+   let tx=g.w-g.trw,by=g.h-g.brd;
+   m.innerHTML+=`<line class="measureLine" x1="${tx}" y1="${g.trd+45}" x2="${g.w}" y2="${g.trd+45}"/><text class="measureText" x="${tx+g.trw/2}" y="${g.trd+105}" text-anchor="middle">${g.trw} mm</text>
+   <line class="measureLine" x1="${tx-45}" y1="0" x2="${tx-45}" y2="${g.trd}"/><text class="measureText" x="${tx-95}" y="${g.trd/2}" text-anchor="middle" transform="rotate(-90 ${tx-95} ${g.trd/2})">${g.trd} mm</text>
+   <line class="measureLine" x1="${g.w-g.brw}" y1="${by-45}" x2="${g.w}" y2="${by-45}"/><text class="measureText" x="${g.w-g.brw/2}" y="${by-95}" text-anchor="middle">${g.brw} mm</text>
+   <line class="measureLine" x1="${g.w-g.brw-45}" y1="${by}" x2="${g.w-g.brw-45}" y2="${g.h}"/><text class="measureText" x="${g.w-g.brw-95}" y="${by+g.brd/2}" text-anchor="middle" transform="rotate(-90 ${g.w-g.brw-95} ${by+g.brd/2})">${g.brd} mm</text>`;
+ }
+}
 function drawGeom(){let g=geom();room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';drawShape(g);$('zoomVal').textContent=Math.round(zoom*100)+'%';$('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp;$('dw').value=g.dw;$('wp').value=g.wp;$('ww').value=g.ww;$('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('note').textContent=g.note;
+$('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
+if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;let clear=g.h-g.trd-g.brd;$('rightClearInfo').textContent=`우측 직선 ${clear.toLocaleString()} mm (도면 3,195)`;}
 for(let id of ['doorGap','doorLeaf','doorArc']){$(id).style.left=g.dp/g.w*100+'%';$(id).style.width=g.dw/g.w*100+'%'}$('doorLabel').style.left=g.dp/g.w*100+'%';$('doorLabel').textContent=g.dw?`문 ${g.dw} mm`:'';$('window').style.left=g.wp/g.w*100+'%';$('window').style.width=g.ww/g.w*100+'%';$('winLabel').style.left=g.wp/g.w*100+'%';$('winLabel').textContent=g.ww?`창호 ${g.ww} mm`:''}
 function dims(e){return +e.dataset.r%180?{w:+e.dataset.d,h:+e.dataset.w}:{w:+e.dataset.w,h:+e.dataset.d}}function rect(e){let q=dims(e);return{x:+e.dataset.x,y:+e.dataset.y,w:q.w,h:q.h}}function ov(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function add(n,w,d,x=100,y=120,r=0){let e=document.createElement('div');e.className='furn';Object.assign(e.dataset,{n,w,d,x,y,r,id:seq++});e.textContent=n;room.appendChild(e);bind(e);select(e);update()}
@@ -77,8 +97,9 @@ function update(){let g=geom(),fs=[...room.querySelectorAll('.furn')],s=sc();fs.
 function status(){if(!sel||!sel.isConnected){sel=null;$('status').textContent='가구를 선택하세요.';return}let a=rect(sel),g=geom();$('status').innerHTML=`<b>${sel.dataset.n}</b><br>${a.w} × ${a.h} mm<br><span class="badge">좌 ${a.x}</span><span class="badge">우 ${Math.round(g.w-a.x-a.w)}</span><span class="badge">상 ${a.y}</span><span class="badge">하 ${Math.round(g.h-a.y-a.h)}</span><br>${sel.classList.contains('bad')?'<b style="color:#b8473f">⚠ 벽체/가구 충돌 또는 영역 이탈</b>':'✓ 방 벽체 내부 배치 가능'}`}
 function wipe(){[...room.querySelectorAll('.furn')].forEach(e=>e.remove());sel=null}function loadLocal(){wipe();let z=JSON.parse(localStorage.getItem(key())||'null');(z?.items||[]).forEach(a=>add(a.n,a.w,a.d,a.x,a.y,a.r));update()}
 function saveSlot(s){localStorage.setItem(key(s),JSON.stringify({geometry:geom(),items:data()}));alert(s+' 저장 완료')}function loadSlot(s){let z=JSON.parse(localStorage.getItem(key(s))||'null');if(!z)return alert('저장된 배치안이 없습니다.');if(z.geometry)setGeom(z.geometry);drawGeom();wipe();z.items.forEach(a=>add(a.n,a.w,a.d,a.x,a.y,a.r));update()}
-$('zoomOut').onclick=()=>setZoom(zoom-.1);$('zoomIn').onclick=()=>setZoom(zoom+.1);$('fit').onclick=fitZoom;$('roomSel').onchange=e=>{rid=e.target.value;drawGeom();loadLocal();window.restartCloudRoom?.()};$('applyRoom').onclick=()=>{let g=geom(),nw=+$('rw').value||g.w,nh=+$('rh').value||g.h,p=normPoly(g).map(v=>[Math.round(v[0]*nw/g.w),Math.round(v[1]*nh/g.h)]);setGeom({...g,w:nw,h:nh,poly:p});drawGeom();update()};
-$('applyPoly').onclick=()=>{try{let g=geom(),p=parsePoly($('polyText').value);if(p.some(v=>v[0]<0||v[1]<0||v[0]>g.w||v[1]>g.h))return alert('꼭짓점은 현재 방 가로·세로 범위 안에 있어야 합니다.');setGeom({...g,poly:p});drawGeom();update()}catch(e){alert(e.message)}};
+$('zoomOut').onclick=()=>setZoom(zoom-.1);$('zoomIn').onclick=()=>setZoom(zoom+.1);$('fit').onclick=fitZoom;$('roomSel').onchange=e=>{rid=e.target.value;drawGeom();loadLocal();window.restartCloudRoom?.()};$('applyRoom').onclick=()=>{let g=geom(),nw=+$('rw').value||g.w,nh=+$('rh').value||g.h;if(rid==='smallroom2')setGeom({...g,w:nw,h:nh});else{let p=normPoly(g).map(v=>[Math.round(v[0]*nw/g.w),Math.round(v[1]*nh/g.h)]);setGeom({...g,w:nw,h:nh,poly:p})}drawGeom();update()};
+$('applyRecess').onclick=()=>{if(rid!=='smallroom2')return;let g=geom(),trw=+$('trw').value,trd=+$('trd').value,brw=+$('brw').value,brd=+$('brd').value;if([trw,trd,brw,brd].some(v=>!Number.isFinite(v)||v<0))return alert('꺾임 치수를 확인해주세요.');if(trw>=g.w||brw>=g.w||trd+brd>=g.h)return alert('꺾임 치수가 방 크기보다 큽니다.');setGeom({...g,trw,trd,brw,brd,rightClear:g.h-trd-brd,shapeVersion:'small2-v35'});drawGeom();update()};
+$('applyPoly').onclick=()=>{if(rid==='smallroom2')return alert('작은방2는 위의 우측 꺾임 치수 입력으로 수정해주세요.');try{let g=geom(),p=parsePoly($('polyText').value);if(p.some(v=>v[0]<0||v[1]<0||v[0]>g.w||v[1]>g.h))return alert('꼭짓점은 현재 방 가로·세로 범위 안에 있어야 합니다.');setGeom({...g,poly:p});drawGeom();update()}catch(e){alert(e.message)}};
 $('rectPoly').onclick=()=>{let g=geom();setGeom({...g,poly:[[0,0],[g.w,0],[g.w,g.h],[0,g.h]]});drawGeom();update()};$('applyOpen').onclick=()=>{setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom();update()};
 $('reset').onclick=()=>{if(confirm('기본 도면값으로 복원할까요?')){delete G[rid];localStorage.setItem('ttobok_geom_v3',JSON.stringify(G));drawGeom();update()}};$('rot').onclick=()=>{if(sel){sel.dataset.r=(+sel.dataset.r+90)%180;update()}};$('dup').onclick=()=>{if(sel)add(sel.dataset.n,+sel.dataset.w,+sel.dataset.d,+sel.dataset.x+100,+sel.dataset.y+100,+sel.dataset.r)};$('del').onclick=()=>{if(sel){let e=sel;sel=null;e.remove();update()}};$('clear').onclick=()=>{if(confirm('현재 방 가구를 모두 비울까요?')){wipe();update()}};$('addCustom').onclick=()=>{if(+$('nw').value&&+$('nd').value)add($('nn').value||'사용자 가구',+$('nw').value,+$('nd').value)};
 CAT.forEach(x=>{let e=document.createElement('div');e.className='item';e.innerHTML=`<div><b>${x[0]}</b><br><span>${x[1]} × ${x[2]} mm</span></div><button>＋ 추가</button>`;e.querySelector('button').onclick=()=>add(...x);$('catalog').appendChild(e)});window.addEventListener('resize',update);drawGeom();loadLocal();
