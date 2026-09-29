@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.18</title>
+<title>또복이 Family Room Planner V3.19</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -48,7 +48,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 </head>
 <body>
 <header>
-<h1>또복이 Family Room Planner <small>V3.18</small></h1>
+<h1>또복이 Family Room Planner <small>V3.19</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
 </header>
@@ -69,6 +69,60 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 <div class="row">문 시작 <input id="dp" type="number"> 폭 <input id="dw" type="number"></div>
 <div class="row" style="margin-top:5px">창 시작 <input id="wp" type="number"> 폭 <input id="ww" type="number"><button id="applyOpen">적용</button></div>
 </details>
+
+<details id="masterMeasureEditor" style="margin-top:8px">
+<summary>📏 안방 실측 도면 수정 모드</summary>
+<div class="small" style="margin:6px 0">
+실측값을 mm로 입력하면 외곽·구역·문·열린 통로·붙박이장·베란다 개구와 충돌 판정이 함께 갱신됩니다.
+</div>
+
+<div class="shapeHint"><b>전체 / 세로 구역</b></div>
+<div class="row" style="margin-top:5px">
+전체 폭 <input id="msW" type="number">
+상부 깊이 <input id="msTopH" type="number">
+</div>
+<div class="row" style="margin-top:5px">
+안방 깊이 <input id="msBedH" type="number">
+베란다 깊이 <input id="msBalH" type="number">
+</div>
+
+<div class="shapeHint"><b>상부 공간</b></div>
+<div class="row" style="margin-top:5px">
+드레스룸 폭 <input id="msDressW" type="number">
+화장대 폭 <input id="msVanityW" type="number">
+</div>
+<div id="msPowderInfo" class="small" style="margin-top:4px"></div>
+
+<div class="shapeHint"><b>안방 ↔ 드레스룸/파우더룸</b></div>
+<div class="row" style="margin-top:5px">
+문없는 통로 시작 <input id="msPassX" type="number">
+폭 <input id="msPassW" type="number">
+</div>
+<div class="row" style="margin-top:5px">
+출입문 시작 <input id="msDoorX" type="number">
+개구 폭 <input id="msDoorW" type="number">
+</div>
+<div id="msOverlapInfo" class="small" style="margin-top:4px"></div>
+
+<div class="shapeHint"><b>붙박이장 / 베란다</b></div>
+<div class="row" style="margin-top:5px">
+붙박이장 깊이 <input id="msClosetW" type="number">
+길이 <input id="msClosetH" type="number">
+</div>
+<div class="row" style="margin-top:5px">
+베란다 개구 시작 <input id="msBalX" type="number">
+폭 <input id="msBalW" type="number">
+</div>
+
+<div class="row" style="margin-top:8px">
+<button id="applyMasterMeasure" class="primary">실측값 적용</button>
+<button id="resetMasterMeasure">안방 실측값 초기화</button>
+</div>
+<div class="small" style="margin-top:6px">
+※ 출입문 힌지는 개구의 우측 끝으로 자동 설정됩니다. 적용 후 기존 가구 위치는 유지되며 새 벽/문 기준으로 충돌 상태가 다시 계산됩니다.
+</div>
+</details>
+
 <div id="note" class="small" style="margin-top:6px"></div>
 <div id="shapeHint" class="shapeHint"></div>
 <details id="small2RecessEditor" style="margin-top:8px"><summary>↳ 작은방2 우측 꺾임 치수</summary>
@@ -135,7 +189,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 const ROOM_DEFAULTS={
  smallroom2:{roomId:'smallroom2',name:'작은방 2 · 아기방',w:2700,h:3590,dp:0,dw:900,wp:0,ww:2150,trw:440,trd:310,brw:550,brd:85,shapeVersion:'small2-v37',note:'내측선 기준. 폭 2,700 · 좌측 3,590 · 우측 직선 3,195 · 하단 유효폭 2,150 · 상단 좌측 문 900 mm. 우측 상/하단 꺾임은 현재 도면 판독 초기값이며 실측 시 수정 가능합니다.'},
  smallroom1:{roomId:'smallroom1',name:'작은방 1',w:2700,h:3590,dp:0,dw:900,doorSide:'top',doorHinge:'left',wp:0,ww:2185,shapeVersion:'small1-v311',note:'가구 배치용 내측 기준: 폭 2,700 mm / 깊이 3,590 mm. 외곽 구조치수는 배치영역 치수와 분리해서 표시하지 않습니다. 상단은 문 900 + 벽/여유 510 + 붙박이장 전면 1,290. 에어드레서는 DF10A9500CG 실제 바닥점유 595(W) × 632(D) mm, 높이 1,960 mm로 반영합니다.'},
- master:{roomId:'master',name:'안방',w:3600,h:6390,dp:0,dw:0,wp:0,ww:0,shapeVersion:'master-v318',note:'안방 전체 통합 도면입니다. 상부는 드레스룸/파우더룸/화장대, 중앙은 안방 3,600 × 3,900 mm, 하부는 베란다 1,220 mm 구간입니다. 드레스룸↔안방 연결부는 문 없는 열린 통로이며, 통로 890 mm의 우측 끝 190 mm가 안방 출입문 개구와 겹치도록 원도면 관계를 반영했습니다. 안방 출입문은 우측 힌지·아래 방향 개폐, 베란다 연결 개구는 2,610 mm입니다.'},
+ master:{roomId:'master',name:'안방',w:3600,h:6390,topH:1270,bedH:3900,balH:1220,dressW:1200,vanityW:580,passX:2010,passW:890,entryX:2710,entryW:890,closetW:600,closetH:3800,balOpenX:990,balOpenW:2610,dp:0,dw:0,wp:0,ww:0,shapeVersion:'master-v319',note:'안방 전체 통합 도면입니다. 실측 도면 수정 모드에서 전체 폭, 상부/안방/베란다 깊이, 드레스룸/화장대 폭, 문없는 통로, 출입문, 붙박이장, 베란다 개구를 각각 수정할 수 있습니다. 파우더룸 폭과 전체 세로는 입력값에서 자동 계산됩니다.'},
  living:{roomId:'living',name:'거실·주방',w:4680,h:6050,dp:0,dw:0,wp:0,ww:3155,shapeVersion:'living-v37',note:'⚠ 개방형 공간의 임시 배치 영역입니다. 실제 내측 경계 확인 후 수정합니다.'}
 };
 const FURNITURE_CATALOG=[
@@ -244,7 +298,7 @@ function normalizeGeom(roomId,input){
  let b=clone(ROOM_DEFAULTS[roomId]),g=input?clone(input):{};
  if(roomId!=='smallroom2'&&(g.trw!=null||g.brd!=null||String(g.shapeVersion||'').startsWith('small2')))g={};
  if(roomId==='smallroom1'&&String(g.shapeVersion||'')!=='small1-v311')g={};
- if(roomId==='master'&&String(g.shapeVersion||'')!=='master-v318')g={};
+ if(roomId==='master'&&String(g.shapeVersion||'')!=='master-v319')g={};
  let out={...b,...g,roomId,name:b.name};
  if(roomId==='smallroom2'){
    if(out.trw==null)out.trw=b.trw;if(out.trd==null)out.trd=b.trd;if(out.brw==null)out.brw=b.brw;if(out.brd==null)out.brd=b.brd;
@@ -252,7 +306,12 @@ function normalizeGeom(roomId,input){
  }else{
    if(roomId==='smallroom1'&&String(out.shapeVersion||'')!=='small1-v311'){out={...b,roomId,name:b.name,poly:defaultPoly(b)}}
    if(roomId==='master'){
-     out.w=3600;out.h=6390;out.dp=0;out.dw=0;out.wp=0;out.ww=0;out.shapeVersion='master-v318';
+     ['topH','bedH','balH','dressW','vanityW','passX','passW','entryX','entryW','closetW','closetH','balOpenX','balOpenW'].forEach(k=>{if(!Number.isFinite(+out[k]))out[k]=b[k]});
+     out.w=Number.isFinite(+out.w)?+out.w:b.w;
+     out.topH=+out.topH;out.bedH=+out.bedH;out.balH=+out.balH;
+     out.h=out.topH+out.bedH+out.balH;
+     out.dp=0;out.dw=0;out.wp=0;out.ww=0;out.shapeVersion='master-v319';
+     out.poly=defaultPoly(out);
    }
    if(!Array.isArray(out.poly)||out.poly.length<3)out.poly=defaultPoly(out);
  }
@@ -310,20 +369,61 @@ function drawShape(g){
   <line class="measureLine" x1="1410" y1="-110" x2="2700" y2="-110"/><text class="measureText" x="2055" y="-135" text-anchor="middle">붙박이장 1290</text>`;
  }
  if(rid==='master'){
-  m.innerHTML+=`<line class="measureLine" x1="${g.w+90}" y1="0" x2="${g.w+90}" y2="1270"/><text class="measureText" x="${g.w+145}" y="635" transform="rotate(-90 ${g.w+145} 635)" text-anchor="middle">상부 1270</text>
-  <line class="measureLine" x1="${g.w+90}" y1="1270" x2="${g.w+90}" y2="5170"/><text class="measureText" x="${g.w+145}" y="3220" transform="rotate(-90 ${g.w+145} 3220)" text-anchor="middle">안방 3900</text>
-  <line class="measureLine" x1="${g.w+90}" y1="5170" x2="${g.w+90}" y2="6390"/><text class="measureText" x="${g.w+145}" y="5780" transform="rotate(-90 ${g.w+145} 5780)" text-anchor="middle">베란다 1220</text>
-  <text class="measureText" x="2455" y="1205" text-anchor="middle">문 없음 890</text>
-  <text class="measureText" x="3155" y="1210" text-anchor="middle">출입문 개구 890</text>
-  <text class="measureText" x="2295" y="5110" text-anchor="middle">베란다 개구 2610</text>`;
+  let bedBottom=g.topH+g.bedH;
+  m.innerHTML+=`<line class="measureLine" x1="${g.w+90}" y1="0" x2="${g.w+90}" y2="${g.topH}"/><text class="measureText" x="${g.w+145}" y="${g.topH/2}" transform="rotate(-90 ${g.w+145} ${g.topH/2})" text-anchor="middle">상부 ${g.topH}</text>
+  <line class="measureLine" x1="${g.w+90}" y1="${g.topH}" x2="${g.w+90}" y2="${bedBottom}"/><text class="measureText" x="${g.w+145}" y="${g.topH+g.bedH/2}" transform="rotate(-90 ${g.w+145} ${g.topH+g.bedH/2})" text-anchor="middle">안방 ${g.bedH}</text>
+  <line class="measureLine" x1="${g.w+90}" y1="${bedBottom}" x2="${g.w+90}" y2="${g.h}"/><text class="measureText" x="${g.w+145}" y="${bedBottom+g.balH/2}" transform="rotate(-90 ${g.w+145} ${bedBottom+g.balH/2})" text-anchor="middle">베란다 ${g.balH}</text>
+  <text class="measureText" x="${g.passX+g.passW/2}" y="${g.topH-65}" text-anchor="middle">문 없음 ${g.passW}</text>
+  <text class="measureText" x="${g.entryX+g.entryW/2}" y="${g.topH-60}" text-anchor="middle">출입문 개구 ${g.entryW}</text>
+  <text class="measureText" x="${g.balOpenX+g.balOpenW/2}" y="${bedBottom-60}" text-anchor="middle">베란다 개구 ${g.balOpenW}</text>`;
  }
 }
 
-function fixedObstacles(){return FIXED_OBSTACLES[rid]||[]}
-function suiteZones(){return SUITE_ZONES[rid]||[]}
-function suiteWalls(){return SUITE_INTERNAL_WALLS[rid]||[]}
-function suiteOpenings(){return SUITE_OPENINGS[rid]||[]}
-function suiteDoors(){return SUITE_DOORS[rid]||[]}
+function masterPowderW(g){return Math.max(0,g.w-g.dressW-g.vanityW)}
+function masterOverlap(g){return Math.max(0,Math.min(g.passX+g.passW,g.entryX+g.entryW)-Math.max(g.passX,g.entryX))}
+function fixedObstacles(){
+ if(rid==='master'){let g=geom();return [{id:'masterBuiltIn',name:'붙박이장',x:0,y:g.topH,w:g.closetW,h:g.closetH,note:`깊이 ${g.closetW} · 길이 ${g.closetH} mm`}]}
+ return FIXED_OBSTACLES[rid]||[]
+}
+function suiteZones(){
+ if(rid==='master'){
+  let g=geom(),pow=masterPowderW(g),bedY=g.topH,balY=g.topH+g.bedH;
+  return [
+   {id:'dress',name:'드레스룸',x:0,y:0,w:g.dressW,h:g.topH,note:`폭 ${g.dressW}`},
+   {id:'powder',name:'파우더룸',x:g.dressW,y:0,w:pow,h:g.topH,note:`폭 ${pow}`},
+   {id:'vanity',name:'화장대',x:g.w-g.vanityW,y:0,w:g.vanityW,h:g.topH,note:`폭 ${g.vanityW}`},
+   {id:'bedroom',name:'안방',x:0,y:bedY,w:g.w,h:g.bedH,note:`${g.w.toLocaleString()} × ${g.bedH.toLocaleString()}`},
+   {id:'balcony',name:'베란다',x:0,y:balY,w:g.w,h:g.balH,note:`깊이 ${g.balH.toLocaleString()}`}
+  ]
+ }
+ return SUITE_ZONES[rid]||[]
+}
+function suiteWalls(){
+ if(rid==='master'){
+  let g=geom(),bedBottom=g.topH+g.bedH;
+  return [
+   {x:0,y:g.topH-15,w:g.passX,h:30,name:'상부-안방 경계벽'},
+   {x:0,y:bedBottom-15,w:g.balOpenX,h:30,name:'안방-베란다 좌측 벽'}
+  ]
+ }
+ return SUITE_INTERNAL_WALLS[rid]||[]
+}
+function suiteOpenings(){
+ if(rid==='master'){
+  let g=geom(),bedBottom=g.topH+g.bedH,ov=masterOverlap(g);
+  return [
+   {x:g.passX,y:g.topH-25,w:g.passW,h:50,name:'드레스룸↔안방 열린 통로',note:`문 없음${ov?` · 출입문과 ${ov} mm 겹침`:''}`},
+   {x:g.balOpenX,y:bedBottom-25,w:g.balOpenW,h:50,name:'베란다 연결 개구',note:`${g.balOpenW.toLocaleString()} mm`}
+  ]
+ }
+ return SUITE_OPENINGS[rid]||[]
+}
+function suiteDoors(){
+ if(rid==='master'){
+  let g=geom();return [{x:g.entryX,y:g.topH,w:g.entryW,hingeX:g.entryX+g.entryW,hingeY:g.topH,name:'안방 출입문',note:`개구 ${g.entryW} · 도어 1000×2200`}]
+ }
+ return SUITE_DOORS[rid]||[]
+}
 function edgeFixtures(){return EDGE_FIXTURES[rid]||[]}
 function renderSuite(){
  let layer=$('suiteLayer');layer.innerHTML='';let ss=scale();
@@ -398,12 +498,49 @@ function drawOpenings(g){
  $('winLabel').style.cssText=`left:${wp*ss}px;bottom:8px`;$('winLabel').textContent=ww?`창호 ${ww} mm`:'';
  renderFixed();
 }
+
+function updateMasterMeasureEditor(g){
+ let box=$('masterMeasureEditor');if(!box)return;
+ box.style.display=rid==='master'?'block':'none';
+ if(rid!=='master')return;
+ const vals={
+  msW:g.w,msTopH:g.topH,msBedH:g.bedH,msBalH:g.balH,
+  msDressW:g.dressW,msVanityW:g.vanityW,msPassX:g.passX,msPassW:g.passW,
+  msDoorX:g.entryX,msDoorW:g.entryW,msClosetW:g.closetW,msClosetH:g.closetH,
+  msBalX:g.balOpenX,msBalW:g.balOpenW
+ };
+ Object.entries(vals).forEach(([id,v])=>{if($(id))$(id).value=v});
+ let pow=masterPowderW(g),ov=masterOverlap(g);
+ $('msPowderInfo').textContent=`파우더룸 폭 자동 계산: ${pow.toLocaleString()} mm`;
+ $('msOverlapInfo').textContent=ov?`문없는 통로와 출입문 개구가 ${ov.toLocaleString()} mm 겹칩니다.`:'문없는 통로와 출입문 개구는 겹치지 않습니다.';
+}
+function readMasterMeasure(){
+ let n=id=>+$(id).value;
+ return {
+  w:n('msW'),topH:n('msTopH'),bedH:n('msBedH'),balH:n('msBalH'),
+  dressW:n('msDressW'),vanityW:n('msVanityW'),passX:n('msPassX'),passW:n('msPassW'),
+  entryX:n('msDoorX'),entryW:n('msDoorW'),closetW:n('msClosetW'),closetH:n('msClosetH'),
+  balOpenX:n('msBalX'),balOpenW:n('msBalW')
+ }
+}
+function validateMasterMeasure(v){
+ let all=Object.values(v);if(all.some(x=>!Number.isFinite(x)||x<0))return '모든 치수는 0 이상의 숫자로 입력해주세요.';
+ if(v.w<1000||v.topH<300||v.bedH<1000||v.balH<300)return '전체 폭/각 공간 깊이 값을 확인해주세요.';
+ if(v.dressW+v.vanityW>=v.w)return '드레스룸 폭 + 화장대 폭은 전체 폭보다 작아야 합니다.';
+ if(v.passW<=0||v.passX+v.passW>v.w)return '문없는 통로 시작/폭이 전체 폭을 벗어납니다.';
+ if(v.entryW<=0||v.entryX+v.entryW>v.w)return '출입문 시작/폭이 전체 폭을 벗어납니다.';
+ if(v.closetW<=0||v.closetW>=v.w||v.closetH<=0||v.closetH>v.bedH)return '붙박이장 깊이/길이를 확인해주세요.';
+ if(v.balOpenW<=0||v.balOpenX+v.balOpenW>v.w)return '베란다 개구 시작/폭이 전체 폭을 벗어납니다.';
+ return '';
+}
+
 function drawGeom(){
  let g=geom();room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';$('zoomVal').textContent=Math.round(zoom*100)+'%';
- $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 내측 2700×3590 · 문900 + 벽510 + 붙박이장1290 · 에어드레서는 가전 목록':rid==='smallroom2'?'작은방2: 원본 도면 + 사용자 확인값':rid==='master'?'안방: 드레스룸/파우더룸/안방/베란다 연결 · 문없는 통로890이 출입문 개구와 190mm 겹침':'도면 판독 임시값';
+ $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 내측 2700×3590 · 문900 + 벽510 + 붙박이장1290 · 에어드레서는 가전 목록':rid==='smallroom2'?'작은방2: 원본 도면 + 사용자 확인값':rid==='master'?'안방: 전체 통합 도면 · 실측 도면 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 개별 편집':'도면 판독 임시값';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
  $('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
  if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;$('rightClearInfo').textContent=`우측 직선 ${(g.h-g.trd-g.brd).toLocaleString()} mm (도면 3,195)`;}
+ updateMasterMeasureEditor(g);
  drawShape(g);requestAnimationFrame(()=>{drawOpenings(g);updateAll()});
 }
 function addFurniture(item,silent=false){
@@ -451,8 +588,22 @@ async function transferSelected(mode){
 }
 
 $('roomSel').onchange=e=>switchRoom(e.target.value);
-$('applyRoom').onclick=()=>{let g=geom();if(rid==='master')return alert('안방 전체 도면은 내부 구역 좌표와 연결되어 있어 현재 버전에서는 전체 가로·세로를 고정합니다. 실측 후 구역별 치수 편집 기능을 추가하겠습니다.');let nw=+$('rw').value||g.w,nh=+$('rh').value||g.h;if(rid==='smallroom2')setGeom({...g,w:nw,h:nh});else setGeom({...g,w:nw,h:nh,poly:defaultPoly({w:nw,h:nh})});drawGeom()};
-$('applyOpen').onclick=()=>{if(rid==='master')return alert('안방의 출입문/문없는 통로/베란다 개구는 전체 좌표에 맞춰 고정되어 있습니다.');setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom()};
+$('applyRoom').onclick=()=>{let g=geom();if(rid==='master')return alert('안방은 아래 「안방 실측 도면 수정 모드」에서 전체 폭과 구역별 치수를 수정해주세요.');let nw=+$('rw').value||g.w,nh=+$('rh').value||g.h;if(rid==='smallroom2')setGeom({...g,w:nw,h:nh});else setGeom({...g,w:nw,h:nh,poly:defaultPoly({w:nw,h:nh})});drawGeom()};
+$('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·베란다 개구는 「안방 실측 도면 수정 모드」에서 수정해주세요.');setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom()};
+
+$('applyMasterMeasure').onclick=()=>{
+ if(rid!=='master')return;
+ let v=readMasterMeasure(),err=validateMasterMeasure(v);if(err)return alert(err);
+ let g=geom(),h=v.topH+v.bedH+v.balH;
+ setGeom({...g,...v,h,shapeVersion:'master-v319',poly:defaultPoly({w:v.w,h})});
+ drawGeom();
+ setSaveState('안방 실측 도면값 적용 · 자동 저장됨');
+};
+$('resetMasterMeasure').onclick=()=>{
+ if(rid!=='master')return;
+ if(!confirm('안방 실측값을 V3.19 기본 도면값으로 되돌릴까요?'))return;
+ delete GEOMS.master;localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
+};
 $('applyRecess').onclick=()=>{if(rid!=='smallroom2')return;let g=geom(),trw=+$('trw').value,trd=+$('trd').value,brw=+$('brw').value,brd=+$('brd').value;if([trw,trd,brw,brd].some(v=>!Number.isFinite(v)||v<0)||trw>=g.w||brw>=g.w||trd+brd>=g.h)return alert('꺾임 치수를 확인해주세요.');setGeom({...g,trw,trd,brw,brd});drawGeom()};
 $('applyPoly').onclick=()=>{if(rid==='smallroom2')return alert('작은방2는 우측 꺾임 치수 입력을 사용해주세요.');try{let g=geom(),p=parsePoly($('polyText').value);setGeom({...g,poly:p});drawGeom()}catch(e){alert(e.message)}};
 $('rectPoly').onclick=()=>{let g=geom();setGeom({...g,poly:defaultPoly(g)});drawGeom()};
