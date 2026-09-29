@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.25</title>
+<title>또복이 Family Room Planner V3.28</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -14,41 +14,57 @@ h1{font-size:18px;margin:0 0 4px}.small,.sub{font-size:11px;color:var(--muted)}
 .app{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 70px)}
 aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto}
 .stage{padding:16px;overflow:auto;display:flex;justify-content:center;align-items:flex-start}
-.roomShell{min-width:max-content;padding:145px 58px 18px}
+.roomShell{min-width:max-content;padding:180px 110px 95px}
 .card{border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:10px;background:#fff}.card h2{font-size:14px;margin:0 0 8px}
 .row,.sync{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 button,input,select,textarea{font:inherit}button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;cursor:pointer}
 input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px;background:#fff}input{width:82px}.sync{margin-top:6px;font-size:11px}
 .dot{width:8px;height:8px;border-radius:50%;background:#aaa}.dot.on{background:#4f8b57}.dot.err{background:var(--bad)}
 .item{display:grid;grid-template-columns:1fr auto;gap:5px;padding:8px 0;border-top:1px solid #eee}.item:first-child{border-top:0}.item b{font-size:13px}.item span{font-size:11px;color:var(--muted)}
-#room{position:relative;width:540px;background:transparent;box-shadow:0 8px 28px #0001;touch-action:none;overflow:visible}
+#room{position:relative;width:540px;background:transparent;box-shadow:0 8px 28px #0001;touch-action:auto;overflow:visible}
 .roomShape{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .wallPoly{fill:#fbfaf7;stroke:#424640;stroke-width:5;vector-effect:non-scaling-stroke}
-.measureLine{stroke:var(--measure);stroke-width:1.4;stroke-dasharray:7 5;vector-effect:non-scaling-stroke}.measureText{fill:#7b6857;font-size:54px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:10px;stroke-linejoin:round}.measureTextSub{fill:#8e8174;font-size:44px;font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:9px;stroke-linejoin:round}
+.measureLine{stroke:var(--measure);stroke-width:1.4;stroke-dasharray:7 5;vector-effect:non-scaling-stroke}.measureExt{stroke:#b8aa9b;stroke-width:1;stroke-dasharray:4 5;vector-effect:non-scaling-stroke;opacity:.8}.measureText{fill:#7b6857;font-size:78px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:13px;stroke-linejoin:round}.measureTextSub{fill:#8e8174;font-size:62px;font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:11px;stroke-linejoin:round}
+.fontSizeSel{height:36px;border:1px solid var(--line);border-radius:9px;background:white;padding:0 8px;font-size:13px}
+body[data-diagram-font="normal"] .measureText{font-size:58px;stroke-width:10px}
+body[data-diagram-font="normal"] .measureTextSub{font-size:46px;stroke-width:8px}
+body[data-diagram-font="normal"] .suiteZone{font-size:14px}
+body[data-diagram-font="normal"] .suiteZone small{font-size:11px}
+body[data-diagram-font="normal"] .label,body[data-diagram-font="normal"] .suiteOpening,body[data-diagram-font="normal"] .suiteDoorLabel,body[data-diagram-font="normal"] .suiteDividerLabel{font-size:12px}
+body[data-diagram-font="large"] .measureText{font-size:78px}
+body[data-diagram-font="large"] .measureTextSub{font-size:62px}
+body[data-diagram-font="large"] .suiteZone{font-size:17px}
+body[data-diagram-font="large"] .suiteZone small{font-size:13px}
+body[data-diagram-font="xlarge"] .measureText{font-size:104px;stroke-width:16px}
+body[data-diagram-font="xlarge"] .measureTextSub{font-size:82px;stroke-width:14px}
+body[data-diagram-font="xlarge"] .suiteZone{font-size:22px}
+body[data-diagram-font="xlarge"] .suiteZone small{font-size:16px}
+body[data-diagram-font="xlarge"] .label,body[data-diagram-font="xlarge"] .suiteOpening,body[data-diagram-font="xlarge"] .suiteDoorLabel,body[data-diagram-font="xlarge"] .suiteDividerLabel{font-size:18px}
+body[data-diagram-font="xlarge"] .furn{font-size:18px}
 .window{position:absolute;height:8px;background:#9cc7d4;border-top:2px solid #fff}.doorGap{position:absolute;height:10px;background:#fbfaf7}
 .doorLeaf{position:absolute;height:2px;background:#8f806e;transform-origin:left top}.doorArc{position:absolute;overflow:visible;pointer-events:none}.doorArc svg{display:block;overflow:visible}.doorArc path{fill:none;stroke:#b5a997;stroke-width:1;stroke-dasharray:4 3}.doorHingeDot{position:absolute;width:6px;height:6px;border-radius:50%;background:#8f806e;transform:translate(-3px,-3px);pointer-events:none;z-index:4}
-.label{position:absolute;font-size:10px;pointer-events:none}.winLabel{color:#57818d}.doorLabel{color:#8f806e}
-.furn{position:absolute;border:2px solid #697867;background:#dce6d8cc;border-radius:5px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:700;user-select:none;touch-action:none;padding:3px;overflow:hidden}
-.furn.sel{outline:3px solid #899c82;z-index:5}.furn.bad{border-color:var(--bad);background:#f0c7c4cc}.fixedObs{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:10px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.fixedObs small{display:block;font-weight:400}.edgeFixture{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:10px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.edgeFixture small{display:block;font-weight:400}
-.suiteZone{position:absolute;border:1px dashed #b8b4aa;background:#f4f1e955;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:700;color:#6c6b65;pointer-events:none;z-index:1}
-.suiteZone small{display:block;font-weight:400;font-size:10px;color:#86837b}
+.label{position:absolute;font-size:14px;pointer-events:none}.winLabel{color:#57818d}.doorLabel{color:#8f806e}
+.furn{position:absolute;border:2px solid #697867;background:#dce6d8cc;border-radius:5px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;font-weight:700;user-select:none;touch-action:none;padding:3px;overflow:hidden}
+.furn.sel{outline:3px solid #899c82;z-index:5}.furn.bad{border-color:var(--bad);background:#f0c7c4cc}.fixedObs{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:13px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.fixedObs small{display:block;font-weight:400}.edgeFixture{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:13px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.edgeFixture small{display:block;font-weight:400}
+.suiteZone{position:absolute;border:1px dashed #b8b4aa;background:#f4f1e955;display:flex;align-items:center;justify-content:center;text-align:center;font-size:17px;font-weight:700;color:#6c6b65;pointer-events:none;z-index:1}
+.suiteZone small{display:block;font-weight:400;font-size:13px;color:#86837b}
 .suiteWall{position:absolute;background:#424640;pointer-events:none;z-index:3}
-.suiteOpening{position:absolute;border:1px dashed #79a7b4;background:#dceef355;color:#517d89;font-size:10px;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:none;z-index:2}
+.suiteOpening{position:absolute;border:1px dashed #79a7b4;background:#dceef355;color:#517d89;font-size:14px;display:flex;align-items:center;justify-content:center;text-align:center;pointer-events:none;z-index:2}
 .suiteDoorLeaf{position:absolute;height:2px;background:#8f806e;transform-origin:left top;pointer-events:none;z-index:4}
 .suiteDoorArc{position:absolute;overflow:visible;pointer-events:none;z-index:4}
 .suiteDoorArc path{fill:none;stroke:#b5a997;stroke-width:1;stroke-dasharray:4 3}
-.suiteDoorLabel{position:absolute;font-size:10px;color:#8f806e;pointer-events:none;z-index:5;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
-.suiteDividerLabel{position:absolute;font-size:10px;color:#7c776d;background:#ffffffcc;padding:2px 4px;border-radius:4px;pointer-events:none;z-index:4}
+.suiteDoorLabel{position:absolute;font-size:14px;color:#8f806e;pointer-events:none;z-index:5;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+.suiteDividerLabel{position:absolute;font-size:14px;color:#7c776d;background:#ffffffcc;padding:2px 4px;border-radius:4px;pointer-events:none;z-index:4}
 .toolbar{position:sticky;bottom:8px;background:#ffffffee;border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 .zoomVal{min-width:54px;text-align:center;font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}
 #status{font-size:12px;line-height:1.55}.shapeHint{margin-top:7px;padding:7px 8px;border-radius:8px;background:#f5f4f0;font-size:11px;color:var(--muted)}.measurePanel{display:none}#small2RecessEditor{display:none!important}
 #polyText{width:100%;min-height:58px;margin-top:5px;font-size:11px}.ok{color:#4f8b57}.warn{color:#9b6b25}
-@media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:130px 42px 18px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:210px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:block}#room{width:430px}}
+@media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:155px 82px 85px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:210px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:block}#room{width:430px}}
 </style>
 </head>
-<body>
+<body data-diagram-font="large">
 <header>
-<h1>또복이 Family Room Planner <small>V3.25</small></h1>
+<h1>또복이 Family Room Planner <small>V3.28</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
 </header>
@@ -183,10 +199,17 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 <div id="doorGap" class="doorGap"></div><div id="doorLeaf" class="doorLeaf"></div><div id="doorArc" class="doorArc"></div><div id="doorHingeDot" class="doorHingeDot"></div><div id="doorLabel" class="label doorLabel"></div><div id="suiteLayer"></div><div id="edgeLayer"></div><div id="fixedLayer"></div>
 </div>
 <div class="toolbar">
+<label class="small" style="display:flex;align-items:center;gap:5px">글자
+<select id="fontSizeSel" class="fontSizeSel">
+<option value="normal">보통</option>
+<option value="large">크게</option>
+<option value="xlarge">매우 크게</option>
+</select></label>
 <button id="zoomOut">－ 축소</button><span id="zoomVal" class="zoomVal">100%</span><button id="zoomIn">＋ 확대</button><button id="fit">화면 기준</button>
+<button id="z200">200%</button><button id="z300">300%</button><button id="z400">400%</button>
 <button id="rot">↻ 90°</button><button id="dup">＋ 복제</button><button id="del">× 제거</button><button id="clear">전체 비우기</button>
 </div>
-<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.</div>
+<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다.</div>
 </div></main>
 </div>
 
@@ -261,6 +284,9 @@ const SUITE_DOORS={
 
 const $=id=>document.getElementById(id),room=$('room');
 let rid='smallroom2',selected=null,seq=1,suppressSave=false,zoom=+(localStorage.getItem('ttobok_zoom_v37')||1);
+let diagramFont=localStorage.getItem('ttobok_diagram_font_v328')||'large';
+if(!['normal','large','xlarge'].includes(diagramFont))diagramFont='large';
+document.body.dataset.diagramFont=diagramFont;
 let GEOMS=JSON.parse(localStorage.getItem('ttobok_geometry_v37')||'{}');
 
 (function migrateMasterToV318(){
@@ -392,41 +418,65 @@ function drawShape(g){
       h3=g.w-g.upperW,
       v3=g.corridorH,
       h4=g.w-g.livingW,
-      v4=g.h-(g.corridorY+g.corridorH);
+      v4=g.h-(g.corridorY+g.corridorH),
+      topY=-230,overallTopY=-480,rightX=g.w+230,overallLeftX=-430,bottomY=g.h+230;
 
   m.innerHTML+=`
-  <line class="measureLine" x1="0" y1="-150" x2="${g.w}" y2="-150"/>
-  <text class="measureText" x="${g.w/2}" y="-185" text-anchor="middle">전체 폭 약 ${g.w.toLocaleString()} mm</text>
+  <!-- 전체 폭 / 깊이: 도면 외부 -->
+  <line class="measureExt" x1="0" y1="0" x2="0" y2="${overallTopY-25}"/>
+  <line class="measureExt" x1="${g.w}" y1="0" x2="${g.w}" y2="${overallTopY-25}"/>
+  <line class="measureLine" x1="0" y1="${overallTopY}" x2="${g.w}" y2="${overallTopY}"/>
+  <text class="measureText" x="${g.w/2}" y="${overallTopY-45}" text-anchor="middle">전체 폭 약 ${g.w.toLocaleString()} mm</text>
 
-  <line class="measureLine" x1="-150" y1="0" x2="-150" y2="${g.h}"/>
-  <text class="measureText" x="-190" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -190 ${g.h/2})">전체 깊이 ${g.h.toLocaleString()} mm</text>
+  <line class="measureExt" x1="0" y1="0" x2="${overallLeftX+25}" y2="0"/>
+  <line class="measureExt" x1="0" y1="${g.h}" x2="${overallLeftX+25}" y2="${g.h}"/>
+  <line class="measureLine" x1="${overallLeftX}" y1="0" x2="${overallLeftX}" y2="${g.h}"/>
+  <text class="measureText" x="${overallLeftX-55}" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 ${overallLeftX-55} ${g.h/2})">전체 깊이 ${g.h.toLocaleString()} mm</text>
 
-  <line class="measureLine" x1="0" y1="115" x2="${g.topW}" y2="115"/>
-  <text class="measureText" x="${g.topW/2}" y="95" text-anchor="middle">상단 ${g.topW.toLocaleString()}</text>
+  <!-- 상부/복도 가로 좌표 체인: 도면 상단 외부 -->
+  <line class="measureExt" x1="0" y1="0" x2="0" y2="${topY+25}"/>
+  <line class="measureExt" x1="${g.topW}" y1="0" x2="${g.topW}" y2="${topY+25}"/>
+  <line class="measureExt" x1="${g.upperW}" y1="${g.stepY}" x2="${g.upperW}" y2="${topY+25}"/>
+  <line class="measureExt" x1="${g.w}" y1="${g.corridorY}" x2="${g.w}" y2="${topY+25}"/>
 
-  <line class="measureLine" x1="${g.topW-110}" y1="0" x2="${g.topW-110}" y2="${g.stepY}"/>
-  <text class="measureTextSub" x="${g.topW-145}" y="${g.stepY/2}" text-anchor="middle" transform="rotate(-90 ${g.topW-145} ${g.stepY/2})">${v1.toLocaleString()}</text>
+  <line class="measureLine" x1="0" y1="${topY}" x2="${g.topW}" y2="${topY}"/>
+  <text class="measureTextSub" x="${g.topW/2}" y="${topY-35}" text-anchor="middle">${g.topW.toLocaleString()}</text>
 
-  <line class="measureLine" x1="${g.topW}" y1="${g.stepY+130}" x2="${g.upperW}" y2="${g.stepY+130}"/>
-  <text class="measureText" x="${g.topW+h2/2}" y="${g.stepY+105}" text-anchor="middle">+${h2.toLocaleString()}</text>
+  <line class="measureLine" x1="${g.topW}" y1="${topY}" x2="${g.upperW}" y2="${topY}"/>
+  <text class="measureTextSub" x="${g.topW+h2/2}" y="${topY-35}" text-anchor="middle">+${h2.toLocaleString()}</text>
 
-  <line class="measureLine" x1="${g.upperW-115}" y1="${g.stepY}" x2="${g.upperW-115}" y2="${g.corridorY}"/>
-  <text class="measureTextSub" x="${g.upperW-150}" y="${g.stepY+v2/2}" text-anchor="middle" transform="rotate(-90 ${g.upperW-150} ${g.stepY+v2/2})">${v2.toLocaleString()}</text>
+  <line class="measureLine" x1="${g.upperW}" y1="${topY}" x2="${g.w}" y2="${topY}"/>
+  <text class="measureTextSub" x="${g.upperW+h3/2}" y="${topY-35}" text-anchor="middle">복도 +${h3.toLocaleString()}</text>
 
-  <line class="measureLine" x1="${g.upperW}" y1="${g.corridorY+130}" x2="${g.w}" y2="${g.corridorY+130}"/>
-  <text class="measureText" x="${g.upperW+h3/2}" y="${g.corridorY+105}" text-anchor="middle">복도 +${h3.toLocaleString()}</text>
+  <!-- 세로 구간 체인: 도면 우측 외부 -->
+  <line class="measureExt" x1="${g.topW}" y1="0" x2="${rightX-25}" y2="0"/>
+  <line class="measureExt" x1="${g.upperW}" y1="${g.stepY}" x2="${rightX-25}" y2="${g.stepY}"/>
+  <line class="measureExt" x1="${g.w}" y1="${g.corridorY}" x2="${rightX-25}" y2="${g.corridorY}"/>
+  <line class="measureExt" x1="${g.w}" y1="${g.corridorY+g.corridorH}" x2="${rightX-25}" y2="${g.corridorY+g.corridorH}"/>
+  <line class="measureExt" x1="${g.livingW}" y1="${g.h}" x2="${rightX-25}" y2="${g.h}"/>
 
-  <line class="measureLine" x1="${g.w-130}" y1="${g.corridorY}" x2="${g.w-130}" y2="${g.corridorY+g.corridorH}"/>
-  <text class="measureTextSub" x="${g.w-165}" y="${g.corridorY+v3/2}" text-anchor="middle" transform="rotate(-90 ${g.w-165} ${g.corridorY+v3/2})">${v3.toLocaleString()}</text>
+  <line class="measureLine" x1="${rightX}" y1="0" x2="${rightX}" y2="${g.stepY}"/>
+  <text class="measureTextSub" x="${rightX+48}" y="${v1/2}" text-anchor="middle" transform="rotate(-90 ${rightX+48} ${v1/2})">${v1.toLocaleString()}</text>
 
-  <line class="measureLine" x1="${g.livingW}" y1="${g.corridorY+g.corridorH-130}" x2="${g.w}" y2="${g.corridorY+g.corridorH-130}"/>
-  <text class="measureText" x="${g.livingW+h4/2}" y="${g.corridorY+g.corridorH-155}" text-anchor="middle">-${h4.toLocaleString()}</text>
+  <line class="measureLine" x1="${rightX}" y1="${g.stepY}" x2="${rightX}" y2="${g.corridorY}"/>
+  <text class="measureTextSub" x="${rightX+48}" y="${g.stepY+v2/2}" text-anchor="middle" transform="rotate(-90 ${rightX+48} ${g.stepY+v2/2})">${v2.toLocaleString()}</text>
 
-  <line class="measureLine" x1="${g.livingW-120}" y1="${g.corridorY+g.corridorH}" x2="${g.livingW-120}" y2="${g.h}"/>
-  <text class="measureTextSub" x="${g.livingW-155}" y="${g.corridorY+g.corridorH+v4/2}" text-anchor="middle" transform="rotate(-90 ${g.livingW-155} ${g.corridorY+g.corridorH+v4/2})">${v4.toLocaleString()}</text>
+  <line class="measureLine" x1="${rightX}" y1="${g.corridorY}" x2="${rightX}" y2="${g.corridorY+g.corridorH}"/>
+  <text class="measureTextSub" x="${rightX+48}" y="${g.corridorY+v3/2}" text-anchor="middle" transform="rotate(-90 ${rightX+48} ${g.corridorY+v3/2})">복도 ${v3.toLocaleString()}</text>
 
-  <line class="measureLine" x1="0" y1="${g.h-135}" x2="${g.livingW}" y2="${g.h-135}"/>
-  <text class="measureText" x="${g.livingW/2}" y="${g.h-165}" text-anchor="middle">하부 거실 폭 ${g.livingW.toLocaleString()}</text>`;
+  <line class="measureLine" x1="${rightX}" y1="${g.corridorY+g.corridorH}" x2="${rightX}" y2="${g.h}"/>
+  <text class="measureTextSub" x="${rightX+48}" y="${g.corridorY+g.corridorH+v4/2}" text-anchor="middle" transform="rotate(-90 ${rightX+48} ${g.corridorY+g.corridorH+v4/2})">${v4.toLocaleString()}</text>
+
+  <!-- 하부 거실 폭과 우측 차이: 도면 아래 외부 -->
+  <line class="measureExt" x1="0" y1="${g.h}" x2="0" y2="${bottomY-25}"/>
+  <line class="measureExt" x1="${g.livingW}" y1="${g.h}" x2="${g.livingW}" y2="${bottomY-25}"/>
+  <line class="measureExt" x1="${g.w}" y1="${g.corridorY+g.corridorH}" x2="${g.w}" y2="${bottomY-25}"/>
+
+  <line class="measureLine" x1="0" y1="${bottomY}" x2="${g.livingW}" y2="${bottomY}"/>
+  <text class="measureText" x="${g.livingW/2}" y="${bottomY+80}" text-anchor="middle">하부 거실 폭 ${g.livingW.toLocaleString()} mm</text>
+
+  <line class="measureLine" x1="${g.livingW}" y1="${bottomY}" x2="${g.w}" y2="${bottomY}"/>
+  <text class="measureTextSub" x="${g.livingW+h4/2}" y="${bottomY+80}" text-anchor="middle">우측 차이 ${h4.toLocaleString()}</text>`;
  }
  if(rid==='smallroom1'){
   let doorEnd=g.dp+g.dw,gap=Math.max(0,g.closetX-doorEnd);
@@ -674,8 +724,11 @@ function applyUnifiedMeasure(){
 }
 
 function drawGeom(){
- let g=geom();room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';$('zoomVal').textContent=Math.round(zoom*100)+'%';
- $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 실측 수정 모드 지원 · 문/하단개구/우측 꺾임 편집':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 전체/구간 치수 표시 · 가전/가구 미배치';
+ let g=geom(),stage=document.querySelector('.stage');
+ room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';
+ if(stage)stage.style.justifyContent=zoom>1.35?'flex-start':'center';
+ $('zoomVal').textContent=Math.round(zoom*100)+'%';
+ $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 실측 수정 모드 지원 · 문/하단개구/우측 꺾임 편집':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
  $('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
  if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;$('rightClearInfo').textContent=`우측 직선 ${(g.h-g.trd-g.brd).toLocaleString()} mm (도면 3,195)`;}
@@ -709,7 +762,13 @@ function status(){
  if(n!==selected.dataset.n){selected.dataset.n=n;selected.textContent=n}
  $('status').innerHTML=`<b>${n}</b> <span class="badge">${selected.dataset.type==='appliance'?'가전':'가구'}</span><br>${a.w} × ${a.h} mm<br><span class="badge">좌 ${Math.round(a.x)}</span><span class="badge">우 ${Math.round(g.w-a.x-a.w)}</span><span class="badge">상 ${Math.round(a.y)}</span><span class="badge">하 ${Math.round(g.h-a.y-a.h)}</span><br>${selected.classList.contains('bad')?'<b style="color:#b8473f">⚠ 벽체/문/고정설비/가구 충돌</b>':'✓ 방 벽체 내부 배치 가능'}`;
 }
-function setZoom(v){zoom=Math.max(.45,Math.min(1.8,v));localStorage.setItem('ttobok_zoom_v37',zoom);drawGeom()}
+function setDiagramFont(v){
+ if(!['normal','large','xlarge'].includes(v))v='large';
+ diagramFont=v;document.body.dataset.diagramFont=v;
+ localStorage.setItem('ttobok_diagram_font_v328',v);
+ if($('fontSizeSel'))$('fontSizeSel').value=v;
+}
+function setZoom(v){zoom=Math.max(.45,Math.min(4,v));localStorage.setItem('ttobok_zoom_v37',zoom);drawGeom()}
 function fitZoom(){let avail=Math.max(260,document.querySelector('.stage').clientWidth-120);setZoom(Math.min(1.25,avail/540))}
 function switchRoom(id){
  if(!ROOM_DEFAULTS[id])return;rid=id;$('roomSel').value=id;selected=null;updateTargets();drawGeom();loadLocal();window.restartCloudRoom();
@@ -732,7 +791,7 @@ $('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
- if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.25 기본 도면값으로 되돌릴까요?`))return;
+ if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.28 기본 도면값으로 되돌릴까요?`))return;
  delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
@@ -741,7 +800,9 @@ $('applyPoly').onclick=()=>{if(rid==='smallroom2')return alert('작은방2는 �
 $('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:{...g,poly:defaultPoly(g)});drawGeom()};
 $('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원할까요?')){delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}};
 $('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!w||!d)return alert('가로와 깊이를 입력해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
-$('zoomOut').onclick=()=>setZoom(zoom-.1);$('zoomIn').onclick=()=>setZoom(zoom+.1);$('fit').onclick=fitZoom;
+$('zoomOut').onclick=()=>setZoom(zoom-(zoom>1.5?.25:.1));$('zoomIn').onclick=()=>setZoom(zoom>1.5?zoom+.25:zoom+.1);$('fit').onclick=fitZoom;
+$('z200').onclick=()=>setZoom(2);$('z300').onclick=()=>setZoom(3);$('z400').onclick=()=>setZoom(4);
+$('fontSizeSel').onchange=e=>setDiagramFont(e.target.value);
 $('rot').onclick=()=>{if(selected){selected.dataset.r=(+selected.dataset.r+90)%180;updateAll()}};
 $('dup').onclick=()=>{if(selected){addFurniture({n:selected.dataset.n,w:+selected.dataset.w,d:+selected.dataset.d,x:+selected.dataset.x+100,y:+selected.dataset.y+100,r:+selected.dataset.r});updateAll()}};
 $('del').onclick=()=>{if(selected){let e=selected;selected=null;e.remove();updateAll()}};
@@ -768,7 +829,7 @@ window.TTOBOK_APP={
 
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLocal()});
 window.addEventListener('pagehide',()=>saveLocal());
-renderCatalog();updateTargets();drawGeom();loadLocal();
+setDiagramFont(diagramFont);renderCatalog();updateTargets();drawGeom();loadLocal();
 </script>
 
 <script src="firebase-config.js"></script>
