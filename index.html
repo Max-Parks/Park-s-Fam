@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.32</title>
+<title>또복이 Family Room Planner V3.33</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -14,7 +14,7 @@ h1{font-size:18px;margin:0 0 4px}.small,.sub{font-size:11px;color:var(--muted)}
 .app{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 70px)}
 aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto}
 .stage{padding:16px;overflow:auto;display:flex;justify-content:center;align-items:flex-start}
-.roomShell{min-width:max-content;padding:180px 110px 95px}
+.roomShell{min-width:max-content;padding:180px 150px 125px}
 .card{border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:10px;background:#fff}.card h2{font-size:14px;margin:0 0 8px}
 .row,.sync{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 button,input,select,textarea{font:inherit}button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;cursor:pointer}
@@ -59,12 +59,12 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 .zoomVal{min-width:54px;text-align:center;font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}
 #status{font-size:12px;line-height:1.55}.shapeHint{margin-top:7px;padding:7px 8px;border-radius:8px;background:#f5f4f0;font-size:11px;color:var(--muted)}.measurePanel{display:none}#small2RecessEditor{display:none!important}
 #polyText{width:100%;min-height:58px;margin-top:5px;font-size:11px}.ok{color:#4f8b57}.warn{color:#9b6b25}
-@media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:155px 82px 85px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:210px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:block}#room{width:430px}}
+@media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:155px 115px 110px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:210px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:block}#room{width:430px}}
 </style>
 </head>
 <body data-diagram-font="large">
 <header>
-<h1>또복이 Family Room Planner <small>V3.32</small></h1>
+<h1>또복이 Family Room Planner <small>V3.33</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
 </header>
@@ -450,7 +450,7 @@ function updateTargets(){
 function drawShape(g){
  let p=normPoly(g);$('roomShape').setAttribute('viewBox',`0 0 ${g.w} ${g.h}`);$('wallPoly').setAttribute('points',p.map(v=>v.join(',')).join(' '));
  $('polyText').value=p.map(v=>v.join(',')).join(' / ');
- $('shapeHint').textContent=rid==='master'?'안방 전체 도면: 구역별 연결 · 문없는 통로/베란다 개구는 열린 공간 · 실제 내부벽만 충돌 판정':rid==='living'?'거실·주방·복도 통합 도면: 사용자가 표시한 파란 영역의 단계형 외곽을 우선 반영 · 가전/가구는 별도 배치':rid==='laundry'?'세탁실: 좌측 출입문 + 상단 중앙 창호 + 좌하단 꺾임 구조 반영 · 가전은 목록에서 나중에 배치':(p.length>4?'내측 벽선: 비정형 다각형 · 실제 벽선 기준 충돌 판정':'내측 벽선: 직사각형 · 방별 독립 도면');
+ $('shapeHint').textContent=rid==='master'?'안방 전체 도면: 구역별 연결 · 문없는 통로/베란다 개구는 열린 공간 · 실제 내부벽만 충돌 판정':rid==='living'?'거실·주방·복도 통합 도면: 사용자가 표시한 파란 영역의 단계형 외곽을 우선 반영 · 가전/가구는 별도 배치':rid==='laundry'?'세탁실: 좌측 출입문 + 상단 중앙 창호 + 좌하단 꺾임 구조 반영 · 꺾임 치수선은 실제 공간 바깥쪽 표시':(p.length>4?'내측 벽선: 비정형 다각형 · 실제 벽선 기준 충돌 판정':'내측 벽선: 직사각형 · 방별 독립 도면');
  let m=$('measures');m.innerHTML='';
  if(rid!=='smallroom1'&&rid!=='living'){
   m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`;
@@ -460,9 +460,22 @@ function drawShape(g){
   m.innerHTML+=`<text class="measureText" x="${tx+g.trw/2}" y="${g.trd+105}" text-anchor="middle">${g.trw} mm</text><text class="measureText" x="${g.w-g.brw/2}" y="${by-80}" text-anchor="middle">${g.brw} mm</text>`;
  }
  if(rid==='laundry'){
-  let y=g.h-g.notchD;
-  m.innerHTML+=`<text class="measureTextSub" x="${g.notchW/2}" y="${Math.max(80,y-55)}" text-anchor="middle">좌하단 꺾임 ${g.notchW.toLocaleString()} mm</text>
-  <text class="measureTextSub" x="${g.notchW+65}" y="${y+g.notchD/2}" text-anchor="middle" transform="rotate(-90 ${g.notchW+65} ${y+g.notchD/2})">${g.notchD.toLocaleString()} mm</text>`;
+  let y=g.h-g.notchD,
+      bottomY=g.h+120,
+      leftX=-155;
+
+  m.innerHTML+=`
+  <!-- 좌하단 꺾임 가로 치수: 실제 공간 아래쪽 바깥 -->
+  <line class="measureExt" x1="0" y1="${y}" x2="0" y2="${bottomY-18}"/>
+  <line class="measureExt" x1="${g.notchW}" y1="${g.h}" x2="${g.notchW}" y2="${bottomY-18}"/>
+  <line class="measureLine" x1="0" y1="${bottomY}" x2="${g.notchW}" y2="${bottomY}"/>
+  <text class="measureTextSub" x="${g.notchW/2}" y="${bottomY-28}" text-anchor="middle">좌하단 꺾임 ${g.notchW.toLocaleString()} mm</text>
+
+  <!-- 좌하단 꺾임 깊이: 실제 공간 왼쪽 바깥 -->
+  <line class="measureExt" x1="0" y1="${y}" x2="${leftX+18}" y2="${y}"/>
+  <line class="measureExt" x1="${g.notchW}" y1="${g.h}" x2="${leftX+18}" y2="${g.h}"/>
+  <line class="measureLine" x1="${leftX}" y1="${y}" x2="${leftX}" y2="${g.h}"/>
+  <text class="measureTextSub" x="${leftX-38}" y="${y+g.notchD/2}" text-anchor="middle" transform="rotate(-90 ${leftX-38} ${y+g.notchD/2})">깊이 ${g.notchD.toLocaleString()} mm</text>`;
  }
  if(rid==='living'){
   let v1=g.stepY,
@@ -874,7 +887,7 @@ $('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
- if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.32 기본 도면값으로 되돌릴까요?`))return;
+ if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.33 기본 도면값으로 되돌릴까요?`))return;
  delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
