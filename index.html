@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.11</title>
+<title>또복이 Family Room Planner V3.12</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -34,12 +34,12 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 .zoomVal{min-width:54px;text-align:center;font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}
 #status{font-size:12px;line-height:1.55}.shapeHint{margin-top:7px;padding:7px 8px;border-radius:8px;background:#f5f4f0;font-size:11px;color:var(--muted)}
 #polyText{width:100%;min-height:58px;margin-top:5px;font-size:11px}.ok{color:#4f8b57}.warn{color:#9b6b25}
-@media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:130px 42px 18px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:210px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:none}#room{width:430px}}
+@media(max-width:760px){.app{display:block}.stage{padding:8px 0 225px;justify-content:flex-start}.roomShell{padding:130px 42px 18px}aside{position:fixed;z-index:30;left:0;right:0;bottom:0;height:210px;border:0;border-top:1px solid var(--line);padding:9px;overflow:auto}.save{display:block}#room{width:430px}}
 </style>
 </head>
 <body>
 <header>
-<h1>또복이 Family Room Planner <small>V3.11</small></h1>
+<h1>또복이 Family Room Planner <small>V3.12</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
 </header>
@@ -97,7 +97,10 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 </div>
 </div>
 
-<div class="card save"><h2>배치안</h2><div class="row">
+<div class="card save"><h2>배치 저장</h2>
+<div class="row"><button id="saveCurrent" class="primary">현재 배치 저장</button><span id="saveState" class="small">자동 저장 사용 중</span></div>
+<div class="small" style="margin-top:7px">A/B/C는 백업 배치안입니다. 저장 시 현재 배치도 함께 동기화됩니다.</div>
+<div class="row" style="margin-top:7px">
 <button data-save="A">A 저장</button><button data-load="A">A 불러오기</button>
 <button data-save="B">B 저장</button><button data-load="B">B 불러오기</button>
 <button data-save="C">C 저장</button><button data-load="C">C 불러오기</button>
@@ -286,13 +289,15 @@ function renderItems(arr){suppressSave=true;clearFurniture();(arr||[]).map(norma
 function loadLocal(){
  let z;try{z=JSON.parse(localStorage.getItem(localKey())||'null')}catch(e){z=null}
  renderItems(z?.items||[]);
+ if(z?.savedAt){let d=new Date(z.savedAt);setSaveState('마지막 로컬 저장 '+d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}))}
 }
-function saveLocal(){localStorage.setItem(localKey(),JSON.stringify({items:items()}))}
+function setSaveState(msg,ok=true){let e=$('saveState');if(e){e.textContent=msg;e.className='small '+(ok?'ok':'warn')}}
+function saveLocal(){localStorage.setItem(localKey(),JSON.stringify({items:items(),savedAt:Date.now()}));setSaveState('이 기기에 자동 저장됨')}
 function updateAll(){
  let g=geom(),fs=[...room.querySelectorAll('.furn')],s=scale();
  fs.forEach(e=>{let q=dims(e);e.style.width=q.w*s+'px';e.style.height=q.h*s+'px';e.style.left=(+e.dataset.x*s)+'px';e.style.top=(+e.dataset.y*s)+'px';e.classList.remove('bad')});
  fs.forEach((e,i)=>{let a=rect(e),dr=doorRect(g),bad=!insideShape(a,g)||(dr&&overlap(a,dr))||fixedHit(a);fs.forEach((b,j)=>{if(i!==j&&overlap(a,rect(b)))bad=true});if(bad)e.classList.add('bad')});
- status();if(!suppressSave){saveLocal();window.scheduleCloudSave()}
+ status();if(!suppressSave){saveLocal();window.scheduleCloudSave();setSaveState('자동 저장 대기 중')}
 }
 function status(){
  if(!selected||!selected.isConnected){selected=null;$('status').textContent='가구를 선택하세요.';return}
@@ -330,9 +335,19 @@ $('rot').onclick=()=>{if(selected){selected.dataset.r=(+selected.dataset.r+90)%1
 $('dup').onclick=()=>{if(selected){addFurniture({n:selected.dataset.n,w:+selected.dataset.w,d:+selected.dataset.d,x:+selected.dataset.x+100,y:+selected.dataset.y+100,r:+selected.dataset.r});updateAll()}};
 $('del').onclick=()=>{if(selected){let e=selected;selected=null;e.remove();updateAll()}};
 $('clear').onclick=()=>{if(confirm('현재 방 가구를 모두 비울까요?')){clearFurniture();updateAll()}};
-$('copyRoom').onclick=()=>transferSelected('copy');$('moveRoom').onclick=()=>transferSelected('move');
-document.querySelectorAll('[data-save]').forEach(b=>b.onclick=()=>{localStorage.setItem(localKey(rid,b.dataset.save),JSON.stringify({geometry:geom(),items:items()}));alert(b.dataset.save+' 저장 완료')});
-document.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{let z=JSON.parse(localStorage.getItem(localKey(rid,b.dataset.load))||'null');if(!z)return alert('저장된 배치안이 없습니다.');if(z.geometry)setGeom(z.geometry);drawGeom();renderItems(z.items||[])});
+
+async function saveCurrentNow(showAlert=false){
+ saveLocal();
+ setSaveState('공동 저장 중...');
+ let ok=false;
+ try{if(window.flushCloudSave)ok=await window.flushCloudSave()}catch(e){ok=false}
+ setSaveState(ok?'현재 배치 공동 저장 완료':'현재 배치 로컬 저장 완료'+(window.TTOBOK_IS_LOGGED_IN?' · 공동 저장 확인 필요':''));
+ if(showAlert)alert(ok?'현재 배치를 저장하고 공동 동기화했습니다.':'현재 배치를 이 기기에 저장했습니다.');
+ return ok;
+}
+$('copyRoom').onclick=()=>transferSelected('copy');$('moveRoom').onclick=()=>transferSelected('move');$('saveCurrent').onclick=()=>saveCurrentNow(true);
+document.querySelectorAll('[data-save]').forEach(b=>b.onclick=async()=>{localStorage.setItem(localKey(rid,b.dataset.save),JSON.stringify({geometry:geom(),items:items(),savedAt:Date.now()}));await saveCurrentNow(false);alert(b.dataset.save+' 배치안을 백업하고 현재 배치도 저장했습니다.')});
+document.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{let z=JSON.parse(localStorage.getItem(localKey(rid,b.dataset.load))||'null');if(!z)return alert('저장된 배치안이 없습니다.');if(z.geometry)setGeom(z.geometry);drawGeom();renderItems(z.items||[]);saveLocal();window.scheduleCloudSave()});
 window.addEventListener('resize',()=>{drawOpenings(geom());updateAll()});
 
 window.TTOBOK_APP={
@@ -340,14 +355,17 @@ window.TTOBOK_APP={
  onCloudGeometry:(roomId,g)=>{if(roomId!==rid)return;let clean=normalizeGeom(roomId,g);GEOMS[roomId]=clean;localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}
 };
 
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLocal()});
+window.addEventListener('pagehide',()=>saveLocal());
 renderCatalog();updateTargets();drawGeom();loadLocal();
 </script>
 
 <script src="firebase-config.js"></script>
 <script type="module">
 const A=window.TTOBOK_APP,cfg=window.TTOBOK_FIREBASE_CONFIG,dot=document.getElementById('dot'),txt=document.getElementById('syncText');
-let auth,db,user,fid=localStorage.getItem('ttobok_family_id')||'',unsub,timer,M,applying=false;
-window.scheduleCloudSave=()=>{if(applying||!db||!user||!fid)return;clearTimeout(timer);timer=setTimeout(save,650)};
+let auth,db,user,fid=localStorage.getItem('ttobok_family_id')||'',unsub,timer,M,applying=false;window.TTOBOK_IS_LOGGED_IN=false;
+window.scheduleCloudSave=()=>{if(applying||!db||!user||!fid)return;clearTimeout(timer);timer=setTimeout(()=>save().catch(()=>{}),650)};
+window.flushCloudSave=async()=>{if(applying||!db||!user||!fid)return false;clearTimeout(timer);await save();return true};
 window.restartCloudRoom=()=>{if(user&&fid)listen()};
 async function init(){
  try{
@@ -355,21 +373,30 @@ async function init(){
   const a=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js');
   const f=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js');
   M={a,f};let x=app.initializeApp(cfg);auth=a.getAuth(x);db=f.getFirestore(x);
-  a.onAuthStateChanged(auth,u=>{user=u;if(u){dot.className='dot on';document.getElementById('login').textContent='로그아웃';txt.textContent=fid?'공동 동기화 · '+(u.displayName||u.email||'로그인'):'가족 코드 설정';if(fid)listen()}else{dot.className='dot';document.getElementById('login').textContent='Google 로그인';txt.textContent='로그인 필요'}});
+  a.onAuthStateChanged(auth,u=>{user=u;window.TTOBOK_IS_LOGGED_IN=!!u;if(u){dot.className='dot on';document.getElementById('login').textContent='로그아웃';txt.textContent=fid?'공동 동기화 · '+(u.displayName||u.email||'로그인'):'가족 코드 설정';if(fid)listen()}else{dot.className='dot';document.getElementById('login').textContent='Google 로그인';txt.textContent='로그인 필요'}});
  }catch(e){dot.className='dot err';txt.textContent='Firebase 연결 오류'}
 }
 document.getElementById('login').onclick=async()=>user?M.a.signOut(auth):M.a.signInWithPopup(auth,new M.a.GoogleAuthProvider());
 document.getElementById('family').onclick=()=>{let v=prompt('가족 코드',fid||'parks-family');if(v){fid=v.trim();localStorage.setItem('ttobok_family_id',fid);if(user)listen()}};
 async function save(){
- let f=M.f,roomId=A.getRoom();
- await f.setDoc(f.doc(db,'families',fid,'rooms',roomId),{roomId,geometry:{...A.geom(),roomId},items:A.items(),updatedAt:f.serverTimestamp(),updatedBy:user.displayName||user.email||user.uid},{merge:true});
+ let f=M.f,roomId=A.getRoom(),payload={roomId,geometry:{...A.geom(),roomId},items:A.items(),clientSavedAt:Date.now(),updatedAt:f.serverTimestamp(),updatedBy:user.displayName||user.email||user.uid};
+ await f.setDoc(f.doc(db,'families',fid,'rooms',roomId),payload,{merge:true});
+ return true;
 }
 function listen(){
  let f=M.f;if(unsub)unsub();let roomId=A.getRoom();
  unsub=f.onSnapshot(f.doc(db,'families',fid,'rooms',roomId),snap=>{
-  if(roomId!==A.getRoom()||!snap.exists())return;let z=snap.data();applying=true;
+  if(roomId!==A.getRoom()||!snap.exists())return;let z=snap.data();
+  let local=null;try{local=JSON.parse(localStorage.getItem(`ttobok_v3_${roomId}_cur`)||'null')}catch(e){}
+  let localTime=+(local?.savedAt||0),cloudTime=+(z.clientSavedAt||0);
+  if(localTime&&localTime>cloudTime+500){
+   txt.textContent='로컬 최신 배치 공동 저장 중...';save().catch(()=>{});
+   return;
+  }
+  applying=true;
   if(z.geometry)A.onCloudGeometry(roomId,z.geometry);
   A.renderItems((z.items||[]).map(A.normalizeItem));
+  localStorage.setItem(`ttobok_v3_${roomId}_cur`,JSON.stringify({items:A.items(),savedAt:cloudTime||Date.now()}));
   applying=false;txt.textContent='공동 동기화 · '+(z.updatedBy||user.displayName||'가족');
  },()=>{dot.className='dot err';txt.textContent='권한/동기화 오류'});
 }
