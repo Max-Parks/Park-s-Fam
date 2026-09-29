@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>또복이 Family Room Planner V3.24</title>
+<title>또복이 Family Room Planner V3.25</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -24,7 +24,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 #room{position:relative;width:540px;background:transparent;box-shadow:0 8px 28px #0001;touch-action:none;overflow:visible}
 .roomShape{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
 .wallPoly{fill:#fbfaf7;stroke:#424640;stroke-width:5;vector-effect:non-scaling-stroke}
-.measureLine{stroke:var(--measure);stroke-width:1;stroke-dasharray:6 5;vector-effect:non-scaling-stroke}.measureText{fill:var(--measure);font-size:48px}
+.measureLine{stroke:var(--measure);stroke-width:1.4;stroke-dasharray:7 5;vector-effect:non-scaling-stroke}.measureText{fill:#7b6857;font-size:54px;font-weight:700;paint-order:stroke;stroke:#fff;stroke-width:10px;stroke-linejoin:round}.measureTextSub{fill:#8e8174;font-size:44px;font-weight:600;paint-order:stroke;stroke:#fff;stroke-width:9px;stroke-linejoin:round}
 .window{position:absolute;height:8px;background:#9cc7d4;border-top:2px solid #fff}.doorGap{position:absolute;height:10px;background:#fbfaf7}
 .doorLeaf{position:absolute;height:2px;background:#8f806e;transform-origin:left top}.doorArc{position:absolute;overflow:visible;pointer-events:none}.doorArc svg{display:block;overflow:visible}.doorArc path{fill:none;stroke:#b5a997;stroke-width:1;stroke-dasharray:4 3}.doorHingeDot{position:absolute;width:6px;height:6px;border-radius:50%;background:#8f806e;transform:translate(-3px,-3px);pointer-events:none;z-index:4}
 .label{position:absolute;font-size:10px;pointer-events:none}.winLabel{color:#57818d}.doorLabel{color:#8f806e}
@@ -48,7 +48,7 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 </head>
 <body>
 <header>
-<h1>또복이 Family Room Planner <small>V3.24</small></h1>
+<h1>또복이 Family Room Planner <small>V3.25</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
 </header>
@@ -121,7 +121,8 @@ input,select,textarea{border:1px solid var(--line);border-radius:8px;padding:7px
 <div class="shapeHint"><b>복도 / 하부 거실 영역</b></div>
 <div class="row" style="margin-top:5px">복도 높이 <input id="lvCorrH" type="number"> 하부 거실 폭 <input id="lvLivingW" type="number"></div>
 <div id="lvInfo" class="small" style="margin-top:4px"></div>
-<div class="small" style="margin-top:6px">현재 값은 사용자가 표시한 파란 영역과 원도면 치수 비율을 맞춘 1차값입니다. 실제 실측 후 숫자만 수정할 수 있습니다.</div>
+<div id="lvDimSummary" class="shapeHint" style="margin-top:7px"></div>
+<div class="small" style="margin-top:6px">※ 도면에 표시되는 수치는 현재 모델의 초기값입니다. 원도면에서 직접 확인된 값과 비율로 잡은 값이 섞여 있으므로 실제 실측 후 숫자만 수정하면 됩니다.</div>
 </div>
 
 <div class="row" style="margin-top:8px"><button id="applyMeasure" class="primary">실측값 적용</button><button id="resetMeasure">현재 방 실측값 초기화</button></div>
@@ -377,7 +378,7 @@ function drawShape(g){
  $('polyText').value=p.map(v=>v.join(',')).join(' / ');
  $('shapeHint').textContent=rid==='master'?'안방 전체 도면: 구역별 연결 · 문없는 통로/베란다 개구는 열린 공간 · 실제 내부벽만 충돌 판정':rid==='living'?'거실·주방·복도 통합 도면: 사용자가 표시한 파란 영역의 단계형 외곽을 우선 반영 · 가전/가구는 별도 배치':(p.length>4?'내측 벽선: 비정형 다각형 · 실제 벽선 기준 충돌 판정':'내측 벽선: 직사각형 · 방별 독립 도면');
  let m=$('measures');m.innerHTML='';
- if(rid!=='smallroom1'){
+ if(rid!=='smallroom1'&&rid!=='living'){
   m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`;
  }
  if(rid==='smallroom2'){
@@ -385,11 +386,47 @@ function drawShape(g){
   m.innerHTML+=`<text class="measureText" x="${tx+g.trw/2}" y="${g.trd+105}" text-anchor="middle">${g.trw} mm</text><text class="measureText" x="${g.w-g.brw/2}" y="${by-80}" text-anchor="middle">${g.brw} mm</text>`;
  }
  if(rid==='living'){
-  m.innerHTML+=`<text class="measureText" x="${g.topW/2}" y="45" text-anchor="middle">상단 ${g.topW} mm</text>
-  <text class="measureText" x="${g.upperW-((g.upperW-g.topW)/2)}" y="${g.stepY+75}" text-anchor="middle">2단 ${g.upperW-g.topW} mm</text>
-  <text class="measureText" x="${g.w-((g.w-g.upperW)/2)}" y="${g.corridorY+90}" text-anchor="middle">복도 확장 ${g.w-g.upperW} mm</text>
-  <text class="measureText" x="${g.w-40}" y="${g.corridorY+g.corridorH/2}" transform="rotate(-90 ${g.w-40} ${g.corridorY+g.corridorH/2})" text-anchor="middle">복도 높이 ${g.corridorH} mm</text>
-  <text class="measureText" x="${g.livingW/2}" y="${g.h-70}" text-anchor="middle">하부 거실 폭 ${g.livingW} mm</text>`;
+  let v1=g.stepY,
+      h2=g.upperW-g.topW,
+      v2=g.corridorY-g.stepY,
+      h3=g.w-g.upperW,
+      v3=g.corridorH,
+      h4=g.w-g.livingW,
+      v4=g.h-(g.corridorY+g.corridorH);
+
+  m.innerHTML+=`
+  <line class="measureLine" x1="0" y1="-150" x2="${g.w}" y2="-150"/>
+  <text class="measureText" x="${g.w/2}" y="-185" text-anchor="middle">전체 폭 약 ${g.w.toLocaleString()} mm</text>
+
+  <line class="measureLine" x1="-150" y1="0" x2="-150" y2="${g.h}"/>
+  <text class="measureText" x="-190" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -190 ${g.h/2})">전체 깊이 ${g.h.toLocaleString()} mm</text>
+
+  <line class="measureLine" x1="0" y1="115" x2="${g.topW}" y2="115"/>
+  <text class="measureText" x="${g.topW/2}" y="95" text-anchor="middle">상단 ${g.topW.toLocaleString()}</text>
+
+  <line class="measureLine" x1="${g.topW-110}" y1="0" x2="${g.topW-110}" y2="${g.stepY}"/>
+  <text class="measureTextSub" x="${g.topW-145}" y="${g.stepY/2}" text-anchor="middle" transform="rotate(-90 ${g.topW-145} ${g.stepY/2})">${v1.toLocaleString()}</text>
+
+  <line class="measureLine" x1="${g.topW}" y1="${g.stepY+130}" x2="${g.upperW}" y2="${g.stepY+130}"/>
+  <text class="measureText" x="${g.topW+h2/2}" y="${g.stepY+105}" text-anchor="middle">+${h2.toLocaleString()}</text>
+
+  <line class="measureLine" x1="${g.upperW-115}" y1="${g.stepY}" x2="${g.upperW-115}" y2="${g.corridorY}"/>
+  <text class="measureTextSub" x="${g.upperW-150}" y="${g.stepY+v2/2}" text-anchor="middle" transform="rotate(-90 ${g.upperW-150} ${g.stepY+v2/2})">${v2.toLocaleString()}</text>
+
+  <line class="measureLine" x1="${g.upperW}" y1="${g.corridorY+130}" x2="${g.w}" y2="${g.corridorY+130}"/>
+  <text class="measureText" x="${g.upperW+h3/2}" y="${g.corridorY+105}" text-anchor="middle">복도 +${h3.toLocaleString()}</text>
+
+  <line class="measureLine" x1="${g.w-130}" y1="${g.corridorY}" x2="${g.w-130}" y2="${g.corridorY+g.corridorH}"/>
+  <text class="measureTextSub" x="${g.w-165}" y="${g.corridorY+v3/2}" text-anchor="middle" transform="rotate(-90 ${g.w-165} ${g.corridorY+v3/2})">${v3.toLocaleString()}</text>
+
+  <line class="measureLine" x1="${g.livingW}" y1="${g.corridorY+g.corridorH-130}" x2="${g.w}" y2="${g.corridorY+g.corridorH-130}"/>
+  <text class="measureText" x="${g.livingW+h4/2}" y="${g.corridorY+g.corridorH-155}" text-anchor="middle">-${h4.toLocaleString()}</text>
+
+  <line class="measureLine" x1="${g.livingW-120}" y1="${g.corridorY+g.corridorH}" x2="${g.livingW-120}" y2="${g.h}"/>
+  <text class="measureTextSub" x="${g.livingW-155}" y="${g.corridorY+g.corridorH+v4/2}" text-anchor="middle" transform="rotate(-90 ${g.livingW-155} ${g.corridorY+g.corridorH+v4/2})">${v4.toLocaleString()}</text>
+
+  <line class="measureLine" x1="0" y1="${g.h-135}" x2="${g.livingW}" y2="${g.h-135}"/>
+  <text class="measureText" x="${g.livingW/2}" y="${g.h-165}" text-anchor="middle">하부 거실 폭 ${g.livingW.toLocaleString()}</text>`;
  }
  if(rid==='smallroom1'){
   let doorEnd=g.dp+g.dw,gap=Math.max(0,g.closetX-doorEnd);
@@ -571,7 +608,14 @@ function updateMeasureEditor(g){
  }
  if(rid==='living'){
   setInputs({lvW:g.w,lvH:g.h,lvTopW:g.topW,lvUpperW:g.upperW,lvStepY:g.stepY,lvCorrY:g.corridorY,lvCorrH:g.corridorH,lvLivingW:g.livingW});
-  $('lvInfo').textContent=`상부 ${g.topW.toLocaleString()} → ${g.upperW.toLocaleString()} mm · 복도 시작 ${g.corridorY.toLocaleString()} mm · 복도 높이 ${g.corridorH.toLocaleString()} mm · 하부 거실 폭 ${g.livingW.toLocaleString()} mm`;
+  let h2=g.upperW-g.topW,v2=g.corridorY-g.stepY,h3=g.w-g.upperW,h4=g.w-g.livingW,v4=g.h-(g.corridorY+g.corridorH);
+  $('lvInfo').textContent=`현재 외곽: ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;
+  $('lvDimSummary').innerHTML=`<b>현재 도면 치수</b><br>
+  상단 ${g.topW.toLocaleString()} · 1단 깊이 ${g.stepY.toLocaleString()}<br>
+  2단 확장 +${h2.toLocaleString()} · 중간 세로 ${v2.toLocaleString()}<br>
+  복도 확장 +${h3.toLocaleString()} · 복도 높이 ${g.corridorH.toLocaleString()}<br>
+  우측 복도→하부 축소 ${h4.toLocaleString()} · 하부 세로 ${v4.toLocaleString()}<br>
+  하부 거실 폭 ${g.livingW.toLocaleString()} mm`;
  }
 }
 function readMasterMeasure(){
@@ -631,7 +675,7 @@ function applyUnifiedMeasure(){
 
 function drawGeom(){
  let g=geom();room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';$('zoomVal').textContent=Math.round(zoom*100)+'%';
- $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 실측 수정 모드 지원 · 문/하단개구/우측 꺾임 편집':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 가전/가구 미배치 · 실측 수정 지원';
+ $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 실측 수정 모드 지원 · 문/하단개구/우측 꺾임 편집':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 전체/구간 치수 표시 · 가전/가구 미배치';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
  $('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
  if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;$('rightClearInfo').textContent=`우측 직선 ${(g.h-g.trd-g.brd).toLocaleString()} mm (도면 3,195)`;}
@@ -688,7 +732,7 @@ $('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
- if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.24 기본 도면값으로 되돌릴까요?`))return;
+ if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.25 기본 도면값으로 되돌릴까요?`))return;
  delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
