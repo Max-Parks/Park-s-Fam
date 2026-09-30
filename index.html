@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.38</title>
+<title>또복이 Family Room Planner V3.39</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -61,6 +61,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 #polyText{width:100%;min-height:58px;margin-top:5px;font-size:11px}.ok{color:#4f8b57}.warn{color:#9b6b25}
 
 .mobileViewBtn{display:none}
+.mobileMoveControls{display:none}
 @media(max-width:760px){
   body{font-size:15px}
   header{padding:8px 10px;padding-right:112px}
@@ -78,6 +79,10 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
   #room{width:430px}
   .toolbar{gap:4px;padding:6px}
   .toolbar button{padding:7px 8px}
+  .mobileMoveControls{display:flex;width:100%;align-items:center;justify-content:center;gap:5px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:6px;margin-top:2px}
+  .mobileMoveControls select{width:auto;min-width:76px}
+  .mobileMoveControls button{min-width:44px;font-size:20px;font-weight:800}
+  .furn.sel{outline-width:4px;box-shadow:0 0 0 5px #ffffffaa}
   .mobileViewBtn{
     display:block;position:fixed;z-index:120;right:8px;top:8px;
     border:1px solid var(--accent);background:#fff;border-radius:10px;
@@ -107,9 +112,9 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </head>
 <body data-diagram-font="large">
 <header>
-<h1>또복이 Family Room Planner <small>V3.38</small></h1>
+<h1>또복이 Family Room Planner <small>V3.39</small></h1>
 <div id="summary" class="sub"></div>
-<div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button></div>
+<div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button><button id="syncPull" title="가족 공동 저장소의 배치를 이 기기로 다시 불러옵니다">↻ 공동 배치 불러오기</button></div>
 </header>
 <button id="mobileView" class="mobileViewBtn" type="button">📱 도면 크게</button>
 
@@ -254,8 +259,8 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </div>
 
 <div class="card save"><h2>배치 저장</h2>
-<div class="row"><button id="saveCurrent" class="primary">현재 배치 저장</button><span id="saveState" class="small">자동 저장 사용 중</span></div>
-<div class="small" style="margin-top:7px">A/B/C는 백업 배치안입니다. 저장 시 현재 배치도 함께 동기화됩니다.</div>
+<div class="row"><button id="saveCurrent" class="primary">현재 배치 저장</button><button id="syncAll">전체 방 공동 저장</button><span id="saveState" class="small">자동 저장 사용 중</span></div>
+<div class="small" style="margin-top:7px">A/B/C는 이 기기의 백업 배치안입니다. <b>전체 방 공동 저장</b>은 이 기기에 저장된 각 방의 현재 가구 배치를 가족 공동 저장소로 한 번에 올립니다.</div>
 <div class="row" style="margin-top:7px">
 <button data-save="A">A 저장</button><button data-load="A">A 불러오기</button>
 <button data-save="B">B 저장</button><button data-load="B">B 불러오기</button>
@@ -279,8 +284,13 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 <button id="zoomOut">－ 축소</button><span id="zoomVal" class="zoomVal">100%</span><button id="zoomIn">＋ 확대</button><button id="fit">화면 기준</button>
 <button id="z200">200%</button><button id="z300">300%</button><button id="z400">400%</button>
 <button id="rot">↻ 90°</button><button id="dup">＋ 복제</button><button id="del">× 제거</button><button id="clear">전체 비우기</button>
+<div id="mobileMoveControls" class="mobileMoveControls">
+  <span class="small"><b>선택 가구 미세이동</b></span>
+  <select id="moveStep" aria-label="가구 이동 간격"><option value="10">10mm</option><option value="50" selected>50mm</option><option value="100">100mm</option></select>
+  <button id="mvLeft" title="왼쪽 이동">←</button><button id="mvUp" title="위 이동">↑</button><button id="mvDown" title="아래 이동">↓</button><button id="mvRight" title="오른쪽 이동">→</button>
 </div>
-<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 편집패널을 숨기고 도면만 전체화면으로 볼 수 있습니다.</div>
+</div>
+<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 도면만 전체화면으로 볼 수 있습니다. 가구를 선택한 뒤 하단의 ← ↑ ↓ → 버튼으로 10/50/100 mm씩 정확하게 이동할 수 있습니다.</div>
 </div></main>
 </div>
 
@@ -947,7 +957,13 @@ function bind(e){e.onpointerdown=v=>{select(e);e.setPointerCapture(v.pointerId);
 function select(e){if(selected)selected.classList.remove('sel');selected=e;e.classList.add('sel');status()}
 function clearFurniture(){[...room.querySelectorAll('.furn')].forEach(e=>e.remove());selected=null}
 function items(){return [...room.querySelectorAll('.furn')].map(e=>storageItem({n:e.dataset.n,w:e.dataset.w,d:e.dataset.d,x:e.dataset.x,y:e.dataset.y,r:e.dataset.r,type:e.dataset.type||'furniture'}))}
-function renderItems(arr){suppressSave=true;clearFurniture();(arr||[]).map(normalizeItem).forEach(a=>addFurniture(a,true));suppressSave=false;updateAll()}
+function renderItems(arr){
+ suppressSave=true;
+ clearFurniture();
+ (arr||[]).map(normalizeItem).forEach(a=>addFurniture(a,true));
+ updateAll();
+ suppressSave=false;
+}
 function loadLocal(){
  let z;try{z=JSON.parse(localStorage.getItem(localKey())||'null')}catch(e){z=null}
  renderItems(z?.items||[]);
@@ -997,7 +1013,7 @@ $('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
- if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.38 기본 도면값으로 되돌릴까요?`))return;
+ if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.39 기본 도면값으로 되돌릴까요?`))return;
  delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
@@ -1015,6 +1031,20 @@ $('mobileView').onclick=()=>{
 };
 $('z200').onclick=()=>setZoom(2);$('z300').onclick=()=>setZoom(3);$('z400').onclick=()=>setZoom(4);
 $('fontSizeSel').onchange=e=>setDiagramFont(e.target.value);
+
+function nudgeSelected(dx,dy){
+ if(!selected||!selected.isConnected)return setSaveState('먼저 이동할 가구를 선택해주세요.',false);
+ let step=+$('moveStep').value||50,g=geom(),q=dims(selected);
+ let nx=(+selected.dataset.x)+(dx*step),ny=(+selected.dataset.y)+(dy*step);
+ nx=Math.max(0,Math.min(g.w-q.w,nx));
+ ny=Math.max(0,Math.min(g.h-q.h,ny));
+ selected.dataset.x=Math.round(nx);selected.dataset.y=Math.round(ny);updateAll();
+}
+$('mvLeft').onclick=()=>nudgeSelected(-1,0);
+$('mvRight').onclick=()=>nudgeSelected(1,0);
+$('mvUp').onclick=()=>nudgeSelected(0,-1);
+$('mvDown').onclick=()=>nudgeSelected(0,1);
+
 $('rot').onclick=()=>{if(selected){selected.dataset.r=(+selected.dataset.r+90)%180;updateAll()}};
 $('dup').onclick=()=>{if(selected){addFurniture({n:selected.dataset.n,w:+selected.dataset.w,d:+selected.dataset.d,x:+selected.dataset.x+100,y:+selected.dataset.y+100,r:+selected.dataset.r});updateAll()}};
 $('del').onclick=()=>{if(selected){let e=selected;selected=null;e.remove();updateAll()}};
@@ -1025,7 +1055,7 @@ async function saveCurrentNow(showAlert=false){
  setSaveState('공동 저장 중...');
  let ok=false;
  try{if(window.flushCloudSave)ok=await window.flushCloudSave()}catch(e){ok=false}
- setSaveState(ok?'현재 배치 공동 저장 완료':'현재 배치 로컬 저장 완료'+(window.TTOBOK_IS_LOGGED_IN?' · 공동 저장 확인 필요':''));
+ setSaveState(ok?'현재 방 배치 공동 저장 완료':'현재 배치 로컬 저장 완료'+(window.TTOBOK_IS_LOGGED_IN?' · 공동 저장 확인 필요':''));
  if(showAlert)alert(ok?'현재 배치를 저장하고 공동 동기화했습니다.':'현재 배치를 이 기기에 저장했습니다.');
  return ok;
 }
@@ -1036,6 +1066,18 @@ window.addEventListener('resize',()=>{drawOpenings(geom());updateAll();if(window
 
 window.TTOBOK_APP={
  normalizeItem,storageItem,geom,setGeom,items,renderItems,getRoom:()=>rid,
+ getRoomIds:()=>Object.keys(ROOM_DEFAULTS),
+ getGeomForRoom:(roomId)=>normalizeGeom(roomId,GEOMS[roomId]||ROOM_DEFAULTS[roomId]),
+ getLocalRoomData:(roomId)=>{
+   let z=null;try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
+   return {geometry:normalizeGeom(roomId,GEOMS[roomId]||ROOM_DEFAULTS[roomId]),items:(z?.items||[]).map(normalizeItem),savedAt:+(z?.savedAt||0)};
+ },
+ applyCloudRoomData:(roomId,z)=>{
+   if(z?.geometry){GEOMS[roomId]=normalizeGeom(roomId,z.geometry);localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS))}
+   let arr=(z?.items||[]).map(normalizeItem);
+   localStorage.setItem(localKey(roomId),JSON.stringify({items:arr.map(storageItem),savedAt:+(z?.clientSavedAt||Date.now())}));
+   if(roomId===rid){drawGeom();renderItems(arr);setSaveState('공동 배치를 이 기기에 적용함')}
+ },
  onCloudGeometry:(roomId,g)=>{if(roomId!==rid)return;let clean=normalizeGeom(roomId,g);GEOMS[roomId]=clean;localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}
 };
 
@@ -1058,11 +1100,11 @@ async function init(){
   const a=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js');
   const f=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js');
   M={a,f};let x=app.initializeApp(cfg);auth=a.getAuth(x);db=f.getFirestore(x);
-  a.onAuthStateChanged(auth,u=>{user=u;window.TTOBOK_IS_LOGGED_IN=!!u;if(u){dot.className='dot on';document.getElementById('login').textContent='로그아웃';txt.textContent=fid?'공동 동기화 · '+(u.displayName||u.email||'로그인'):'가족 코드 설정';if(fid)listen()}else{dot.className='dot';document.getElementById('login').textContent='Google 로그인';txt.textContent='로그인 필요'}});
+  a.onAuthStateChanged(auth,u=>{user=u;window.TTOBOK_IS_LOGGED_IN=!!u;if(u){dot.className='dot on';document.getElementById('login').textContent='로그아웃';txt.textContent=fid?'공동 동기화 · '+fid+' · '+(u.displayName||u.email||'로그인'):'가족 코드 설정';if(fid)listen()}else{dot.className='dot';document.getElementById('login').textContent='Google 로그인';txt.textContent='로그인 필요'}});
  }catch(e){dot.className='dot err';txt.textContent='Firebase 연결 오류'}
 }
 document.getElementById('login').onclick=async()=>user?M.a.signOut(auth):M.a.signInWithPopup(auth,new M.a.GoogleAuthProvider());
-document.getElementById('family').onclick=()=>{let v=prompt('가족 코드',fid||'parks-family');if(v){fid=v.trim();localStorage.setItem('ttobok_family_id',fid);if(user)listen()}};
+document.getElementById('family').onclick=()=>{let v=prompt('가족 코드',fid||'parks-family');if(v){fid=v.trim();localStorage.setItem('ttobok_family_id',fid);txt.textContent='가족 코드 · '+fid;if(user)listen()}};
 async function save(){
  let f=M.f,roomId=A.getRoom(),payload={roomId,geometry:{...A.geom(),roomId},items:A.items(),clientSavedAt:Date.now(),updatedAt:f.serverTimestamp(),updatedBy:user.displayName||user.email||user.uid};
  await f.setDoc(f.doc(db,'families',fid,'rooms',roomId),payload,{merge:true});
@@ -1071,20 +1113,88 @@ async function save(){
 function listen(){
  let f=M.f;if(unsub)unsub();let roomId=A.getRoom();
  unsub=f.onSnapshot(f.doc(db,'families',fid,'rooms',roomId),snap=>{
-  if(roomId!==A.getRoom()||!snap.exists())return;let z=snap.data();
-  let local=null;try{local=JSON.parse(localStorage.getItem(`ttobok_v3_${roomId}_cur`)||'null')}catch(e){}
-  let localTime=+(local?.savedAt||0),cloudTime=+(z.clientSavedAt||0);
-  if(localTime&&localTime>cloudTime+500){
-   txt.textContent='로컬 최신 배치 공동 저장 중...';save().catch(()=>{});
+  if(roomId!==A.getRoom())return;
+
+  let local=A.getLocalRoomData(roomId),localItems=local.items||[];
+
+  if(!snap.exists()){
+   if(localItems.length){
+    txt.textContent='이 기기 배치를 공동 저장 중...';
+    save().catch(()=>{});
+   }else{
+    txt.textContent='공동 동기화 · '+fid+' · 아직 저장된 배치 없음';
+   }
    return;
   }
+
+  let z=snap.data(),cloudItems=(z.items||[]).map(A.normalizeItem);
+
+  // 새 휴대폰의 빈 로컬 상태가 PC의 공동 배치를 덮어쓰지 않도록 보호.
+  // 반대로 클라우드가 비어 있고 이 기기에 실제 가구가 있으면 기존 PC/태블릿 배치를 공동 저장한다.
+  if(cloudItems.length===0 && localItems.length>0){
+   txt.textContent='이 기기의 기존 배치를 공동 저장 중...';
+   save().catch(()=>{});
+   return;
+  }
+
   applying=true;
-  if(z.geometry)A.onCloudGeometry(roomId,z.geometry);
-  A.renderItems((z.items||[]).map(A.normalizeItem));
-  localStorage.setItem(`ttobok_v3_${roomId}_cur`,JSON.stringify({items:A.items(),savedAt:cloudTime||Date.now()}));
-  applying=false;txt.textContent='공동 동기화 · '+(z.updatedBy||user.displayName||'가족');
+  A.applyCloudRoomData(roomId,z);
+  applying=false;
+  txt.textContent='공동 동기화 · '+fid+' · '+(z.updatedBy||user.displayName||'가족');
  },()=>{dot.className='dot err';txt.textContent='권한/동기화 오류'});
 }
+
+window.pushAllRooms=async()=>{
+ if(!db||!user||!fid)return false;
+ let f=M.f,ids=A.getRoomIds(),count=0;
+ txt.textContent='전체 방 공동 저장 중...';
+ for(const roomId of ids){
+   let local=A.getLocalRoomData(roomId);
+   let payload={
+     roomId,
+     geometry:{...local.geometry,roomId},
+     items:(local.items||[]).map(A.storageItem),
+     clientSavedAt:Date.now(),
+     updatedAt:f.serverTimestamp(),
+     updatedBy:user.displayName||user.email||user.uid
+   };
+   await f.setDoc(f.doc(db,'families',fid,'rooms',roomId),payload,{merge:true});
+   count++;
+ }
+ txt.textContent=`전체 ${count}개 방 공동 저장 완료 · ${fid}`;
+ return true;
+};
+
+window.pullAllRooms=async()=>{
+ if(!db||!user||!fid)return false;
+ let f=M.f,ids=A.getRoomIds(),count=0,preserved=0;
+ txt.textContent='공동 배치 불러오는 중...';
+ for(const roomId of ids){
+   let snap=await f.getDoc(f.doc(db,'families',fid,'rooms',roomId));
+   if(!snap.exists())continue;
+   let z=snap.data(),cloudItems=(z.items||[]).map(A.normalizeItem),local=A.getLocalRoomData(roomId);
+   if(cloudItems.length===0 && (local.items||[]).length>0){preserved++;continue}
+   A.applyCloudRoomData(roomId,z);count++;
+ }
+ txt.textContent=`공동 배치 ${count}개 방 불러옴${preserved?` · 로컬 보호 ${preserved}개`:''} · ${fid}`;
+ return true;
+};
+
+document.getElementById('syncPull').onclick=async()=>{
+ if(!user)return alert('먼저 Google 로그인을 해주세요.');
+ if(!fid)return alert('먼저 가족 코드를 설정해주세요.');
+ try{await window.pullAllRooms()}catch(e){dot.className='dot err';txt.textContent='공동 배치 불러오기 실패';alert('공동 배치를 불러오지 못했습니다. 로그인과 가족 코드를 확인해주세요.')}
+};
+document.getElementById('syncAll').onclick=async()=>{
+ if(!user)return alert('먼저 Google 로그인을 해주세요.');
+ if(!fid)return alert('먼저 가족 코드를 설정해주세요.');
+ if(!confirm('이 기기에 저장된 모든 방의 현재 배치를 가족 공동 저장소에 올릴까요?'))return;
+ try{
+   let ok=await window.pushAllRooms();
+   if(ok){A.getLocalRoomData(A.getRoom());alert('이 기기의 모든 방 현재 배치를 공동 저장했습니다.')}
+ }catch(e){dot.className='dot err';txt.textContent='전체 방 공동 저장 실패';alert('전체 방 공동 저장에 실패했습니다.')}
+};
+
 window.cloudAppendItem=async(target,item)=>{
  if(!db||!user||!fid)return false;let f=M.f,ref=f.doc(db,'families',fid,'rooms',target),snap=await f.getDoc(ref),z=snap.exists()?snap.data():{},arr=(z.items||[]).map(A.normalizeItem);arr.push(A.normalizeItem(item));
  await f.setDoc(ref,{roomId:target,items:arr.map(A.storageItem),updatedAt:f.serverTimestamp(),updatedBy:user.displayName||user.email||user.uid},{merge:true});return true;
