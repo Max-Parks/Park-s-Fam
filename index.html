@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.41</title>
+<title>또복이 Family Room Planner V3.42</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -13,8 +13,8 @@ header{padding:12px 16px;background:#fff;border-bottom:1px solid var(--line);pos
 h1{font-size:18px;margin:0 0 4px}.small,.sub{font-size:11px;color:var(--muted)}
 .app{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 70px)}
 aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto}
-.stage{padding:16px;overflow:auto;display:flex;justify-content:center;align-items:flex-start}
-.roomShell{min-width:max-content;padding:205px 210px 165px}
+.stage{padding:16px;overflow:auto;display:flex;justify-content:flex-start;align-items:flex-start;scrollbar-gutter:stable}
+.roomShell{min-width:max-content;padding:205px 210px 165px;margin-left:auto;margin-right:auto}
 .card{border:1px solid var(--line);border-radius:12px;padding:11px;margin-bottom:10px;background:#fff}.card h2{font-size:14px;margin:0 0 8px}
 .row,.sync{display:flex;gap:7px;align-items:center;flex-wrap:wrap}
 button,input,select,textarea{font:inherit}button{border:1px solid var(--line);background:#fff;border-radius:9px;padding:8px 10px;cursor:pointer}
@@ -62,6 +62,17 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 
 .mobileViewBtn{display:none}
 .mobileMoveControls{display:none}
+
+@media(min-width:761px) and (max-width:1600px){
+  .stage{justify-content:flex-start;padding-left:10px;padding-right:10px}
+  .roomShell{
+    margin-left:0;
+    margin-right:0;
+    padding-left:285px;
+    padding-right:245px;
+  }
+}
+
 @media(max-width:760px){
   body{font-size:15px}
   header{padding:8px 10px;padding-right:112px}
@@ -112,7 +123,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </head>
 <body data-diagram-font="large">
 <header>
-<h1>또복이 Family Room Planner <small>V3.41</small></h1>
+<h1>또복이 Family Room Planner <small>V3.42</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button><button id="syncPull" title="가족 공동 저장소의 배치를 이 기기로 다시 불러옵니다">↻ 공동 배치 불러오기</button></div>
 </header>
@@ -282,7 +293,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 <option value="large">크게</option>
 <option value="xlarge">매우 크게</option>
 </select></label>
-<button id="zoomOut">－ 축소</button><span id="zoomVal" class="zoomVal">100%</span><button id="zoomIn">＋ 확대</button><button id="fit">화면 기준</button>
+<button id="zoomOut">－ 축소</button><span id="zoomVal" class="zoomVal">100%</span><button id="zoomIn">＋ 확대</button><button id="fit">화면 기준</button><button id="leftView" title="도면 왼쪽 바깥 치수부터 보기">← 좌측 보기</button>
 <button id="z200">200%</button><button id="z300">300%</button><button id="z400">400%</button>
 <button id="rot">↻ 90°</button><button id="dup">＋ 복제</button><button id="del">× 제거</button><button id="clear">전체 비우기</button>
 <div id="mobileMoveControls" class="mobileMoveControls">
@@ -291,7 +302,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
   <button id="mvLeft" title="왼쪽 이동">←</button><button id="mvUp" title="위 이동">↑</button><button id="mvDown" title="아래 이동">↓</button><button id="mvRight" title="오른쪽 이동">→</button>
 </div>
 </div>
-<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 도면만 전체화면으로 볼 수 있습니다. 가구를 선택한 뒤 하단의 ← ↑ ↓ → 버튼으로 10/50/100 mm씩 정확하게 이동할 수 있습니다.</div>
+<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다. 태블릿에서 왼쪽 치수가 안 보이면 「← 좌측 보기」를 누르면 바깥 치수 시작점으로 이동합니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 도면만 전체화면으로 볼 수 있습니다. 가구를 선택한 뒤 하단의 ← ↑ ↓ → 버튼으로 10/50/100 mm씩 정확하게 이동할 수 있습니다.</div>
 </div></main>
 </div>
 
@@ -990,9 +1001,17 @@ function applyUnifiedMeasure(){
 }
 
 function drawGeom(){
- let g=geom(),stage=document.querySelector('.stage');
+ let g=geom(),stage=document.querySelector('.stage'),shell=document.querySelector('.roomShell');
  room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';
- if(stage)stage.style.justifyContent=zoom>1.35?'flex-start':'center';
+ if(stage)stage.style.justifyContent='flex-start';
+ if(shell&&stage){
+   requestAnimationFrame(()=>{
+     let overflow=shell.scrollWidth>stage.clientWidth;
+     shell.style.marginLeft=overflow?'0':'auto';
+     shell.style.marginRight=overflow?'0':'auto';
+     if(overflow&&window.innerWidth>760&&window.innerWidth<=1600)stage.scrollLeft=0;
+   });
+ }
  $('zoomVal').textContent=Math.round(zoom*100)+'%';
  $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 출입문 실측 65+800+65=930 mm 적용 · 힌지축 65 mm 안쪽 · 모든 주요 치수는 실제 공간 바깥 표시':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':rid==='living'?'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시':rid==='laundry'?'세탁실: 좌측 문 + 상단 창호 + 좌하단 꺾임 반영 · 꺾임 560×290 mm 초기 추정 · 가전은 목록에서 배치':'공용욕실: 내측 1620×2100 · 외부→내부 밀기 · 우측하단 힌지 · 좌측 방향 개폐 · 위생기구 미배치';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
@@ -1041,7 +1060,12 @@ function setDiagramFont(v){
  if($('fontSizeSel'))$('fontSizeSel').value=v;
 }
 function setZoom(v){zoom=Math.max(.45,Math.min(4,v));localStorage.setItem('ttobok_zoom_v37',zoom);drawGeom()}
-function fitZoom(){let avail=Math.max(260,document.querySelector('.stage').clientWidth-120);setZoom(Math.min(1.25,avail/540))}
+function fitZoom(){
+ let stage=document.querySelector('.stage');
+ let reserve=(window.innerWidth>760&&window.innerWidth<=1600)?520:220;
+ let avail=Math.max(260,stage.clientWidth-reserve);
+ setZoom(Math.min(1.25,avail/540));
+}
 function switchRoom(id){
  if(!ROOM_DEFAULTS[id])return;rid=id;$('roomSel').value=id;selected=null;updateTargets();drawGeom();loadLocal();window.restartCloudRoom();
  if(window.innerWidth<=760)setTimeout(()=>fitZoom(),90);
@@ -1064,7 +1088,7 @@ $('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
- if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.41 기본 도면값으로 되돌릴까요?`))return;
+ if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.42 기본 도면값으로 되돌릴까요?`))return;
  delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
@@ -1074,6 +1098,7 @@ $('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:
 $('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원할까요?')){delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}};
 $('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!w||!d)return alert('가로와 깊이를 입력해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
 $('zoomOut').onclick=()=>setZoom(zoom-(zoom>1.5?.25:.1));$('zoomIn').onclick=()=>setZoom(zoom>1.5?zoom+.25:zoom+.1);$('fit').onclick=fitZoom;
+$('leftView').onclick=()=>{let st=document.querySelector('.stage');if(st)st.scrollTo({left:0,behavior:'smooth'})};
 $('mobileView').onclick=()=>{
  document.body.classList.toggle('mobile-focus');
  let on=document.body.classList.contains('mobile-focus');
