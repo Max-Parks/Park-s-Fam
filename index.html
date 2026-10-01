@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.49</title>
+<title>또복이 Family Room Planner V3.53</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -54,6 +54,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 .suiteDoorArc{position:absolute;overflow:visible;pointer-events:none;z-index:4}
 .suiteDoorArc path{fill:none;stroke:#b5a997;stroke-width:1;stroke-dasharray:4 3}
 .suiteDoorLabel{position:absolute;font-size:14px;color:#8f806e;pointer-events:none;z-index:5;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap}
+.houseDoorMark{position:absolute;pointer-events:none;z-index:4}.houseDoorMark svg{display:block;overflow:visible}.houseDoorMark path{fill:none;stroke:#a99a87;stroke-width:2;stroke-dasharray:10 7;vector-effect:non-scaling-stroke}.houseDoorLeaf{position:absolute;height:2px;background:#8d7e6d;transform-origin:left top;pointer-events:none}.houseDoorLabel{position:absolute;font-size:11px;font-weight:700;color:#76695c;white-space:nowrap}
 .suiteDividerLabel{position:absolute;font-size:14px;color:#7c776d;background:#ffffffcc;padding:2px 4px;border-radius:4px;pointer-events:none;z-index:4}
 .toolbar{position:sticky;bottom:8px;background:#ffffffee;border:1px solid var(--line);border-radius:12px;padding:8px;display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:12px}
 .zoomVal{min-width:54px;text-align:center;font-size:12px;color:var(--muted)}.badge{display:inline-block;padding:3px 7px;border-radius:99px;background:#edf0ea;margin:2px}
@@ -134,6 +135,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 <div class="card">
 <h2>방 선택 · 도면 편집</h2><div id="roomSource" class="small" style="margin-bottom:6px"></div>
 <select id="roomSel">
+<option value="house">집 · 전체 도면</option>
 <option value="smallroom2">작은방 2 · 아기방</option>
 <option value="smallroom1">작은방 1</option>
 <option value="master">안방</option>
@@ -343,7 +345,8 @@ const ROOM_DEFAULTS={
  laundry:{roomId:'laundry',name:'세탁실',w:1600,h:1200,dp:0,dw:800,doorSide:'left',doorHinge:'bottom',wp:275,ww:1050,windowSide:'top',notchW:560,notchD:290,shapeVersion:'laundry-v332',note:'세탁실 1차 도면입니다. 내측 폭 1,600 mm는 제공된 확대 도면의 표기값을 사용했습니다. 깊이 1,200 mm는 도면 비율 초기값입니다. 좌측 출입문은 아래쪽 힌지에서 실내 우측으로 열리고, 상단 중앙 창호는 창 시작 275 mm / 폭 1,050 mm 초기값입니다. 좌하단은 사용자가 확인한 꺾임 구조를 반영했으며, 현재 꺾임 가로 560 mm / 깊이 290 mm는 이미지 비율을 이용한 초기 추정값이라 실측 후 수정해야 합니다.'},
  commonbath:{roomId:'commonbath',name:'공용욕실',w:1620,h:2100,dp:820,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'right',doorSwing:'in-left',wp:0,ww:0,shapeVersion:'commonbath-v349',note:'공용욕실 1차 도면입니다. 도면상 내측 폭 1,620 mm / 깊이 2,100 mm를 적용했습니다. 하단 출입문은 800 × 2,200 mm이며, 욕실 외부에서 안으로 밀어 들어가는 구조입니다. 우측하단 힌지 기준 문짝 자유단이 하단 좌측 닫힘 위치에서 우측 벽 쪽 열린 위치로 감기듯 올라가는 곡선 점선으로 표시되며, 완전히 열리면 우측 벽 방향으로 붙는 형태를 표현합니다. 문 시작 X 820 mm는 내측 폭과 문 폭을 기준으로 우측 벽에 붙인 초기 좌표입니다. 상부 590 mm 표기는 욕실 내부 유효공간 치수로 확정하지 않아 이번 버전에는 별도 구조물로 넣지 않았습니다.'},
  ensuite:{roomId:'ensuite',name:'부부욕실',w:1680,h:2300,slantW:630,slantD:860,dp:60,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'left',doorSwing:'in-left-wall-arc',rightWall:820,wp:0,ww:0,shapeVersion:'ensuite-v346',note:'부부욕실 1차 도면입니다. 원도면 표기값에서 전체 폭 1,680 mm, 세로 2,300 mm, 출입문 800 × 2,200 mm, 문 우측 벽 820 mm를 적용했습니다. 문 시작 X 60 mm는 1,680−800−820으로 계산한 값입니다. 출입문은 욕실 밖에서 안으로 밀며, 닫힌 상태의 문짝 우측 끝이 좌측 방향으로 회전하고 완전히 열리면 좌측 벽측(문 시작 60 mm 위치)에 붙고, 열림 궤적은 하단 개구부에서 좌측 벽 방향으로 휘는 곡선으로 표시합니다. 좌상단 사선은 도면 비율로 약 630 × 860 mm를 초기 추정했으며 실측 전 확정값이 아닙니다.'},
- entry:{roomId:'entry',name:'현관',w:1810,h:1590,clearW:1300,sideW:510,thresholdD:310,dp:0,dw:1200,doorNominalW:1200,doorNominalH:2200,doorSide:'top',doorHinge:'left',doorSwing:'in-left-wall',openX:0,openW:1300,wp:0,ww:0,shapeVersion:'entry-v345',note:'현관 1차 도면입니다. 원도면에서 1,300 mm 유효부, 우측 510 mm 구간, 세로 1,590 mm, 하단 310 mm 구간, 현관문 1,200 × 2,200 mm를 확인했습니다. 전체 폭 1,810 mm는 1,300+510으로 계산했습니다. 하단 실내 연결 개구 1,300 mm와 현관문 개폐 방향은 도면 형상을 이용한 1차 해석이며 실측 후 수정 가능합니다.'}
+ entry:{roomId:'entry',name:'현관',w:1810,h:1590,clearW:1300,sideW:510,thresholdD:310,dp:0,dw:1200,doorNominalW:1200,doorNominalH:2200,doorSide:'top',doorHinge:'left',doorSwing:'in-left-wall',openX:0,openW:1300,wp:0,ww:0,shapeVersion:'entry-v345',note:'현관 1차 도면입니다. 원도면에서 1,300 mm 유효부, 우측 510 mm 구간, 세로 1,590 mm, 하단 310 mm 구간, 현관문 1,200 × 2,200 mm를 확인했습니다. 전체 폭 1,810 mm는 1,300+510으로 계산했습니다. 하단 실내 연결 개구 1,300 mm와 현관문 개폐 방향은 도면 형상을 이용한 1차 해석이며 실측 후 수정 가능합니다.'},
+ house:{roomId:'house',name:'집 · 전체 도면',w:14220,h:10930,dp:0,dw:0,wp:0,ww:0,shapeVersion:'house-v353',note:'현재까지 정리한 안방, 거실·주방·복도, 세탁실, 공용욕실, 부부욕실, 현관, 작은방 1, 작은방 2를 하나의 집 도면으로 묶은 통합 보기입니다. 원도면의 가로 모듈 3,820 / 4,680 / 2,840 / 2,880 mm를 기준으로 좌우 구획을 다시 정렬했고, 각 섹션에서 확정한 비정형 외곽과 문 방향도 전체 도면에 반영했습니다. 가구 배치 가이드는 넣지 않았고, 세부 실측은 추후 각 방 섹션에서 보정하면 됩니다.'}
 };
 const FURNITURE_CATALOG=[
  ['일룸 쿠시노 범퍼형 SS',1114,2065],
@@ -374,11 +377,18 @@ const FIXED_OBSTACLES={
  master:[
   {id:'masterBuiltIn',name:'붙박이장',x:0,y:1270,w:600,h:3800,note:'안방 좌측 · 깊이 약 600 mm(초기값)'}
  ],
- living:[]
+ living:[],
+ house:[
+  {id:'houseMasterBuiltIn',name:'붙박이장',x:110,y:5810,w:600,h:3800,note:'안방 좌측 고정'},
+  {id:'houseLaundryNotch',name:'세탁실 꺾임',x:7040,y:1340,w:560,h:290,note:'세탁실 좌하단 구조'}
+ ]
 };
 const EDGE_FIXTURES={
  smallroom1:[
   {id:'builtIn',name:'붙박이장',x:1410,y:-540,w:1290,h:540,note:'1,290 × 540 · 방 상단 바깥쪽 고정가구'}
+ ],
+ house:[
+  {id:'houseSmall1Closet',name:'작은방1 붙박이장',x:12820,y:6800,w:1290,h:540,note:'1,290 × 540'}
  ]
 };
 const SUITE_ZONES={
@@ -467,6 +477,31 @@ function ensuitePoly(g){
  if(!sw||!sd)return defaultPoly(g);
  return [[sw,0],[g.w,0],[g.w,g.h],[0,g.h],[0,sd]]
 }
+function housePoly(g){
+ let w=Number.isFinite(+g.w)?+g.w:14220;
+ let h=Number.isFinite(+g.h)?+g.h:10930;
+ return [
+  [0,1850],[920,930],[1500,430],[9480,430],[9480,2070],[11360,2070],[11360,3370],[12960,3370],[12960,5710],[w,5710],[w,10240],[13020,10240],[13020,h],[3600,h],[3600,9750],[640,9750],[640,8460],[0,8460]
+ ]
+}
+const HOUSE_MODULES={masterX:0,masterW:3820,commonX:3820,commonW:4680,small2X:8500,small2W:2840,small1X:11340,small1W:2880};
+function houseDoorSpecs(){
+ return [
+  {id:'hdMaster',name:'안방',side:'top',hinge:'right',x:2820,y:5810,w:890},
+  {id:'hdLaundry',name:'세탁실',side:'left',hinge:'bottom',x:7040,y:780,w:800},
+  {id:'hdCommonBath',name:'공용욕실',side:'bottom',hinge:'right',x:8680,y:4610,w:800,swing:'common'},
+  {id:'hdEnsuite',name:'부부욕실',side:'bottom',hinge:'left',x:1960,y:3700,w:800,swing:'ensuite'},
+  {id:'hdEntry',name:'현관문',side:'top',hinge:'left',x:10200,y:3440,w:1200},
+  {id:'hdSmall2',name:'작은방2',side:'top',hinge:'left',x:8570,y:7340,w:800},
+  {id:'hdSmall1',name:'작은방1',side:'top',hinge:'left',x:11410,y:7340,w:900}
+ ]
+}
+function houseZoneClip(id){
+ if(id==='hzEnsuite')return 'polygon(37.5% 0,100% 0,100% 100%,0 100%,0 37.4%)';
+ if(id==='hzLaundry')return 'polygon(0 0,100% 0,100% 100%,35% 100%,35% 75.8%,0 75.8%)';
+ if(id==='hzSmall2')return 'polygon(0 0,83.7% 0,83.7% 8.6%,100% 8.6%,100% 97.6%,79.6% 97.6%,79.6% 100%,0 100%)';
+ return '';
+}
 function livingPoly(g){
  let topW=Math.max(300,Math.min(g.w,+g.topW||2700));
  let upperW=Math.max(topW,Math.min(g.w,+g.upperW||3290));
@@ -491,6 +526,7 @@ function normalizeGeom(roomId,input){
    g={...g,doorHinge:'left',doorSwing:'in-left-wall-arc',shapeVersion:'ensuite-v346'};
  }
  if(roomId==='entry'&&String(g.shapeVersion||'')!=='entry-v345')g={};
+ if(roomId==='house'&&String(g.shapeVersion||'')!=='house-v353')g={};
  let out={...b,...g,roomId,name:b.name};
  if(roomId==='smallroom2'){
    ['trw','trd','brw','brd','dp','dw','wp','ww'].forEach(k=>{if(!Number.isFinite(+out[k]))out[k]=b[k]});
@@ -560,6 +596,11 @@ function normalizeGeom(roomId,input){
      out.openW=Number.isFinite(+out.openW)?+out.openW:b.openW;
      out.doorNominalW=1200;out.doorNominalH=2200;out.doorSide='top';out.doorHinge='left';out.doorSwing='in-left-wall';
      out.wp=0;out.ww=0;out.shapeVersion='entry-v345';out.poly=defaultPoly(out);
+   }
+   if(roomId==='house'){
+     out.w=Number.isFinite(+out.w)?+out.w:b.w;
+     out.h=Number.isFinite(+out.h)?+out.h:b.h;
+     out.dp=0;out.dw=0;out.wp=0;out.ww=0;out.shapeVersion='house-v353';out.poly=housePoly(out);
    }
    if(!Array.isArray(out.poly)||out.poly.length<3)out.poly=defaultPoly(out);
  }
@@ -633,10 +674,87 @@ function updateTargets(){
 function drawShape(g){
  let p=normPoly(g);$('roomShape').setAttribute('viewBox',`0 0 ${g.w} ${g.h}`);$('wallPoly').setAttribute('points',p.map(v=>v.join(',')).join(' '));
  $('polyText').value=p.map(v=>v.join(',')).join(' / ');
- $('shapeHint').textContent=rid==='master'?'안방 전체 도면: 구역별 연결 · 문없는 통로/베란다 개구는 열린 공간 · 실제 내부벽만 충돌 판정':rid==='living'?'거실·주방·복도 통합 도면: 사용자가 표시한 파란 영역의 단계형 외곽을 우선 반영 · 가전/가구는 별도 배치':rid==='laundry'?'세탁실: 좌측 출입문 + 상단 중앙 창호 + 좌하단 꺾임 구조 반영 · 꺾임 치수선은 실제 공간 바깥쪽 표시':rid==='commonbath'?'공용욕실: 내측 1,620 × 2,100 mm · 하단 800 × 2,200 mm 문 · 외부에서 밀어 들어감 · 우측하단 힌지 · 좌측 방향 개폐':rid==='ensuite'?'부부욕실: 1,680 × 2,300 mm 비정형 외곽 · 문은 밖에서 밀어 진입 · 좌측 힌지 · 열리면 좌측 벽측에 붙음':rid==='entry'?'현관: 1,300 + 510 = 1,810 mm 1차 모델 · 깊이 1,590 · 현관문 1,200×2,200 · 하단 실내 연결 개구 표시':(p.length>4?'내측 벽선: 비정형 다각형 · 실제 벽선 기준 충돌 판정':'내측 벽선: 직사각형 · 방별 독립 도면');
+ $('shapeHint').textContent=rid==='house'?'집 전체 보기: 각 섹션을 통합한 전체 도면 · 주요 방 경계/개구부/고정 구조 + 대표 치수선 표시 · 세부 가구/실측은 추후 보정':rid==='master'?'안방 전체 도면: 구역별 연결 · 문없는 통로/베란다 개구는 열린 공간 · 실제 내부벽만 충돌 판정':rid==='living'?'거실·주방·복도 통합 도면: 사용자가 표시한 파란 영역의 단계형 외곽을 우선 반영 · 가전/가구는 별도 배치':rid==='laundry'?'세탁실: 좌측 출입문 + 상단 중앙 창호 + 좌하단 꺾임 구조 반영 · 꺾임 치수선은 실제 공간 바깥쪽 표시':rid==='commonbath'?'공용욕실: 내측 1,620 × 2,100 mm · 하단 800 × 2,200 mm 문 · 외부에서 밀어 들어감 · 우측하단 힌지 · 좌측 방향 개폐':rid==='ensuite'?'부부욕실: 1,680 × 2,300 mm 비정형 외곽 · 문은 밖에서 밀어 진입 · 좌측 힌지 · 열리면 좌측 벽측에 붙음':rid==='entry'?'현관: 1,300 + 510 = 1,810 mm 1차 모델 · 깊이 1,590 · 현관문 1,200×2,200 · 하단 실내 연결 개구 표시':(p.length>4?'내측 벽선: 비정형 다각형 · 실제 벽선 기준 충돌 판정':'내측 벽선: 직사각형 · 방별 독립 도면');
  let m=$('measures');m.innerHTML='';
- if(rid!=='smallroom1'&&rid!=='living'&&rid!=='smallroom2'&&rid!=='ensuite'&&rid!=='entry'){
+ if(rid!=='smallroom1'&&rid!=='living'&&rid!=='smallroom2'&&rid!=='ensuite'&&rid!=='entry'&&rid!=='house'){
   m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`;
+ }
+ if(rid==='house'){
+  let topY=-430,bottomY=g.h+260,leftX=-280,rightX=g.w+235,subBottom=g.h+150,subRight=g.w+120;
+  m.innerHTML+=`
+  <line class="measureExt" x1="0" y1="0" x2="0" y2="${topY+25}"/>
+  <line class="measureExt" x1="${g.w}" y1="0" x2="${g.w}" y2="${topY+25}"/>
+  <line class="measureLine" x1="0" y1="${topY}" x2="${g.w}" y2="${topY}"/>
+  <text class="measureText" x="${g.w/2}" y="${topY-40}" text-anchor="middle">집 전체 폭 ${g.w.toLocaleString()} mm</text>
+
+  <line class="measureExt" x1="0" y1="0" x2="${leftX+25}" y2="0"/>
+  <line class="measureExt" x1="0" y1="${g.h}" x2="${leftX+25}" y2="${g.h}"/>
+  <line class="measureLine" x1="${leftX}" y1="0" x2="${leftX}" y2="${g.h}"/>
+  <text class="measureText" x="${leftX-45}" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 ${leftX-45} ${g.h/2})">집 전체 깊이 ${g.h.toLocaleString()} mm</text>
+
+  <line class="measureExt" x1="0" y1="${g.h}" x2="0" y2="${bottomY-22}"/>
+  <line class="measureExt" x1="${g.w}" y1="${g.h}" x2="${g.w}" y2="${bottomY-22}"/>
+  <line class="measureLine" x1="0" y1="${bottomY}" x2="${g.w}" y2="${bottomY}"/>
+  <text class="measureText" x="${g.w/2}" y="${bottomY+70}" text-anchor="middle">하단 기준 폭 ${g.w.toLocaleString()} mm</text>
+
+  <line class="measureExt" x1="${g.w}" y1="5710" x2="${rightX-22}" y2="5710"/>
+  <line class="measureExt" x1="${g.w}" y1="${g.h}" x2="${rightX-22}" y2="${g.h}"/>
+  <line class="measureLine" x1="${rightX}" y1="5710" x2="${rightX}" y2="${g.h}"/>
+  <text class="measureTextSub" x="${rightX+48}" y="${(5710+g.h)/2}" text-anchor="middle" transform="rotate(-90 ${rightX+48} ${(5710+g.h)/2})">우측 하부 약 5,220 mm</text>
+
+  <line class="measureExt" x1="0" y1="${g.h}" x2="0" y2="${subBottom-12}"/>
+  <line class="measureExt" x1="3600" y1="${g.h}" x2="3600" y2="${subBottom-12}"/>
+  <line class="measureLine" x1="0" y1="${subBottom}" x2="3600" y2="${subBottom}"/>
+  <text class="measureTextSub" x="1800" y="${subBottom+48}" text-anchor="middle">안방/베란다 폭 3,600</text>
+
+  <line class="measureExt" x1="8210" y1="${g.h}" x2="8210" y2="${subBottom-12}"/>
+  <line class="measureExt" x1="10910" y1="${g.h}" x2="10910" y2="${subBottom-12}"/>
+  <line class="measureLine" x1="8210" y1="${subBottom}" x2="10910" y2="${subBottom}"/>
+  <text class="measureTextSub" x="9560" y="${subBottom+48}" text-anchor="middle">작은방2 폭 2,700</text>
+
+  <line class="measureExt" x1="10910" y1="${g.h}" x2="10910" y2="${subBottom-12}"/>
+  <line class="measureExt" x1="13610" y1="${g.h}" x2="13610" y2="${subBottom-12}"/>
+  <line class="measureLine" x1="10910" y1="${subBottom}" x2="13610" y2="${subBottom}"/>
+  <text class="measureTextSub" x="12260" y="${subBottom+48}" text-anchor="middle">작은방1 폭 2,700</text>
+
+  <line class="measureExt" x1="${g.w}" y1="6170" x2="${subRight-15}" y2="6170"/>
+  <line class="measureExt" x1="${g.w}" y1="9760" x2="${subRight-15}" y2="9760"/>
+  <line class="measureLine" x1="${subRight}" y1="6170" x2="${subRight}" y2="9760"/>
+  <text class="measureTextSub" x="${subRight+42}" y="7965" text-anchor="middle" transform="rotate(-90 ${subRight+42} 7965)">침실 깊이 3,590</text>
+
+  <line class="measureExt" x1="0" y1="0" x2="0" y2="-330"/>
+  <line class="measureExt" x1="3820" y1="0" x2="3820" y2="-330"/>
+  <line class="measureExt" x1="8500" y1="0" x2="8500" y2="-330"/>
+  <line class="measureExt" x1="11340" y1="0" x2="11340" y2="-330"/>
+  <line class="measureExt" x1="14220" y1="0" x2="14220" y2="-330"/>
+  <line class="measureLine" x1="0" y1="-285" x2="3820" y2="-285"/>
+  <line class="measureLine" x1="3820" y1="-285" x2="8500" y2="-285"/>
+  <line class="measureLine" x1="8500" y1="-285" x2="11340" y2="-285"/>
+  <line class="measureLine" x1="11340" y1="-285" x2="14220" y2="-285"/>
+  <text class="measureTextSub" x="1910" y="-305" text-anchor="middle">3,820</text>
+  <text class="measureTextSub" x="6160" y="-305" text-anchor="middle">4,680</text>
+  <text class="measureTextSub" x="9920" y="-305" text-anchor="middle">2,840</text>
+  <text class="measureTextSub" x="12780" y="-305" text-anchor="middle">2,880</text>
+
+  <line class="measureExt" x1="0" y1="0" x2="0" y2="-250"/>
+  <line class="measureExt" x1="3600" y1="0" x2="3600" y2="-250"/>
+  <line class="measureLine" x1="0" y1="-210" x2="3600" y2="-210"/>
+  <text class="measureTextSub" x="1800" y="-230" text-anchor="middle">안방 구간 3,600</text>
+
+  <line class="measureExt" x1="7240" y1="430" x2="7240" y2="-160"/>
+  <line class="measureExt" x1="8840" y1="430" x2="8840" y2="-160"/>
+  <line class="measureLine" x1="7240" y1="-120" x2="8840" y2="-120"/>
+  <text class="measureTextSub" x="8040" y="-140" text-anchor="middle">세탁실 폭 1,600</text>
+
+  <line class="measureExt" x1="8120" y1="2570" x2="8120" y2="2380"/>
+  <line class="measureExt" x1="9740" y1="2570" x2="9740" y2="2380"/>
+  <line class="measureLine" x1="8120" y1="2420" x2="9740" y2="2420"/>
+  <text class="measureTextSub" x="8930" y="2400" text-anchor="middle">공용욕실 폭 1,620</text>
+
+  <line class="measureExt" x1="10020" y1="3320" x2="10020" y2="3160"/>
+  <line class="measureExt" x1="11830" y1="3320" x2="11830" y2="3160"/>
+  <line class="measureLine" x1="10020" y1="3200" x2="11830" y2="3200"/>
+  <text class="measureTextSub" x="10925" y="3180" text-anchor="middle">현관 폭 1,810</text>`;
  }
  if(rid==='smallroom2'){
   let tx=g.w-g.trw,by=g.h-g.brd,
@@ -880,6 +998,24 @@ function suiteZones(){
    {id:'livingCorridor',name:'복도',x:g.upperW+250,y:g.corridorY+180,w:Math.max(900,g.w-g.upperW-500),h:Math.max(500,g.corridorH-360),note:'작은방/현관 방향 공용 통로'}
   ]
  }
+ if(rid==='house'){
+  return [
+   {id:'hzEnsuite',name:'부부욕실',x:1900,y:1400,w:1680,h:2300,note:'1,680 × 2,300',poly:true},
+   {id:'hzDress',name:'드레스룸',x:110,y:4540,w:1200,h:1270,note:'안방 상부'},
+   {id:'hzPowder',name:'파우더룸',x:1310,y:4540,w:1820,h:1270,note:'문 없는 연결'},
+   {id:'hzVanity',name:'화장대',x:3130,y:4540,w:580,h:1270,note:'폭 580'},
+   {id:'hzMaster',name:'안방',x:110,y:5810,w:3600,h:3900,note:'3,600 × 3,900'},
+   {id:'hzBalcony',name:'베란다',x:110,y:9710,w:3600,h:1220,note:'깊이 1,220'},
+   {id:'hzKitchen',name:'주방',x:3930,y:430,w:3300,h:3400,note:'공용부(통합)'},
+   {id:'hzLaundry',name:'세탁실',x:7040,y:430,w:1600,h:1200,note:'1,600 × 1,200',poly:true},
+   {id:'hzCommonBath',name:'공용욕실',x:7860,y:2510,w:1620,h:2100,note:'1,620 × 2,100'},
+   {id:'hzEntry',name:'현관',x:10200,y:3440,w:1810,h:1590,note:'1,810 × 1,590'},
+   {id:'hzHall',name:'복도',x:7600,y:5100,w:4400,h:1100,note:'공용 통로'},
+   {id:'hzLiving',name:'거실',x:3930,y:6500,w:3650,h:3430,note:'공용부(통합)'},
+   {id:'hzSmall2',name:'작은방 2 · 아기방',x:8570,y:7340,w:2700,h:3590,note:'2,700 × 3,590',poly:true},
+   {id:'hzSmall1',name:'작은방 1',x:11410,y:7340,w:2700,h:3590,note:'2,700 × 3,590'}
+  ]
+ }
  return SUITE_ZONES[rid]||[]
 }
 function suiteWalls(){
@@ -888,6 +1024,24 @@ function suiteWalls(){
   return [
    {x:0,y:g.topH-15,w:g.passX,h:30,name:'상부-안방 경계벽'},
    {x:0,y:bedBottom-15,w:g.balOpenX,h:30,name:'안방-베란다 좌측 벽'}
+  ]
+ }
+ if(rid==='house'){
+  return [
+   {x:110,y:5795,w:1900,h:30,name:'상부-안방 좌측 경계'},
+   {x:2900,y:5795,w:810,h:30,name:'상부-안방 우측 경계'},
+   {x:3695,y:4540,w:30,h:5170,name:'안방-공용부 경계'},
+   {x:110,y:9695,w:880,h:30,name:'안방-베란다 좌측 경계'},
+   {x:7040,y:1630,w:1600,h:30,name:'세탁실 하부 경계'},
+   {x:7025,y:430,w:30,h:1200,name:'주방-세탁실 좌측 경계'},
+   {x:7845,y:2510,w:30,h:2100,name:'주방-공용욕실 경계'},
+   {x:7860,y:4595,w:1620,h:30,name:'공용욕실 하부 경계'},
+   {x:9465,y:2510,w:30,h:2100,name:'공용욕실 우측 경계'},
+   {x:10185,y:3440,w:30,h:1590,name:'현관 좌측 경계'},
+   {x:10200,y:5015,w:1300,h:30,name:'현관-실내 연결 경계'},
+   {x:8485,y:6200,w:30,h:4730,name:'공용부-작은방2 경계'},
+   {x:11325,y:6200,w:30,h:4730,name:'작은방2-작은방1 경계'},
+   {x:8500,y:7325,w:5720,h:30,name:'복도-침실 경계'}
   ]
  }
  return SUITE_INTERNAL_WALLS[rid]||[]
@@ -904,11 +1058,21 @@ function suiteOpenings(){
    {x:g.balOpenX,y:bedBottom-25,w:g.balOpenW,h:50,name:'베란다 연결 개구',note:`${g.balOpenW.toLocaleString()} mm`}
   ]
  }
+ if(rid==='house'){
+  return [
+   {x:2120,y:5785,w:890,h:50,name:'드레스룸↔안방',note:'문 없음',hideText:true},
+   {x:1100,y:9685,w:2610,h:50,name:'베란다 연결 개구',note:'2,610 mm',hideText:true},
+   {x:10200,y:5005,w:1300,h:50,name:'현관 실내 연결',note:'1,300 mm',hideText:true}
+  ]
+ }
  return SUITE_OPENINGS[rid]||[]
 }
 function suiteDoors(){
  if(rid==='master'){
   let g=geom();return [{x:g.entryX,y:g.topH,w:g.entryW,hingeX:g.entryX+g.entryW,hingeY:g.topH,name:'안방 출입문',note:`개구 ${g.entryW} · 도어 1000×2200`}]
+ }
+ if(rid==='house'){
+  return []
  }
  return SUITE_DOORS[rid]||[]
 }
@@ -925,6 +1089,7 @@ function renderSuite(){
    let e=document.createElement('div');
    e.className='suiteZone';
    e.style.cssText=`left:${o.x*ss}px;top:${o.y*ss}px;width:${o.w*ss}px;height:${o.h*ss}px`;
+   if(rid==='house'&&o.poly){let cp=houseZoneClip(o.id);if(cp)e.style.clipPath=cp;}
    if(o.hideText){
      e.style.background='transparent';
      e.style.border='1px dashed #c9c4b8';
@@ -952,8 +1117,36 @@ function renderSuite(){
    let R=o.w*ss,hx=o.hingeX*ss,hy=o.hingeY*ss,k=.55228475*R;
    let leaf=document.createElement('div');leaf.className='suiteDoorLeaf';leaf.style.cssText=`left:${hx}px;top:${hy}px;width:${R}px;transform:rotate(90deg)`;layer.appendChild(leaf);
    let arc=document.createElement('div');arc.className='suiteDoorArc';arc.style.cssText=`left:${(o.hingeX-o.w)*ss}px;top:${hy}px;width:${R}px;height:${R}px`;arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C 0 ${k} ${R-k} ${R} ${R} ${R}"/></svg>`;layer.appendChild(arc);
-   let label=document.createElement('div');label.className='suiteDoorLabel';label.style.cssText=`left:${hx-28}px;top:${hy+12}px`;label.textContent=`${o.name} · ${o.note}`;layer.appendChild(label);
+   let label=document.createElement('div');label.className='suiteDoorLabel';label.style.cssText=`left:${hx-28}px;top:${hy+12}px${o.hideLabel?';display:none':''}`;label.textContent=`${o.name}${o.note?` · ${o.note}`:''}`;layer.appendChild(label);
  });
+ if(rid==='house'){
+  houseDoorSpecs().forEach(o=>{
+   let R=o.w*ss,k=.55228475*R;
+   let mark=document.createElement('div');mark.className='houseDoorMark';
+   let leaf=document.createElement('div');leaf.className='houseDoorLeaf';
+   let svg='',left=o.x*ss,top=o.y*ss;
+   if(o.side==='top'){
+    mark.style.cssText=`left:${left}px;top:${top}px;width:${R}px;height:${R}px`;
+    leaf.style.cssText=`left:${o.hinge==='right'?R:0}px;top:0;width:${R}px;transform:rotate(90deg)`;
+    svg=o.hinge==='right'?`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C 0 ${k} ${R-k} ${R} ${R} ${R}"/></svg>`:`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M ${R} 0 C ${R} ${k} ${k} ${R} 0 ${R}"/></svg>`;
+   }else if(o.side==='bottom'){
+    mark.style.cssText=`left:${left}px;top:${top-R}px;width:${R}px;height:${R}px`;
+    if(o.hinge==='right'){
+      leaf.style.cssText=`left:${R}px;top:${R}px;width:${R}px;transform:rotate(-90deg)`;
+      svg=o.swing==='common'?`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 ${R-6} C ${Math.round(R*.14)} ${Math.round(R*.60)} ${Math.round(R*.62)} ${Math.round(R*.18)} ${R-8} ${Math.round(R*.22)}"/></svg>`:`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 ${R} C ${k} ${R} ${R} ${R-k} ${R} 0"/></svg>`;
+    }else{
+      leaf.style.cssText=`left:0;top:${R}px;width:${R}px;transform:rotate(-90deg)`;
+      svg=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M ${R} ${R} C ${R} ${R-k} ${k} 0 0 0"/></svg>`;
+    }
+   }else if(o.side==='left'){
+    mark.style.cssText=`left:${left}px;top:${top}px;width:${R}px;height:${R}px`;
+    let hy=o.hinge==='bottom'?R:0;
+    leaf.style.cssText=`left:0;top:${hy}px;width:${R}px;transform:rotate(0deg)`;
+    svg=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C ${k} 0 ${R} ${R-k} ${R} ${R}"/></svg>`;
+   }
+   mark.innerHTML=svg;mark.appendChild(leaf);layer.appendChild(mark);
+  });
+ }
 }
 function renderFixed(){
  let layer=$('fixedLayer');layer.innerHTML='';let edge=$('edgeLayer');edge.innerHTML='';let ss=scale();
@@ -1230,7 +1423,7 @@ function drawGeom(){
    });
  }
  $('zoomVal').textContent=Math.round(zoom*100)+'%';
- $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 출입문 실측 65+800+65=930 mm 적용 · 힌지축 65 mm 안쪽 · 모든 주요 치수는 실제 공간 바깥 표시':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':rid==='living'?'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시':rid==='laundry'?'세탁실: 좌측 문 + 상단 창호 + 좌하단 꺾임 반영 · 꺾임 560×290 mm 초기 추정 · 가전은 목록에서 배치':rid==='commonbath'?'공용욕실: 내측 1620×2100 · 외부→내부 밀기 · 우측하단 힌지 · 좌측 방향 개폐 · 위생기구 미배치':rid==='ensuite'?'부부욕실: 1680×2300 · 문 800×2200 · 밖에서 밀어 진입 · 좌하단 힌지 기준 800 mm 1/4 원호로 열림':'현관: 원도면 1300+510 / 깊이1590 / 하단310 / 현관문1200×2200 기준 1차 도면 · 내부 겹침 방지를 위해 치수 위주 표시';
+ $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='house'?'집 전체 도면: 원도면의 3,820/4,680/2,840/2,880 모듈에 맞춰 재정렬 · 비정형 형상/문 방향/개구부 반영 · 가구 가이드는 제외':rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 출입문 실측 65+800+65=930 mm 적용 · 힌지축 65 mm 안쪽 · 모든 주요 치수는 실제 공간 바깥 표시':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':rid==='living'?'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시':rid==='laundry'?'세탁실: 좌측 문 + 상단 창호 + 좌하단 꺾임 반영 · 꺾임 560×290 mm 초기 추정 · 가전은 목록에서 배치':rid==='commonbath'?'공용욕실: 내측 1620×2100 · 외부→내부 밀기 · 우측하단 힌지 · 좌측 방향 개폐 · 위생기구 미배치':rid==='ensuite'?'부부욕실: 1680×2300 · 문 800×2200 · 밖에서 밀어 진입 · 좌하단 힌지 기준 800 mm 1/4 원호로 열림':'현관: 원도면 1300+510 / 깊이1590 / 하단310 / 현관문1200×2200 기준 1차 도면 · 내부 겹침 방지를 위해 치수 위주 표시';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
  $('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
  if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;$('rightClearInfo').textContent=`우측 직선 ${(g.h-g.trd-g.brd).toLocaleString()} mm (도면 3,195)`;}
@@ -1300,8 +1493,8 @@ async function transferSelected(mode){
 }
 
 $('roomSel').onchange=e=>switchRoom(e.target.value);
-$('applyRoom').onclick=()=>{let g=geom();if(rid==='master')return alert('안방은 아래 「실측 도면 수정 모드」에서 전체 폭과 구역별 치수를 수정해주세요.');if(rid==='living')return alert('거실·주방·복도는 아래 「실측 도면 수정 모드」에서 비정형 외곽을 함께 수정해주세요.');if(rid==='laundry')return alert('세탁실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이, 문·창호, 좌하단 꺾임을 수정해주세요.');if(rid==='commonbath')return alert('공용욕실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이와 하단 문을 수정해주세요.');if(rid==='ensuite')return alert('부부욕실은 아래 「실측 도면 수정 모드」에서 전체 크기·사선·하단 문을 수정해주세요.');if(rid==='entry')return alert('현관은 아래 「실측 도면 수정 모드」에서 전체 크기·현관문·실내 연결부를 수정해주세요.');let nw=+$('rw').value||g.w,nh=+$('rh').value||g.h;if(rid==='smallroom2')setGeom({...g,w:nw,h:nh});else setGeom({...g,w:nw,h:nh,poly:defaultPoly({w:nw,h:nh})});drawGeom()};
-$('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·베란다 개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='living')return alert('거실·주방·복도 창호/개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='laundry')return alert('세탁실 문/창호 위치와 폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='commonbath')return alert('공용욕실 문 위치/폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='ensuite')return alert('부부욕실 문은 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='entry')return alert('현관문/실내 연결부는 「실측 도면 수정 모드」에서 수정해주세요.');setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom()};
+$('applyRoom').onclick=()=>{let g=geom();if(rid==='house')return alert('집 항목은 현재 전체 통합 보기입니다. 전체 실측은 추후 별도 편집 기능에서 반영하고, 현재는 각 방 수정 결과를 모아 확인하는 용도로 사용해주세요.');if(rid==='master')return alert('안방은 아래 「실측 도면 수정 모드」에서 전체 폭과 구역별 치수를 수정해주세요.');if(rid==='living')return alert('거실·주방·복도는 아래 「실측 도면 수정 모드」에서 비정형 외곽을 함께 수정해주세요.');if(rid==='laundry')return alert('세탁실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이, 문·창호, 좌하단 꺾임을 수정해주세요.');if(rid==='commonbath')return alert('공용욕실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이와 하단 문을 수정해주세요.');if(rid==='ensuite')return alert('부부욕실은 아래 「실측 도면 수정 모드」에서 전체 크기·사선·하단 문을 수정해주세요.');if(rid==='entry')return alert('현관은 아래 「실측 도면 수정 모드」에서 전체 크기·현관문·실내 연결부를 수정해주세요.');let nw=+$('rw').value||g.w,nh=+$('rh').value||g.h;if(rid==='smallroom2')setGeom({...g,w:nw,h:nh});else setGeom({...g,w:nw,h:nh,poly:defaultPoly({w:nw,h:nh})});drawGeom()};
+$('applyOpen').onclick=()=>{if(rid==='house')return alert('집 항목은 개구부를 개별 편집하지 않습니다. 각 섹션 도면에서 수정한 뒤 전체 보기에서 반영 상태를 확인해주세요.');if(rid==='master')return alert('안방 문·통로·베란다 개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='living')return alert('거실·주방·복도 창호/개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='laundry')return alert('세탁실 문/창호 위치와 폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='commonbath')return alert('공용욕실 문 위치/폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='ensuite')return alert('부부욕실 문은 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='entry')return alert('현관문/실내 연결부는 「실측 도면 수정 모드」에서 수정해주세요.');setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom()};
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
@@ -1310,8 +1503,8 @@ $('resetMeasure').onclick=()=>{
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
 $('applyRecess').onclick=()=>{if(rid!=='smallroom2')return;let g=geom(),trw=+$('trw').value,trd=+$('trd').value,brw=+$('brw').value,brd=+$('brd').value;if([trw,trd,brw,brd].some(v=>!Number.isFinite(v)||v<0)||trw>=g.w||brw>=g.w||trd+brd>=g.h)return alert('꺾임 치수를 확인해주세요.');setGeom({...g,trw,trd,brw,brd});drawGeom()};
-$('applyPoly').onclick=()=>{if(rid==='smallroom2')return alert('작은방2는 우측 꺾임 치수 입력을 사용해주세요.');if(rid==='ensuite')return alert('부부욕실은 실측 도면 수정 모드의 사선 치수를 사용해주세요.');if(rid==='entry')return alert('현관은 실측 도면 수정 모드의 전용 치수를 사용해주세요.');try{let g=geom(),p=parsePoly($('polyText').value);setGeom(rid==='living'?{...g,customPoly:p,poly:p}:{...g,poly:p});drawGeom()}catch(e){alert(e.message)}};
-$('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:{...g,poly:defaultPoly(g)});drawGeom()};
+$('applyPoly').onclick=()=>{if(rid==='house')return alert('집 항목은 현재 통합 보기입니다. 외곽 수정보다는 개별 방 수정 후 전체 보기를 확인해주세요.');if(rid==='smallroom2')return alert('작은방2는 우측 꺾임 치수 입력을 사용해주세요.');if(rid==='ensuite')return alert('부부욕실은 실측 도면 수정 모드의 사선 치수를 사용해주세요.');if(rid==='entry')return alert('현관은 실측 도면 수정 모드의 전용 치수를 사용해주세요.');try{let g=geom(),p=parsePoly($('polyText').value);setGeom(rid==='living'?{...g,customPoly:p,poly:p}:{...g,poly:p});drawGeom()}catch(e){alert(e.message)}};
+$('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:rid==='house'?{...g,poly:housePoly(g),shapeVersion:'house-v353'}:{...g,poly:defaultPoly(g)});drawGeom()};
 $('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원할까요?')){delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}};
 $('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!w||!d)return alert('가로와 깊이를 입력해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
 $('zoomOut').onclick=()=>setZoom(zoom-(zoom>1.5?.25:.1));$('zoomIn').onclick=()=>setZoom(zoom>1.5?zoom+.25:zoom+.1);$('fit').onclick=fitZoom;
