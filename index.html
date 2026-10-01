@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.46</title>
+<title>또복이 Family Room Planner V3.47</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -42,7 +42,7 @@ body[data-diagram-font="xlarge"] .suiteZone small{font-size:16px}
 body[data-diagram-font="xlarge"] .label,body[data-diagram-font="xlarge"] .suiteOpening,body[data-diagram-font="xlarge"] .suiteDoorLabel,body[data-diagram-font="xlarge"] .suiteDividerLabel{font-size:18px}
 body[data-diagram-font="xlarge"] .furn{font-size:18px}
 .window{position:absolute;height:8px;background:#9cc7d4;border-top:2px solid #fff}.doorGap{position:absolute;height:10px;background:#fbfaf7}
-.doorLeaf{position:absolute;height:2px;background:#8f806e;transform-origin:left top}.doorArc{position:absolute;overflow:visible;pointer-events:none}.doorArc svg{display:block;overflow:visible}.doorArc path{fill:none;stroke:#b5a997;stroke-width:1;stroke-dasharray:4 3}.doorHingeDot{position:absolute;width:6px;height:6px;border-radius:50%;background:#8f806e;transform:translate(-3px,-3px);pointer-events:none;z-index:4}
+.doorLeaf{position:absolute;height:2px;background:#8f806e;transform-origin:left top}.doorArc{position:absolute;overflow:visible;pointer-events:none}.doorArc svg{display:block;overflow:visible}.doorArc path{fill:none;stroke:#b5a997;stroke-width:1;stroke-dasharray:4 3}.doorArc .ensuiteSwingPath{stroke:#aa9a86;stroke-width:2;stroke-dasharray:10 7;vector-effect:non-scaling-stroke}.doorHingeDot{position:absolute;width:6px;height:6px;border-radius:50%;background:#8f806e;transform:translate(-3px,-3px);pointer-events:none;z-index:4}
 .label{position:absolute;font-size:14px;pointer-events:none}.winLabel{color:#57818d}.doorLabel{color:#8f806e}
 .furn{position:absolute;border:2px solid #697867;background:#dce6d8cc;border-radius:5px;display:flex;align-items:center;justify-content:center;text-align:center;font-size:14px;font-weight:700;user-select:none;touch-action:none;padding:3px;overflow:hidden}
 .furn.sel{outline:3px solid #899c82;z-index:5}.furn.bad{border-color:var(--bad);background:#f0c7c4cc}.fixedObs{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:13px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.fixedObs small{display:block;font-weight:400}.edgeFixture{position:absolute;background:#d9d7d0;border:2px solid #77746d;border-radius:3px;font-size:13px;display:flex;align-items:center;justify-content:center;text-align:center;padding:2px;pointer-events:none;z-index:2}.edgeFixture small{display:block;font-weight:400}
@@ -123,7 +123,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </head>
 <body data-diagram-font="large">
 <header>
-<h1>또복이 Family Room Planner <small>V3.46</small></h1>
+<h1>또복이 Family Room Planner <small>V3.47</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">로컬 모드</span><button id="login">Google 로그인</button><button id="family">가족 코드</button><button id="syncPull" title="가족 공동 저장소의 배치를 이 기기로 다시 불러옵니다">↻ 공동 배치 불러오기</button></div>
 </header>
@@ -1025,9 +1025,9 @@ function drawOpenings(g){
    let hxLeaf=(g.doorSwing==='in-left-wall-arc')?hx+2:hx;
    $('doorLeaf').style.cssText=`left:${hxLeaf}px;top:${hy}px;width:${R}px;height:2px;transform-origin:left top;transform:rotate(-90deg)`;
    if(g.doorSwing==='in-left-wall'||g.doorSwing==='in-left-wall-arc'){
-    arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}">
-      <defs><marker id="doorArrowLeftWall" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#b7a995"/></marker></defs>
-      <path d="M ${R-4} ${R-6} C ${R*0.72} ${R*0.92} ${R*0.2} ${R*0.52} 10 8" marker-end="url(#doorArrowLeftWall)"/>
+    arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}" class="ensuiteDoorArcSvg">
+      <defs><marker id="doorArrowLeftWall" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#aa9a86"/></marker></defs>
+      <path class="ensuiteSwingPath" d="M ${R} ${R} C ${R} ${R-k} ${k} 0 0 0" marker-end="url(#doorArrowLeftWall)"/>
     </svg>`;
    }else{
     arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M ${R} ${R} C ${R-k} ${R} 0 ${R-k} 0 0"/></svg>`;
@@ -1230,7 +1230,7 @@ function drawGeom(){
    });
  }
  $('zoomVal').textContent=Math.round(zoom*100)+'%';
- $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 출입문 실측 65+800+65=930 mm 적용 · 힌지축 65 mm 안쪽 · 모든 주요 치수는 실제 공간 바깥 표시':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':rid==='living'?'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시':rid==='laundry'?'세탁실: 좌측 문 + 상단 창호 + 좌하단 꺾임 반영 · 꺾임 560×290 mm 초기 추정 · 가전은 목록에서 배치':rid==='commonbath'?'공용욕실: 내측 1620×2100 · 외부→내부 밀기 · 우측하단 힌지 · 좌측 방향 개폐 · 위생기구 미배치':rid==='ensuite'?'부부욕실: 1680×2300 · 문 800×2200 · 밖에서 밀어 진입 · 열림 궤적은 좌측 벽측 방향으로 표시':'현관: 원도면 1300+510 / 깊이1590 / 하단310 / 현관문1200×2200 기준 1차 도면 · 내부 겹침 방지를 위해 치수 위주 표시';
+ $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 출입문 실측 65+800+65=930 mm 적용 · 힌지축 65 mm 안쪽 · 모든 주요 치수는 실제 공간 바깥 표시':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':rid==='living'?'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시':rid==='laundry'?'세탁실: 좌측 문 + 상단 창호 + 좌하단 꺾임 반영 · 꺾임 560×290 mm 초기 추정 · 가전은 목록에서 배치':rid==='commonbath'?'공용욕실: 내측 1620×2100 · 외부→내부 밀기 · 우측하단 힌지 · 좌측 방향 개폐 · 위생기구 미배치':rid==='ensuite'?'부부욕실: 1680×2300 · 문 800×2200 · 밖에서 밀어 진입 · 좌하단 힌지 기준 800 mm 1/4 원호로 열림':'현관: 원도면 1300+510 / 깊이1590 / 하단310 / 현관문1200×2200 기준 1차 도면 · 내부 겹침 방지를 위해 치수 위주 표시';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
  $('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
  if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;$('rightClearInfo').textContent=`우측 직선 ${(g.h-g.trd-g.brd).toLocaleString()} mm (도면 3,195)`;}
@@ -1305,7 +1305,7 @@ $('applyOpen').onclick=()=>{if(rid==='master')return alert('안방 문·통로·
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
- if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.46 기본 도면값으로 되돌릴까요?`))return;
+ if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 V3.47 기본 도면값으로 되돌릴까요?`))return;
  delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
