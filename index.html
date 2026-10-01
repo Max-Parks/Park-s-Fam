@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.54</title>
+<title>또복이 Family Room Planner V3.55</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -351,21 +351,39 @@ const ROOM_DEFAULTS={
  commonbath:{roomId:'commonbath',name:'공용욕실',w:1620,h:2100,dp:820,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'right',doorSwing:'in-left',wp:0,ww:0,shapeVersion:'commonbath-v349',note:'공용욕실 1차 도면입니다. 도면상 내측 폭 1,620 mm / 깊이 2,100 mm를 적용했습니다. 하단 출입문은 800 × 2,200 mm이며, 욕실 외부에서 안으로 밀어 들어가는 구조입니다. 우측하단 힌지 기준 문짝 자유단이 하단 좌측 닫힘 위치에서 우측 벽 쪽 열린 위치로 감기듯 올라가는 곡선 점선으로 표시되며, 완전히 열리면 우측 벽 방향으로 붙는 형태를 표현합니다. 문 시작 X 820 mm는 내측 폭과 문 폭을 기준으로 우측 벽에 붙인 초기 좌표입니다. 상부 590 mm 표기는 욕실 내부 유효공간 치수로 확정하지 않아 이번 버전에는 별도 구조물로 넣지 않았습니다.'},
  ensuite:{roomId:'ensuite',name:'부부욕실',w:1680,h:2300,slantW:630,slantD:860,dp:60,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'left',doorSwing:'in-left-wall-arc',rightWall:820,wp:0,ww:0,shapeVersion:'ensuite-v346',note:'부부욕실 1차 도면입니다. 원도면 표기값에서 전체 폭 1,680 mm, 세로 2,300 mm, 출입문 800 × 2,200 mm, 문 우측 벽 820 mm를 적용했습니다. 문 시작 X 60 mm는 1,680−800−820으로 계산한 값입니다. 출입문은 욕실 밖에서 안으로 밀며, 닫힌 상태의 문짝 우측 끝이 좌측 방향으로 회전하고 완전히 열리면 좌측 벽측(문 시작 60 mm 위치)에 붙고, 열림 궤적은 하단 개구부에서 좌측 벽 방향으로 휘는 곡선으로 표시합니다. 좌상단 사선은 도면 비율로 약 630 × 860 mm를 초기 추정했으며 실측 전 확정값이 아닙니다.'},
  entry:{roomId:'entry',name:'현관',w:1810,h:1590,clearW:1300,sideW:510,thresholdD:310,dp:0,dw:1200,doorNominalW:1200,doorNominalH:2200,doorSide:'top',doorHinge:'left',doorSwing:'in-left-wall',openX:0,openW:1300,wp:0,ww:0,shapeVersion:'entry-v345',note:'현관 1차 도면입니다. 원도면에서 1,300 mm 유효부, 우측 510 mm 구간, 세로 1,590 mm, 하단 310 mm 구간, 현관문 1,200 × 2,200 mm를 확인했습니다. 전체 폭 1,810 mm는 1,300+510으로 계산했습니다. 하단 실내 연결 개구 1,300 mm와 현관문 개폐 방향은 도면 형상을 이용한 1차 해석이며 실측 후 수정 가능합니다.'},
- house:{roomId:'house',name:'집 · 전체 도면',w:14220,h:10930,dp:0,dw:0,wp:0,ww:0,shapeVersion:'house-v354',note:'현재까지 정리한 안방, 거실·주방·복도, 세탁실, 공용욕실, 부부욕실, 현관, 작은방 1, 작은방 2를 하나의 집 도면으로 묶은 통합 보기입니다. 원도면의 가로 모듈 3,820 / 4,680 / 2,840 / 2,880 mm를 기준으로 좌우 구획을 다시 정렬했고, 각 섹션에서 확정한 비정형 외곽과 문 방향도 전체 도면에 반영했습니다. 가구 배치 가이드는 넣지 않았고, 세부 실측은 추후 각 방 섹션에서 보정하면 됩니다.'}
+ house:{roomId:'house',name:'집 · 전체 도면',w:14220,h:10930,dp:0,dw:0,wp:0,ww:0,shapeVersion:'house-v355',note:'현재까지 정리한 안방, 거실·주방·복도, 세탁실, 공용욕실, 부부욕실, 현관, 작은방 1, 작은방 2를 하나의 집 도면으로 묶은 통합 보기입니다. 원도면의 가로 모듈 3,820 / 4,680 / 2,840 / 2,880 mm를 기준으로 좌우 구획을 다시 정렬했고, 각 섹션에서 확정한 비정형 외곽과 문 방향도 전체 도면에 반영했습니다. 가구 배치 가이드는 넣지 않았고, 세부 실측은 추후 각 방 섹션에서 보정하면 됩니다.'}
 };
 const FURNITURE_CATALOG=[
- ['일룸 쿠시노 범퍼형 SS',1114,2065],
- ['한샘 샘키즈 수납장 1305',1277,335],
- ['한샘 샘키즈 책장 1305',1277,335],
- ['한샘 샘키즈 키큰옷장 서랍형 800',800,620],
- ['기저귀갈이대',850,550],
- ['수유의자',800,800]
+ ['일룸 쿠시노 범퍼형 SS',1114,2065,'기존 등록',1],
+ ['한샘 샘키즈 수납장 1305',1277,335,'기존 등록',1],
+ ['한샘 샘키즈 책장 1305',1277,335,'기존 등록',1],
+ ['한샘 샘키즈 키큰옷장 서랍형 800',800,620,'기존 등록',1],
+ ['기저귀갈이대',850,550,'기존 등록',1],
+ ['수유의자',800,800,'기존 등록',1],
+
+ ['시몬스 D2178A 침대 프레임 LK',1725,2128,'바닥점유 W×L · 높이 1,058 mm · 사용자 이미지/제품 규격 교차확인',1],
+ ['시몬스 협탁 #101',460,459,'바닥점유 W×L · 높이 1,058 mm · 2개 보유',2],
+ ['소파',3100,1100,'사용자 제공 치수 · 모델명 미상',1],
+ ['스툴',600,300,'사용자 제공 치수 · 모델명 미상',1],
+ ['식탁',800,1490,'바닥점유 W×L · 높이 750 mm · 사용자 제공 치수',1],
+ ['식탁 의자',440,440,'바닥점유 W×D · 높이 865 mm · 4개 보유',4]
 ];
 const APPLIANCE_CATALOG=[
- ['삼성 에어드레서 DF10A9500CG',595,632,'높이 1,960 mm'],
- ['세탁기',null,null,'실제 제품 W×D 입력 후 추가'],
- ['건조기',null,null,'실제 제품 W×D 입력 후 추가'],
- ['세탁기+건조기 적층',null,null,'적층 시 바닥 점유 W×D 입력 후 추가']
+ ['삼성 The Frame 75형 KQ75LSB03AFXKR',1682,27,'벽걸이 본체 기준 · 높이 960 mm · 스탠드 사용 시 깊이 316 mm',1],
+ ['삼성 BESPOKE AI 세탁기 WF25B9600KE',686,875,'높이 984 mm · 공식 규격',1],
+ ['삼성 BESPOKE AI 건조기 DV20B9760CE',686,872,'높이 984 mm · 이미지의 깊이 875 → 공식 872 mm로 보정',1],
+ ['삼성 인버터 제습기 AY18CG7500GGD',420,220,'높이 652 mm · 공식 규격',1],
+ ['삼성 BESPOKE 정수기 RWP71411AAWM',170,405,'본체 기준 W×D · 높이 490 mm · 파우셋 185×295×48 mm',1],
+ ['삼성 BESPOKE 큐커 MO22A7797CP',500,415.8,'높이 385.3 mm · 공식 규격',1],
+ ['삼성 BESPOKE 냉장고 RF60B91T1AP',912,697,'높이 1,853 mm · 공식 규격',1],
+ ['삼성 BESPOKE 김치플러스 3도어 키친핏 313L',695,600,'높이 1,853 mm · 이미지 모델명 RF60B91T1AP는 냉장고 모델이라 김치냉장고 모델명은 추후 확인 필요',1],
+ ['삼성 식기세척기 DW60A8775 계열',598,570,'높이 815 mm · 공식 지원 규격',1],
+ ['삼성 BESPOKE 큐브 Air AX053B812HSD',380,406,'높이 438 mm',1],
+ ['삼성 BESPOKE 제트 VS20B957G5 계열 + 청정스테이션',300,300,'보관 시 청정스테이션 바닥점유 기준 · 본체 250×930×202 mm',1],
+ ['삼성 에어드레서 DF10A9500CG',595,632,'높이 1,960 mm · 공식 규격',1],
+ ['삼성 BESPOKE 슈드레서 DJ30T9500WE',450,361,'높이 1,135 mm',1],
+ ['삼성 BESPOKE 제트봇 VR30T85514 계열 + 스테이션',350,480,'본체+스테이션 바닥점유 기준 · 높이 544 mm · 본체 350×99.8×350 mm',1],
+ ['빌트인 복합오븐 (모델명 확인 필요)',null,null,'현재 이미지에 모델명이 없어 정확 규격 적용 보류 · 추가 시 W×D 직접 입력',1]
 ];
 const LEGACY_NAMES={
  '1200x2150':'일룸 쿠시노 코지 범퍼형 SS (기존)',
@@ -548,7 +566,7 @@ function normalizeGeom(roomId,input){
    g={...g,doorHinge:'left',doorSwing:'in-left-wall-arc',shapeVersion:'ensuite-v346'};
  }
  if(roomId==='entry'&&String(g.shapeVersion||'')!=='entry-v345')g={};
- if(roomId==='house'&&String(g.shapeVersion||'')!=='house-v354')g={};
+ if(roomId==='house'&&String(g.shapeVersion||'')!=='house-v355')g={};
  let out={...b,...g,roomId,name:b.name};
  if(roomId==='smallroom2'){
    ['trw','trd','brw','brd','dp','dw','wp','ww'].forEach(k=>{if(!Number.isFinite(+out[k]))out[k]=b[k]});
@@ -622,7 +640,7 @@ function normalizeGeom(roomId,input){
    if(roomId==='house'){
      out.w=Number.isFinite(+out.w)?+out.w:b.w;
      out.h=Number.isFinite(+out.h)?+out.h:b.h;
-     out.dp=0;out.dw=0;out.wp=0;out.ww=0;out.shapeVersion='house-v354';out.poly=housePoly(out);
+     out.dp=0;out.dw=0;out.wp=0;out.ww=0;out.shapeVersion='house-v355';out.poly=housePoly(out);
    }
    if(!Array.isArray(out.poly)||out.poly.length<3)out.poly=defaultPoly(out);
  }
@@ -664,27 +682,57 @@ function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function dims(e){return +e.dataset.r%180?{w:+e.dataset.d,h:+e.dataset.w}:{w:+e.dataset.w,h:+e.dataset.d}}
 function rect(e){let q=dims(e);return{x:+e.dataset.x,y:+e.dataset.y,w:q.w,h:q.h}}
 
+const INVENTORY_ROOM_IDS=()=>Object.keys(ROOM_DEFAULTS).filter(id=>id!=='house');
+function catalogMaxQty(name){
+ let hit=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].find(v=>v[0]===name);
+ return Math.max(1,+(hit?.[4]||1));
+}
+function storedItemsForInventory(roomId){
+ if(roomId===rid && rid!=='house')return items();
+ let z=null;
+ try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
+ return (z?.items||[]).map(normalizeItem);
+}
+function inventoryPlacedCount(name){
+ return INVENTORY_ROOM_IDS().reduce((sum,roomId)=>{
+   return sum+storedItemsForInventory(roomId).filter(a=>a.n===name).length;
+ },0);
+}
+function inventoryCanAdd(name,qty=1){
+ let max=catalogMaxQty(name);
+ let isCatalog=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].some(v=>v[0]===name);
+ if(!isCatalog)return true;
+ return inventoryPlacedCount(name)+qty<=max;
+}
+
 function renderCatalog(){
  function renderList(targetId,list,isAppliance=false){
-  let c=$(targetId);c.innerHTML='';
+  let c=$(targetId);c.innerHTML='',visible=0;
   list.forEach(v=>{
+   let name=v[0],max=Math.max(1,+(v[4]||1)),placed=inventoryPlacedCount(name);
+   if(placed>=max)return;
+   let remain=max-placed;
    let e=document.createElement('div');e.className='item';
    let extra=v[3]?` · ${v[3]}`:'';
    let hasSize=Number.isFinite(+v[1])&&+v[1]>0&&Number.isFinite(+v[2])&&+v[2]>0;
-   e.innerHTML=`<div><b>${v[0]}</b><br><span>${hasSize?`${v[1]} × ${v[2]} mm`:'치수 미입력'}${extra}</span></div><button>＋ 추가</button>`;
+   let qtyText=max>1?` · 남은 수량 ${remain}/${max}`:'';
+   e.innerHTML=`<div><b>${name}</b><br><span>${hasSize?`${v[1]} × ${v[2]} mm`:'치수 미입력'}${qtyText}${extra}</span></div><button>＋ 추가</button>`;
    e.querySelector('button').onclick=()=>{
+    if(!inventoryCanAdd(name,1)){renderCatalog();return;}
     let w=+v[1],d=+v[2];
     if(!hasSize){
-     w=+prompt(`${v[0]}의 가로(W) mm를 입력해주세요.`,'');
+     w=+prompt(`${name}의 가로(W) mm를 입력해주세요.`,'');
      if(!Number.isFinite(w)||w<=0)return;
-     d=+prompt(`${v[0]}의 깊이(D) mm를 입력해주세요.`,'');
+     d=+prompt(`${name}의 깊이(D) mm를 입력해주세요.`,'');
      if(!Number.isFinite(d)||d<=0)return;
     }
-    addFurniture({n:v[0],w,d,x:120,y:160,r:0,type:isAppliance?'appliance':'furniture'});
+    addFurniture({n:name,w,d,x:120,y:160,r:0,type:isAppliance?'appliance':'furniture'});
+    updateAll();
+    renderCatalog();
    };
-   c.appendChild(e);
+   c.appendChild(e);visible++;
   });
-  if(!c.children.length)c.innerHTML='<div class="small">등록된 항목이 없습니다.</div>';
+  if(!visible)c.innerHTML='<div class="small">모든 보유 항목이 배치되어 있습니다. 도면에서 제거하면 이 목록에 다시 나타납니다.</div>';
  }
  renderList('furnitureCatalog',FURNITURE_CATALOG,false);
  renderList('applianceCatalog',APPLIANCE_CATALOG,true);
@@ -1516,6 +1564,7 @@ function renderItems(arr){
  (arr||[]).map(normalizeItem).forEach(a=>addFurniture(a,true));
  updateAll();
  suppressSave=false;
+ renderCatalog();
 }
 function loadLocal(){
  let z;try{z=JSON.parse(localStorage.getItem(localKey())||'null')}catch(e){z=null}
@@ -1558,10 +1607,12 @@ async function transferSelected(mode){
  if(!selected||!selected.isConnected)return alert('먼저 가구를 선택해주세요.');
  let target=$('targetRoom').value;if(!target||target===rid)return;
  let a=normalizeItem({n:selected.dataset.n,w:selected.dataset.w,d:selected.dataset.d,x:100,y:120,r:selected.dataset.r});
+ if(mode==='copy'&&!inventoryCanAdd(a.n,1))return alert(`${a.n}은(는) 보유 수량이 모두 배치되어 있어 복사할 수 없습니다.`);
  let z;try{z=JSON.parse(localStorage.getItem(localKey(target))||'null')}catch(e){z=null}
  let targetItems=(z?.items||[]).map(normalizeItem);targetItems.push(a);localStorage.setItem(localKey(target),JSON.stringify({items:targetItems.map(storageItem)}));
  let cloudOk=false;try{if(window.cloudAppendItem)cloudOk=await window.cloudAppendItem(target,a)}catch(e){}
  if(mode==='move'){let e=selected;selected=null;e.remove();updateAll()}
+ renderCatalog();
  $('transferMsg').textContent=`${a.n} → ${ROOM_DEFAULTS[target].name} ${mode==='move'?'이동':'복사'} 완료${cloudOk?' · 공동 동기화':' · 로컬 저장'}`;
 }
 
@@ -1577,7 +1628,7 @@ $('resetMeasure').onclick=()=>{
 };
 $('applyRecess').onclick=()=>{if(rid!=='smallroom2')return;let g=geom(),trw=+$('trw').value,trd=+$('trd').value,brw=+$('brw').value,brd=+$('brd').value;if([trw,trd,brw,brd].some(v=>!Number.isFinite(v)||v<0)||trw>=g.w||brw>=g.w||trd+brd>=g.h)return alert('꺾임 치수를 확인해주세요.');setGeom({...g,trw,trd,brw,brd});drawGeom()};
 $('applyPoly').onclick=()=>{if(rid==='house')return alert('집 항목은 현재 통합 보기입니다. 외곽 수정보다는 개별 방 수정 후 전체 보기를 확인해주세요.');if(rid==='smallroom2')return alert('작은방2는 우측 꺾임 치수 입력을 사용해주세요.');if(rid==='ensuite')return alert('부부욕실은 실측 도면 수정 모드의 사선 치수를 사용해주세요.');if(rid==='entry')return alert('현관은 실측 도면 수정 모드의 전용 치수를 사용해주세요.');try{let g=geom(),p=parsePoly($('polyText').value);setGeom(rid==='living'?{...g,customPoly:p,poly:p}:{...g,poly:p});drawGeom()}catch(e){alert(e.message)}};
-$('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:rid==='house'?{...g,poly:housePoly(g),shapeVersion:'house-v354'}:{...g,poly:defaultPoly(g)});drawGeom()};
+$('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:rid==='house'?{...g,poly:housePoly(g),shapeVersion:'house-v355'}:{...g,poly:defaultPoly(g)});drawGeom()};
 $('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원할까요?')){delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}};
 $('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!w||!d)return alert('가로와 깊이를 입력해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
 $('zoomOut').onclick=()=>setZoom(zoom-(zoom>1.5?.25:.1));$('zoomIn').onclick=()=>setZoom(zoom>1.5?zoom+.25:zoom+.1);$('fit').onclick=fitZoom;
@@ -1605,9 +1656,9 @@ $('mvUp').onclick=()=>nudgeSelected(0,-1);
 $('mvDown').onclick=()=>nudgeSelected(0,1);
 
 $('rot').onclick=()=>{if(selected){selected.dataset.r=(+selected.dataset.r+90)%180;updateAll()}};
-$('dup').onclick=()=>{if(selected){addFurniture({n:selected.dataset.n,w:+selected.dataset.w,d:+selected.dataset.d,x:+selected.dataset.x+100,y:+selected.dataset.y+100,r:+selected.dataset.r});updateAll()}};
-$('del').onclick=()=>{if(selected){let e=selected;selected=null;e.remove();updateAll()}};
-$('clear').onclick=()=>{if(confirm('현재 방 가구를 모두 비울까요?')){clearFurniture();updateAll()}};
+$('dup').onclick=()=>{if(selected){let n=selected.dataset.n;if(!inventoryCanAdd(n,1))return alert(`${n}은(는) 보유 수량이 모두 배치되어 있습니다.`);addFurniture({n,w:+selected.dataset.w,d:+selected.dataset.d,x:+selected.dataset.x+100,y:+selected.dataset.y+100,r:+selected.dataset.r,type:selected.dataset.type||'furniture'});updateAll();renderCatalog()}};
+$('del').onclick=()=>{if(selected){let e=selected;selected=null;e.remove();updateAll();renderCatalog()}};
+$('clear').onclick=()=>{if(confirm('현재 방 가구를 모두 비울까요?')){clearFurniture();updateAll();renderCatalog()}};
 
 async function saveCurrentNow(showAlert=false){
  saveLocal();
