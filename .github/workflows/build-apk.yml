@@ -1,0 +1,206 @@
+name: Build Ttobok Android APK
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK 36
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager "platforms;android-36" "build-tools;35.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.11.1'
+
+      - name: Create Android project
+        shell: bash
+        run: |
+          rm -rf android-apk
+          mkdir -p android-apk/app/src/main/res/values
+          mkdir -p android-apk/app/src/main/res/drawable
+
+          cat > android-apk/settings.gradle <<'EOF'
+          pluginManagement {
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          dependencyResolutionManagement {
+              repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.name = "TtobokHome"
+          include(":app")
+          EOF
+
+          cat > android-apk/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application' version '8.10.1' apply false
+          }
+          EOF
+
+          cat > android-apk/app/build.gradle <<'EOF'
+          plugins {
+              id 'com.android.application'
+          }
+          
+          android {
+              namespace 'com.maxparks.ttobokhome'
+              compileSdk 36
+          
+              defaultConfig {
+                  applicationId 'com.maxparks.ttobokhome'
+                  minSdk 23
+                  targetSdk 35
+                  versionCode 1
+                  versionName '1.0.0'
+              }
+          
+              signingConfigs {
+                  release {
+                      storeFile file('../ttobok-release.p12')
+                      storePassword System.getenv('TTOBOK_KEYSTORE_PASSWORD')
+                      keyAlias 'ttobok'
+                      keyPassword System.getenv('TTOBOK_KEYSTORE_PASSWORD')
+                  }
+              }
+          
+              buildTypes {
+                  release {
+                      minifyEnabled false
+                      signingConfig signingConfigs.release
+                  }
+              }
+          
+              compileOptions {
+                  sourceCompatibility JavaVersion.VERSION_17
+                  targetCompatibility JavaVersion.VERSION_17
+              }
+          }
+          
+          dependencies {
+              implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.3'
+          }
+          EOF
+
+          cat > android-apk/app/src/main/AndroidManifest.xml <<'EOF'
+          <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+              <uses-permission android:name="android.permission.INTERNET" />
+          
+              <application
+                  android:allowBackup="false"
+                  android:icon="@drawable/app_icon"
+                  android:label="@string/app_name"
+                  android:supportsRtl="true"
+                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:usesCleartextTraffic="false">
+          
+                  <meta-data
+                      android:name="asset_statements"
+                      android:resource="@string/asset_statements" />
+          
+                  <activity
+                      android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
+                      android:exported="true"
+                      android:label="@string/app_name">
+          
+                      <meta-data
+                          android:name="android.support.customtabs.trusted.DEFAULT_URL"
+                          android:value="@string/launch_url" />
+                      <meta-data
+                          android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
+                          android:value="customtabs" />
+                      <meta-data
+                          android:name="android.support.customtabs.trusted.DISPLAY_MODE"
+                          android:value="standalone" />
+                      <meta-data
+                          android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
+                          android:value="any" />
+          
+                      <intent-filter>
+                          <action android:name="android.intent.action.MAIN" />
+                          <category android:name="android.intent.category.LAUNCHER" />
+                      </intent-filter>
+                  </activity>
+              </application>
+          </manifest>
+          EOF
+
+          cat > android-apk/app/src/main/res/values/strings.xml <<'EOF'
+          <resources>
+              <string name="app_name">또복이 집도면</string>
+              <string name="launch_url">https://max-parks.github.io/Park-s-Fam/</string>
+              <string name="asset_statements">[{&quot;relation&quot;:[&quot;delegate_permission/common.handle_all_urls&quot;],&quot;target&quot;:{&quot;namespace&quot;:&quot;web&quot;,&quot;site&quot;:&quot;https://max-parks.github.io&quot;}}]</string>
+          </resources>
+          EOF
+
+          echo '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' | base64 --decode > android-apk/app/src/main/res/drawable/app_icon.png
+
+      - name: Restore private signing key
+        env:
+          TTOBOK_SIGNING_BUNDLE: ${{ secrets.TTOBOK_SIGNING_BUNDLE }}
+        shell: bash
+        run: |
+          if [ -z "$TTOBOK_SIGNING_BUNDLE" ]; then
+            echo "Repository secret TTOBOK_SIGNING_BUNDLE is missing."
+            exit 1
+          fi
+          PASS="${TTOBOK_SIGNING_BUNDLE%%|*}"
+          KEY_B64="${TTOBOK_SIGNING_BUNDLE#*|}"
+          echo "::add-mask::$PASS"
+          echo "$KEY_B64" | base64 --decode > android-apk/ttobok-release.p12
+          echo "TTOBOK_KEYSTORE_PASSWORD=$PASS" >> "$GITHUB_ENV"
+
+      - name: Build signed release APK
+        run: gradle -p android-apk :app:assembleRelease --no-daemon
+
+      - name: Prepare APK
+        run: |
+          cp android-apk/app/build/outputs/apk/release/app-release.apk ttobok-home.apk
+          ls -lh ttobok-home.apk
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ttobok-home-apk
+          path: ttobok-home.apk
+          if-no-files-found: error
+
+      - name: Publish APK to GitHub Pages repository
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ttobok-home.apk
+          if git diff --cached --quiet; then
+            echo "APK unchanged."
+            exit 0
+          fi
+          git commit -m "Build Android APK"
+          git push
