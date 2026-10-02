@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.55</title>
+<title>또복이 Family Room Planner V3.56</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <style>
@@ -351,7 +351,7 @@ const ROOM_DEFAULTS={
  commonbath:{roomId:'commonbath',name:'공용욕실',w:1620,h:2100,dp:820,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'right',doorSwing:'in-left',wp:0,ww:0,shapeVersion:'commonbath-v349',note:'공용욕실 1차 도면입니다. 도면상 내측 폭 1,620 mm / 깊이 2,100 mm를 적용했습니다. 하단 출입문은 800 × 2,200 mm이며, 욕실 외부에서 안으로 밀어 들어가는 구조입니다. 우측하단 힌지 기준 문짝 자유단이 하단 좌측 닫힘 위치에서 우측 벽 쪽 열린 위치로 감기듯 올라가는 곡선 점선으로 표시되며, 완전히 열리면 우측 벽 방향으로 붙는 형태를 표현합니다. 문 시작 X 820 mm는 내측 폭과 문 폭을 기준으로 우측 벽에 붙인 초기 좌표입니다. 상부 590 mm 표기는 욕실 내부 유효공간 치수로 확정하지 않아 이번 버전에는 별도 구조물로 넣지 않았습니다.'},
  ensuite:{roomId:'ensuite',name:'부부욕실',w:1680,h:2300,slantW:630,slantD:860,dp:60,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'left',doorSwing:'in-left-wall-arc',rightWall:820,wp:0,ww:0,shapeVersion:'ensuite-v346',note:'부부욕실 1차 도면입니다. 원도면 표기값에서 전체 폭 1,680 mm, 세로 2,300 mm, 출입문 800 × 2,200 mm, 문 우측 벽 820 mm를 적용했습니다. 문 시작 X 60 mm는 1,680−800−820으로 계산한 값입니다. 출입문은 욕실 밖에서 안으로 밀며, 닫힌 상태의 문짝 우측 끝이 좌측 방향으로 회전하고 완전히 열리면 좌측 벽측(문 시작 60 mm 위치)에 붙고, 열림 궤적은 하단 개구부에서 좌측 벽 방향으로 휘는 곡선으로 표시합니다. 좌상단 사선은 도면 비율로 약 630 × 860 mm를 초기 추정했으며 실측 전 확정값이 아닙니다.'},
  entry:{roomId:'entry',name:'현관',w:1810,h:1590,clearW:1300,sideW:510,thresholdD:310,dp:0,dw:1200,doorNominalW:1200,doorNominalH:2200,doorSide:'top',doorHinge:'left',doorSwing:'in-left-wall',openX:0,openW:1300,wp:0,ww:0,shapeVersion:'entry-v345',note:'현관 1차 도면입니다. 원도면에서 1,300 mm 유효부, 우측 510 mm 구간, 세로 1,590 mm, 하단 310 mm 구간, 현관문 1,200 × 2,200 mm를 확인했습니다. 전체 폭 1,810 mm는 1,300+510으로 계산했습니다. 하단 실내 연결 개구 1,300 mm와 현관문 개폐 방향은 도면 형상을 이용한 1차 해석이며 실측 후 수정 가능합니다.'},
- house:{roomId:'house',name:'집 · 전체 도면',w:14220,h:10930,dp:0,dw:0,wp:0,ww:0,shapeVersion:'house-v355',note:'현재까지 정리한 안방, 거실·주방·복도, 세탁실, 공용욕실, 부부욕실, 현관, 작은방 1, 작은방 2를 하나의 집 도면으로 묶은 통합 보기입니다. 원도면의 가로 모듈 3,820 / 4,680 / 2,840 / 2,880 mm를 기준으로 좌우 구획을 다시 정렬했고, 각 섹션에서 확정한 비정형 외곽과 문 방향도 전체 도면에 반영했습니다. 가구 배치 가이드는 넣지 않았고, 세부 실측은 추후 각 방 섹션에서 보정하면 됩니다.'}
+ house:{roomId:'house',name:'집 · 전체 도면',w:14220,h:10930,dp:0,dw:0,wp:0,ww:0,shapeVersion:'house-v356',note:'현재까지 정리한 안방, 거실·주방·복도, 세탁실, 공용욕실, 부부욕실, 현관, 작은방 1, 작은방 2를 하나의 집 도면으로 묶은 통합 보기입니다. 원도면의 가로 모듈 3,820 / 4,680 / 2,840 / 2,880 mm를 기준으로 좌우 구획을 다시 정렬했고, 각 섹션에서 확정한 비정형 외곽과 문 방향도 전체 도면에 반영했습니다. 가구 배치 가이드는 넣지 않았고, 세부 실측은 추후 각 방 섹션에서 보정하면 됩니다.'}
 };
 const FURNITURE_CATALOG=[
  ['일룸 쿠시노 범퍼형 SS',1114,2065,'기존 등록',1],
@@ -386,7 +386,7 @@ const APPLIANCE_CATALOG=[
  ['빌트인 복합오븐 (모델명 확인 필요)',null,null,'현재 이미지에 모델명이 없어 정확 규격 적용 보류 · 추가 시 W×D 직접 입력',1]
 ];
 const LEGACY_NAMES={
- '1200x2150':'일룸 쿠시노 코지 범퍼형 SS (기존)',
+ '1200x2150':'일룸 쿠시노 범퍼형 SS',
  '1114x2065':'일룸 쿠시노 범퍼형 SS',
  '1305x335':'한샘 샘키즈 수납장 1305 (기존)',
  '1277x335':'한샘 샘키즈 수납장/책장 1305',
@@ -443,7 +443,9 @@ const SUITE_DOORS={
 };
 
 const $=id=>document.getElementById(id),room=$('room');
-let rid='smallroom2',selected=null,seq=1,suppressSave=false,zoom=+(localStorage.getItem('ttobok_zoom_v37')||1);
+let rid=localStorage.getItem('ttobok_current_room_v356')||'smallroom2';
+if(!ROOM_DEFAULTS[rid])rid='smallroom2';
+let selected=null,seq=1,suppressSave=false,zoom=+(localStorage.getItem('ttobok_zoom_v37')||1);
 let diagramFont=localStorage.getItem('ttobok_diagram_font_v328')||'large';
 if(!['normal','large','xlarge'].includes(diagramFont))diagramFont='large';
 document.body.dataset.diagramFont=diagramFont;
@@ -480,9 +482,17 @@ let GEOMS=JSON.parse(localStorage.getItem('ttobok_geometry_v37')||'{}');
 
 function clone(x){return JSON.parse(JSON.stringify(x))}
 function validName(v){if(v==null)return '';let s=String(v).trim();return (!s||s==='undefined'||s==='null'||s==='NaN')?'':s}
+const ITEM_ALIASES={
+ '일룸 쿠시노 코지 범퍼형 SS (기존)':'일룸 쿠시노 범퍼형 SS',
+ '일룸 쿠시노 코지 범퍼형 SS':'일룸 쿠시노 범퍼형 SS',
+ '일룸 쿠시노 범퍼형 SS (기존)':'일룸 쿠시노 범퍼형 SS'
+};
 function normalizeItem(a={}){
  let w=+(a.w??a.width??0),d=+(a.d??a.depth??a.h??0),r=+(a.r??a.rot??a.rotation??0),x=+(a.x??100),y=+(a.y??120);
  let n=validName(a.n)||validName(a.name)||validName(a.label)||validName(a.title)||LEGACY_NAMES[`${w}x${d}`]||LEGACY_NAMES[`${d}x${w}`]||(w&&d?`기존 가구 ${w}×${d}`:'이름 없는 기존 가구');
+ n=ITEM_ALIASES[n]||n;
+ // 과거 1200×2150 임시값으로 저장된 쿠시노도 현재 확정 규격으로 통일.
+ if(n==='일룸 쿠시노 범퍼형 SS'){w=1114;d=2065}
  return {n,name:n,w,d,x,y,r:(r||0)%180,rot:(r||0)%180,type:a.type||'furniture'};
 }
 function storageItem(a){let z=normalizeItem(a);return {n:z.n,name:z.n,w:z.w,d:z.d,x:z.x,y:z.y,r:z.r,rot:z.r,type:z.type||'furniture'}}
@@ -566,7 +576,7 @@ function normalizeGeom(roomId,input){
    g={...g,doorHinge:'left',doorSwing:'in-left-wall-arc',shapeVersion:'ensuite-v346'};
  }
  if(roomId==='entry'&&String(g.shapeVersion||'')!=='entry-v345')g={};
- if(roomId==='house'&&String(g.shapeVersion||'')!=='house-v355')g={};
+ if(roomId==='house'&&String(g.shapeVersion||'')!=='house-v356')g={};
  let out={...b,...g,roomId,name:b.name};
  if(roomId==='smallroom2'){
    ['trw','trd','brw','brd','dp','dw','wp','ww'].forEach(k=>{if(!Number.isFinite(+out[k]))out[k]=b[k]});
@@ -640,7 +650,7 @@ function normalizeGeom(roomId,input){
    if(roomId==='house'){
      out.w=Number.isFinite(+out.w)?+out.w:b.w;
      out.h=Number.isFinite(+out.h)?+out.h:b.h;
-     out.dp=0;out.dw=0;out.wp=0;out.ww=0;out.shapeVersion='house-v355';out.poly=housePoly(out);
+     out.dp=0;out.dw=0;out.wp=0;out.ww=0;out.shapeVersion='house-v356';out.poly=housePoly(out);
    }
    if(!Array.isArray(out.poly)||out.poly.length<3)out.poly=defaultPoly(out);
  }
@@ -699,10 +709,51 @@ function inventoryPlacedCount(name){
  },0);
 }
 function inventoryCanAdd(name,qty=1){
- let max=catalogMaxQty(name);
- let isCatalog=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].some(v=>v[0]===name);
+ let canonical=ITEM_ALIASES[name]||name,max=catalogMaxQty(canonical);
+ let isCatalog=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].some(v=>v[0]===canonical);
  if(!isCatalog)return true;
- return inventoryPlacedCount(name)+qty<=max;
+ return inventoryPlacedCount(canonical)+qty<=max;
+}
+function sanitizeRoomItems(roomId,arr){
+ let counts={},changed=false,out=[];
+ (arr||[]).forEach(raw=>{
+   let a=normalizeItem(raw),max=catalogMaxQty(a.n);
+   let isCatalog=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].some(v=>v[0]===a.n);
+   if(isCatalog){
+     let c=counts[a.n]||0;
+     if(c>=max){changed=true;return}
+     counts[a.n]=c+1;
+   }
+   let before=JSON.stringify(storageItem(raw)),after=JSON.stringify(storageItem(a));
+   if(before!==after)changed=true;
+   out.push(a);
+ });
+ return {items:out,changed};
+}
+function repairInventoryLocal(){
+ let globalCounts={},changedRooms=[];
+ INVENTORY_ROOM_IDS().forEach(roomId=>{
+   let z=null;try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
+   if(!z)return;
+   let next=[],changed=false;
+   (z.items||[]).forEach(raw=>{
+     let a=normalizeItem(raw),max=catalogMaxQty(a.n);
+     let isCatalog=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].some(v=>v[0]===a.n);
+     if(isCatalog){
+       let c=globalCounts[a.n]||0;
+       if(c>=max){changed=true;return}
+       globalCounts[a.n]=c+1;
+     }
+     let before=JSON.stringify(storageItem(raw)),after=JSON.stringify(storageItem(a));
+     if(before!==after)changed=true;
+     next.push(storageItem(a));
+   });
+   if(changed){
+     localStorage.setItem(localKey(roomId),JSON.stringify({...z,items:next,savedAt:Date.now()}));
+     changedRooms.push(roomId);
+   }
+ });
+ return changedRooms;
 }
 
 function renderCatalog(){
@@ -1561,9 +1612,13 @@ function items(){return [...room.querySelectorAll('.furn')].map(e=>storageItem({
 function renderItems(arr){
  suppressSave=true;
  clearFurniture();
- (arr||[]).map(normalizeItem).forEach(a=>addFurniture(a,true));
+ let clean=sanitizeRoomItems(rid,arr);
+ clean.items.forEach(a=>addFurniture(a,true));
  updateAll();
  suppressSave=false;
+ if(clean.changed&&rid!=='house'){
+   localStorage.setItem(localKey(rid),JSON.stringify({items:clean.items.map(storageItem),savedAt:Date.now()}));
+ }
  renderCatalog();
 }
 function loadLocal(){
@@ -1599,7 +1654,7 @@ function fitZoom(){
  setZoom(Math.min(1.25,avail/540));
 }
 function switchRoom(id){
- if(!ROOM_DEFAULTS[id])return;rid=id;$('roomSel').value=id;selected=null;updateTargets();drawGeom();loadLocal();window.restartCloudRoom();
+ if(!ROOM_DEFAULTS[id])return;rid=id;localStorage.setItem('ttobok_current_room_v356',rid);$('roomSel').value=id;selected=null;updateTargets();drawGeom();loadLocal();window.restartCloudRoom();
  if(window.innerWidth<=760)setTimeout(()=>fitZoom(),90);
 }
 function parsePoly(t){let p=t.split('/').map(v=>v.trim()).filter(Boolean).map(v=>v.split(',').map(Number));if(p.length<3||p.some(v=>v.length!==2||v.some(n=>!Number.isFinite(n))))throw Error('꼭짓점 형식을 확인해주세요.');return p}
@@ -1628,7 +1683,7 @@ $('resetMeasure').onclick=()=>{
 };
 $('applyRecess').onclick=()=>{if(rid!=='smallroom2')return;let g=geom(),trw=+$('trw').value,trd=+$('trd').value,brw=+$('brw').value,brd=+$('brd').value;if([trw,trd,brw,brd].some(v=>!Number.isFinite(v)||v<0)||trw>=g.w||brw>=g.w||trd+brd>=g.h)return alert('꺾임 치수를 확인해주세요.');setGeom({...g,trw,trd,brw,brd});drawGeom()};
 $('applyPoly').onclick=()=>{if(rid==='house')return alert('집 항목은 현재 통합 보기입니다. 외곽 수정보다는 개별 방 수정 후 전체 보기를 확인해주세요.');if(rid==='smallroom2')return alert('작은방2는 우측 꺾임 치수 입력을 사용해주세요.');if(rid==='ensuite')return alert('부부욕실은 실측 도면 수정 모드의 사선 치수를 사용해주세요.');if(rid==='entry')return alert('현관은 실측 도면 수정 모드의 전용 치수를 사용해주세요.');try{let g=geom(),p=parsePoly($('polyText').value);setGeom(rid==='living'?{...g,customPoly:p,poly:p}:{...g,poly:p});drawGeom()}catch(e){alert(e.message)}};
-$('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:rid==='house'?{...g,poly:housePoly(g),shapeVersion:'house-v355'}:{...g,poly:defaultPoly(g)});drawGeom()};
+$('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:rid==='house'?{...g,poly:housePoly(g),shapeVersion:'house-v356'}:{...g,poly:defaultPoly(g)});drawGeom()};
 $('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원할까요?')){delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}};
 $('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!w||!d)return alert('가로와 깊이를 입력해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
 $('zoomOut').onclick=()=>setZoom(zoom-(zoom>1.5?.25:.1));$('zoomIn').onclick=()=>setZoom(zoom>1.5?zoom+.25:zoom+.1);$('fit').onclick=fitZoom;
@@ -1657,8 +1712,18 @@ $('mvDown').onclick=()=>nudgeSelected(0,1);
 
 $('rot').onclick=()=>{if(selected){selected.dataset.r=(+selected.dataset.r+90)%180;updateAll()}};
 $('dup').onclick=()=>{if(selected){let n=selected.dataset.n;if(!inventoryCanAdd(n,1))return alert(`${n}은(는) 보유 수량이 모두 배치되어 있습니다.`);addFurniture({n,w:+selected.dataset.w,d:+selected.dataset.d,x:+selected.dataset.x+100,y:+selected.dataset.y+100,r:+selected.dataset.r,type:selected.dataset.type||'furniture'});updateAll();renderCatalog()}};
-$('del').onclick=()=>{if(selected){let e=selected;selected=null;e.remove();updateAll();renderCatalog()}};
-$('clear').onclick=()=>{if(confirm('현재 방 가구를 모두 비울까요?')){clearFurniture();updateAll();renderCatalog()}};
+$('del').onclick=async()=>{
+ if(!selected||!selected.isConnected)return setSaveState('먼저 제거할 가구를 선택해주세요.',false);
+ let e=selected,n=e.dataset.n;selected=null;e.remove();updateAll();renderCatalog();
+ try{if(window.TTOBOK_IS_LOGGED_IN&&window.flushCloudSave)await window.flushCloudSave()}catch(err){}
+ setSaveState(`${n} 제거 완료 · 보관함으로 복귀`);
+};
+$('clear').onclick=async()=>{
+ if(!confirm('현재 방 가구를 모두 비울까요?'))return;
+ clearFurniture();updateAll();renderCatalog();
+ try{if(window.TTOBOK_IS_LOGGED_IN&&window.flushCloudSave)await window.flushCloudSave()}catch(err){}
+ setSaveState('현재 방 가구·가전 전체 제거 완료 · 보관함으로 복귀');
+};
 
 async function saveCurrentNow(showAlert=false){
  saveLocal();
@@ -1675,7 +1740,7 @@ document.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{let z=JSON.pa
 window.addEventListener('resize',()=>{drawOpenings(geom());updateAll();if(window.innerWidth<=760)setTimeout(()=>fitZoom(),80)});
 
 window.TTOBOK_APP={
- normalizeItem,storageItem,geom,setGeom,items,renderItems,getRoom:()=>rid,
+ normalizeItem,storageItem,geom,setGeom,items,renderItems,repairInventoryLocal,getRoom:()=>rid,
  cloudGeometry,localGeometryFromCloud,
  getRoomIds:()=>Object.keys(ROOM_DEFAULTS),
  getRoomName:(roomId)=>ROOM_DEFAULTS[roomId]?.name||roomId,
@@ -1686,16 +1751,20 @@ window.TTOBOK_APP={
  },
  applyCloudRoomData:(roomId,z)=>{
    if(z?.geometry){GEOMS[roomId]=localGeometryFromCloud(roomId,z.geometry);localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS))}
-   let arr=(z?.items||[]).map(normalizeItem);
+   let clean=sanitizeRoomItems(roomId,z?.items||[]),arr=clean.items;
    localStorage.setItem(localKey(roomId),JSON.stringify({items:arr.map(storageItem),savedAt:+(z?.clientSavedAt||Date.now())}));
-   if(roomId===rid){drawGeom();renderItems(arr);setSaveState('공동 배치를 이 기기에 적용함')}
+   if(roomId===rid){drawGeom();renderItems(arr);setSaveState(clean.changed?'공동 배치 중복 항목 정리 후 적용함':'공동 배치를 이 기기에 적용함')}
  },
  onCloudGeometry:(roomId,g)=>{if(roomId!==rid)return;let clean=localGeometryFromCloud(roomId,g);GEOMS[roomId]=clean;localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}
 };
 
 document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLocal()});
 window.addEventListener('pagehide',()=>saveLocal());
-setDiagramFont(diagramFont);renderCatalog();updateTargets();drawGeom();loadLocal();
+setDiagramFont(diagramFont);
+let repairedRooms=repairInventoryLocal();
+$('roomSel').value=rid;
+renderCatalog();updateTargets();drawGeom();loadLocal();
+if(repairedRooms.length)setSaveState(`중복/구형 가구 ${repairedRooms.length}개 방 자동 정리됨 · 현재 배치를 저장하면 공동 저장소에도 반영됩니다.`);
 if(window.innerWidth<=760)setTimeout(()=>fitZoom(),140);
 </script>
 
