@@ -47,6 +47,11 @@ jobs:
           mkdir -p android-apk/app/src/main/res/values
           mkdir -p android-apk/app/src/main/res/drawable
 
+          cat > android-apk/gradle.properties <<'EOF'
+          android.useAndroidX=true
+          android.enableJetifier=true
+          EOF
+
           cat > android-apk/settings.gradle <<'EOF'
           pluginManagement {
               repositories {
