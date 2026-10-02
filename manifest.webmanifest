@@ -1,1 +1,42 @@
-{"name": "또복이 Family Room Planner", "short_name": "또복이 플래너", "start_url": "./", "display": "standalone", "background_color": "#f5f4f0", "theme_color": "#6d7d66", "icons": [{"src": "icon.svg", "sizes": "any", "type": "image/svg+xml"}]}
+{
+  "id": "./",
+  "name": "또복이 Family Room Planner",
+  "short_name": "또복이 집도면",
+  "description": "가족 공동 집도면·가구·가전 배치 플래너",
+  "lang": "ko-KR",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "display_override": [
+    "window-controls-overlay",
+    "standalone",
+    "minimal-ui"
+  ],
+  "background_color": "#f5f4f0",
+  "theme_color": "#6d7d66",
+  "orientation": "any",
+  "categories": [
+    "lifestyle",
+    "utilities"
+  ],
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
