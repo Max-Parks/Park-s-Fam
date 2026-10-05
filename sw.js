@@ -1,7 +1,8 @@
-const CACHE='ttobok-v362-app-1';
+const CACHE='ttobok-v363-app-1';
 const APP_SHELL=[
   './',
   './index.html',
+  './geometry-core.js',
   './manifest.webmanifest',
   './firebase-config.js',
   './icon-180.png',
@@ -24,7 +25,7 @@ self.addEventListener('install', event => {
 self.addEventListener('activate', event => {
   event.waitUntil((async () => {
     const keys = await caches.keys();
-    await Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)));
+    await Promise.all(keys.filter(k => k.startsWith('ttobok-') && k !== CACHE).map(k => caches.delete(k)));
     await self.clients.claim();
   })());
 });

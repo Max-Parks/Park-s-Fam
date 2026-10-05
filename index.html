@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.62</title>
+<title>또복이 Family Room Planner V3.63</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <meta name="application-name" content="또복이 Family Room Planner">
@@ -136,7 +136,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </head>
 <body data-diagram-font="large">
 <header>
-<h1>또복이 Family Room Planner <small>V3.62</small></h1>
+<h1>또복이 Family Room Planner <small>V3.63</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">가족 전용 · 로그인 필요</span><button id="login">Google 로그인</button><button id="family">가족: parks-family</button><button id="syncPull" title="가족 공동 저장소의 배치를 이 기기로 다시 불러옵니다">↻ 공동 배치 불러오기</button><button id="installApp" class="installBtn" type="button">📲 Android APK 설치</button></div>
 </header>
@@ -312,7 +312,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </div>
 
 <div class="card save"><h2>배치 저장</h2>
-<div class="row"><button id="saveCurrent" class="primary">현재 배치 저장</button><button id="syncAll">전체 방 공동 저장</button><span id="saveState" class="small">자동 저장 사용 중</span></div>
+<div class="row"><button id="saveCurrent" class="primary">현재 배치 저장</button><button id="restoreBackup">이전 로컬 배치 복구</button><button id="syncAll">전체 방 공동 저장</button><span id="saveState" class="small">자동 저장 사용 중</span></div>
 <div class="small" style="margin-top:7px">A/B/C는 이 기기의 백업 배치안입니다. <b>전체 방 공동 저장</b>은 각 방의 현재 가구 배치와 도면 치수를 가족 공동 저장소에 안전한 형식으로 한 번에 올립니다.</div>
 <div class="row" style="margin-top:7px">
 <button data-save="A">A 저장</button><button data-load="A">A 불러오기</button>
@@ -347,6 +347,7 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </div></main>
 </div>
 
+<script src="geometry-core.js"></script>
 <script>window.scheduleCloudSave=()=>{};window.restartCloudRoom=()=>{};window.cloudAppendItem=null;</script>
 <script>
 const ROOM_DEFAULTS={
@@ -358,7 +359,7 @@ const ROOM_DEFAULTS={
  commonbath:{roomId:'commonbath',name:'공용욕실',w:1620,h:2100,dp:820,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'right',doorSwing:'in-left',wp:0,ww:0,shapeVersion:'commonbath-v349',note:'공용욕실 1차 도면입니다. 도면상 내측 폭 1,620 mm / 깊이 2,100 mm를 적용했습니다. 하단 출입문은 800 × 2,200 mm이며, 욕실 외부에서 안으로 밀어 들어가는 구조입니다. 우측하단 힌지 기준 문짝 자유단이 하단 좌측 닫힘 위치에서 우측 벽 쪽 열린 위치로 감기듯 올라가는 곡선 점선으로 표시되며, 완전히 열리면 우측 벽 방향으로 붙는 형태를 표현합니다. 문 시작 X 820 mm는 내측 폭과 문 폭을 기준으로 우측 벽에 붙인 초기 좌표입니다. 상부 590 mm 표기는 욕실 내부 유효공간 치수로 확정하지 않아 이번 버전에는 별도 구조물로 넣지 않았습니다.'},
  ensuite:{roomId:'ensuite',name:'부부욕실',w:1680,h:2300,slantW:630,slantD:860,dp:60,dw:800,doorNominalW:800,doorNominalH:2200,doorSide:'bottom',doorHinge:'left',doorSwing:'in-left-wall-arc',rightWall:820,wp:0,ww:0,shapeVersion:'ensuite-v346',note:'부부욕실 1차 도면입니다. 원도면 표기값에서 전체 폭 1,680 mm, 세로 2,300 mm, 출입문 800 × 2,200 mm, 문 우측 벽 820 mm를 적용했습니다. 문 시작 X 60 mm는 1,680−800−820으로 계산한 값입니다. 출입문은 욕실 밖에서 안으로 밀며, 닫힌 상태의 문짝 우측 끝이 좌측 방향으로 회전하고 완전히 열리면 좌측 벽측(문 시작 60 mm 위치)에 붙고, 열림 궤적은 하단 개구부에서 좌측 벽 방향으로 휘는 곡선으로 표시합니다. 좌상단 사선은 도면 비율로 약 630 × 860 mm를 초기 추정했으며 실측 전 확정값이 아닙니다.'},
  entry:{roomId:'entry',name:'현관',w:1810,h:1590,clearW:1300,sideW:510,thresholdD:310,dp:0,dw:1200,doorNominalW:1200,doorNominalH:2200,doorSide:'top',doorHinge:'left',doorSwing:'in-left-wall',openX:0,openW:1300,wp:0,ww:0,shapeVersion:'entry-v345',note:'현관 1차 도면입니다. 원도면에서 1,300 mm 유효부, 우측 510 mm 구간, 세로 1,590 mm, 하단 310 mm 구간, 현관문 1,200 × 2,200 mm를 확인했습니다. 전체 폭 1,810 mm는 1,300+510으로 계산했습니다. 하단 실내 연결 개구 1,300 mm와 현관문 개폐 방향은 도면 형상을 이용한 1차 해석이며 실측 후 수정 가능합니다.'},
- house:{roomId:'house',name:'집 · 전체 도면',w:14220,h:10930,dp:0,dw:0,wp:0,ww:0,shapeVersion:'house-v362',note:'현재까지 정리한 안방, 거실·주방·복도, 세탁실, 공용욕실, 부부욕실, 현관, 작은방 1, 작은방 2를 하나의 집 도면으로 묶은 통합 보기입니다. 원도면의 가로 모듈 3,820 / 4,680 / 2,840 / 2,880 mm를 기준으로 좌우 구획을 다시 정렬했고, 각 섹션에서 확정한 비정형 외곽과 문 방향도 전체 도면에 반영했습니다. 가구 배치 가이드는 넣지 않았고, 세부 실측은 추후 각 방 섹션에서 보정하면 됩니다.'}
+ house:{roomId:'house',name:'집 · 전체 도면',w:14220,h:10930,dp:0,dw:0,wp:0,ww:0,shapeVersion:'house-v362',note:'전체 집은 방 위치를 확인하는 참고도입니다. 전체 외곽과 방·복도 연결 좌표는 각 방 실측값과 대조가 필요합니다. 가구 배치와 간격·충돌은 각 방 도면에서 확인해주세요.'}
 };
 const FURNITURE_CATALOG=[
  ['일룸 쿠시노 범퍼형 SS',1114,2065,'기존 등록',1],
@@ -461,38 +462,60 @@ let selected=null,seq=1,suppressSave=false,zoom=+(localStorage.getItem('ttobok_z
 let diagramFont=localStorage.getItem('ttobok_diagram_font_v328')||'large';
 if(!['normal','large','xlarge'].includes(diagramFont))diagramFont='large';
 document.body.dataset.diagramFont=diagramFont;
-let GEOMS=JSON.parse(localStorage.getItem('ttobok_geometry_v37')||'{}');
+let GEOMS=readObject('ttobok_geometry_v37');
 
 (function migrateMasterToV318(){
  const marker='ttobok_master_v318_migrated';
  if(localStorage.getItem(marker))return;
- const read=k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}};
- const write=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
- const shiftOldMaster=z=>{
-   if(!z)return null;
-   let c=JSON.parse(JSON.stringify(z));
-   c.items=(c.items||[]).map(it=>({...it,y:(+(it.y??120))+1270}));
-   c.savedAt=Date.now();
-   return c;
- };
- ['cur','A','B','C'].forEach(slot=>{
-   const suite=read(`ttobok_v3_masterSuite_${slot}`);
-   const oldMaster=read(`ttobok_v3_master_${slot}`);
-   if(suite){
-     suite.savedAt=Date.now();
-     write(`ttobok_v3_master_${slot}`,suite);
-   }else if(oldMaster){
-     const shifted=shiftOldMaster(oldMaster);
-     if(shifted)write(`ttobok_v3_master_${slot}`,shifted);
-   }
- });
- delete GEOMS.masterSuite;
- delete GEOMS.master;
- localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));
- localStorage.setItem(marker,'1');
+ // A missing marker does not prove that existing coordinates are legacy.
+ // Copy an intact suite only into an absent master slot; retain every source.
+ try{
+  for(const slot of ['cur','A','B','C']){
+   const source=`ttobok_v3_masterSuite_${slot}`,target=`ttobok_v3_master_${slot}`;
+   if(localStorage.getItem(target)!==null)continue;
+   const raw=localStorage.getItem(source);if(!raw)continue;
+   let suite;try{suite=JSON.parse(raw)}catch(e){continue}
+   if(!suite||!Array.isArray(suite.items)||!suite.items.every(validItem))continue;
+   const backup='ttobok_v363_migration_backup_'+slot;
+   if(!localStorage.getItem(backup))localStorage.setItem(backup,JSON.stringify({source:raw,geometry:localStorage.getItem('ttobok_geometry_v37')}));
+   localStorage.setItem(target,raw);
+  }
+  if(!GEOMS.master&&GEOMS.masterSuite){
+   GEOMS.master=clone(GEOMS.masterSuite);
+   localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));
+  }
+  localStorage.setItem(marker,'1');
+ }catch(e){/* Keep original records and allow startup if storage is full. */}
 })();
 
+function readObject(key){
+ const raw=localStorage.getItem(key);if(!raw)return {};
+ try{const value=JSON.parse(raw);if(value&&typeof value==='object'&&!Array.isArray(value))return value}catch(e){}
+ try{localStorage.setItem(key+'_invalid_backup',raw)}catch(e){}
+ return {};
+}
 function clone(x){return JSON.parse(JSON.stringify(x))}
+function escapeHtml(value){return String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function validItem(a){return a&&typeof a==='object'&&[a.w??a.width,a.d??a.depth??a.h].every(v=>Number.isFinite(+v)&&+v>0)&&[a.x??100,a.y??120].every(v=>Number.isFinite(+v))}
+function cloudVersion(z){return JSON.stringify([z?.revision||0,z?.clientSavedAt||0,z?.updatedClientId||''])}
+function readLocalRoom(roomId){
+ const z=readObject(localKey(roomId));
+ return {...z,items:sanitizeRoomItems(roomId,z.items||[]).items,savedAt:+z.savedAt||0,dirty:z.dirty===true,localRevision:+z.localRevision||0,baseVersion:z.baseVersion??null,hasLocalData:Array.isArray(z.items),geometry:normalizeGeom(roomId,GEOMS[roomId]||ROOM_DEFAULTS[roomId])};
+}
+function backupLocalRoom(roomId){
+ const current=readLocalRoom(roomId);if(!current.hasLocalData)return;
+ const key='ttobok_v363_recovery_'+roomId,old=readObject(key),backups=Array.isArray(old.backups)?old.backups:[];
+ backups.unshift({...current,backedUpAt:Date.now()});
+ localStorage.setItem(key,JSON.stringify({backups:backups.slice(0,5)}));
+}
+function persistRoom(roomId,arr,force=false){
+ if(roomId==='house'||!Array.isArray(arr))return false;
+ const prev=readLocalRoom(roomId),geometry=normalizeGeom(roomId,GEOMS[roomId]||ROOM_DEFAULTS[roomId]),next=arr.map(storageItem);
+ const raw=readObject(localKey(roomId));
+ if(!force&&prev.hasLocalData&&JSON.stringify(prev.items.map(storageItem))===JSON.stringify(next)&&JSON.stringify(raw.geometry||geometry)===JSON.stringify(geometry))return false;
+ localStorage.setItem(localKey(roomId),JSON.stringify({...raw,items:next,geometry,savedAt:Date.now(),dirty:true,localRevision:prev.localRevision+1,baseVersion:prev.baseVersion}));
+ return true;
+}
 function validName(v){if(v==null)return '';let s=String(v).trim();return (!s||s==='undefined'||s==='null'||s==='NaN')?'':s}
 const ITEM_ALIASES={
  '일룸 쿠시노 코지 범퍼형 SS (기존)':'일룸 쿠시노 범퍼형 SS',
@@ -500,25 +523,26 @@ const ITEM_ALIASES={
  '일룸 쿠시노 범퍼형 SS (기존)':'일룸 쿠시노 범퍼형 SS'
 };
 function normalizeItem(a={}){
+ a=a&&typeof a==='object'?a:{};
  let w=+(a.w??a.width??0),d=+(a.d??a.depth??a.h??0),r=+(a.r??a.rot??a.rotation??0),x=+(a.x??100),y=+(a.y??120);
  let n=validName(a.n)||validName(a.name)||validName(a.label)||validName(a.title)||LEGACY_NAMES[`${w}x${d}`]||LEGACY_NAMES[`${d}x${w}`]||(w&&d?`기존 가구 ${w}×${d}`:'이름 없는 기존 가구');
  n=ITEM_ALIASES[n]||n;
  // 과거 1200×2150 임시값으로 저장된 쿠시노도 현재 확정 규격으로 통일.
  if(n==='일룸 쿠시노 범퍼형 SS'){w=1114;d=2065}
- return {n,name:n,w,d,x,y,r:(r||0)%180,rot:(r||0)%180,type:a.type||'furniture'};
+ return {n,name:n,w,d,x,y,r:((Math.round((r||0)/90)*90)%180+180)%180,rot:((Math.round((r||0)/90)*90)%180+180)%180,type:a.type||'furniture'};
 }
 function storageItem(a){let z=normalizeItem(a);return {n:z.n,name:z.n,w:z.w,d:z.d,x:z.x,y:z.y,r:z.r,rot:z.r,type:z.type||'furniture'}}
 function small2Poly(g){return [[0,0],[g.w-g.trw,0],[g.w-g.trw,g.trd],[g.w,g.trd],[g.w,g.h-g.brd],[g.w-g.brw,g.h-g.brd],[g.w-g.brw,g.h],[0,g.h]]}
 function defaultPoly(g){return [[0,0],[g.w,0],[g.w,g.h],[0,g.h]]}
 function laundryPoly(g){
- let nw=Math.max(0,Math.min(g.w-100,+g.notchW||0));
- let nd=Math.max(0,Math.min(g.h-100,+g.notchD||0));
+ let nw=Math.max(0,Math.min(g.w,+g.notchW||0));
+ let nd=Math.max(0,Math.min(g.h,+g.notchD||0));
  if(!nw||!nd)return defaultPoly(g);
  return [[0,0],[g.w,0],[g.w,g.h],[nw,g.h],[nw,g.h-nd],[0,g.h-nd]]
 }
 function ensuitePoly(g){
- let sw=Math.max(0,Math.min(g.w-200,+g.slantW||0));
- let sd=Math.max(0,Math.min(g.h-300,+g.slantD||0));
+ let sw=Math.max(0,Math.min(g.w,+g.slantW||0));
+ let sd=Math.max(0,Math.min(g.h,+g.slantD||0));
  if(!sw||!sd)return defaultPoly(g);
  return [[sw,0],[g.w,0],[g.w,g.h],[0,g.h],[0,sd]]
 }
@@ -559,11 +583,10 @@ function houseWindowSpecs(){
 }
 
 function houseZoneClip(id){
- if(id==='hzEnsuite')return 'polygon(37.5% 0,100% 0,100% 100%,0 100%,0 37.4%)';
- if(id==='hzLaundry')return 'polygon(0 0,100% 0,100% 100%,35% 100%,35% 75.8%,0 75.8%)';
- if(id==='hzSmall2')return 'polygon(0 0,83.7% 0,83.7% 8.6%,100% 8.6%,100% 97.6%,79.6% 97.6%,79.6% 100%,0 100%)';
- return '';
+ const roomId={hzEnsuite:'ensuite',hzLaundry:'laundry',hzSmall2:'smallroom2'}[id];if(!roomId)return '';
+ const g=geomForRoom(roomId);return 'polygon('+normPoly(g).map(([x,y])=>`${x/g.w*100}% ${y/g.h*100}%`).join(',')+')';
 }
+
 function livingPoly(g){
  let topW=Math.max(300,Math.min(g.w,+g.topW||2700));
  let upperW=Math.max(topW,Math.min(g.w,+g.upperW||3290));
@@ -579,15 +602,15 @@ function normalizeGeom(roomId,input){
  if(roomId==='smallroom2'&&String(g.shapeVersion||'')!=='small2-v341'){
    g={...g,dp:0,dw:930,doorLeafW:800,doorFrameSide:65,doorHingeOffset:65,doorNominalW:800,doorNominalH:2200,doorSide:'top',doorHinge:'left',shapeVersion:'small2-v341'};
  }
- if(roomId==='smallroom1'&&String(g.shapeVersion||'')!=='small1-v311')g={};
- if(roomId==='master'&&String(g.shapeVersion||'')!=='master-v319')g={};
- if(roomId==='living'&&String(g.shapeVersion||'')!=='living-v324')g={};
- if(roomId==='laundry'&&String(g.shapeVersion||'')!=='laundry-v332')g={};
- if(roomId==='commonbath'&&String(g.shapeVersion||'')!=='commonbath-v349')g={};
+ if(roomId==='smallroom1')g.shapeVersion='small1-v311';
+ if(roomId==='master')g.shapeVersion='master-v319';
+ if(roomId==='living')g.shapeVersion='living-v324';
+ if(roomId==='laundry')g.shapeVersion='laundry-v332';
+ if(roomId==='commonbath')g.shapeVersion='commonbath-v349';
  if(roomId==='ensuite'&&String(g.shapeVersion||'')!=='ensuite-v346'){
    g={...g,doorHinge:'left',doorSwing:'in-left-wall-arc',shapeVersion:'ensuite-v346'};
  }
- if(roomId==='entry'&&String(g.shapeVersion||'')!=='entry-v345')g={};
+ if(roomId==='entry')g.shapeVersion='entry-v345';
  if(roomId==='house'&&String(g.shapeVersion||'')!=='house-v362')g={};
  let out={...b,...g,roomId,name:b.name};
  if(roomId==='smallroom2'){
@@ -634,7 +657,7 @@ function normalizeGeom(roomId,input){
      out.h=Number.isFinite(+out.h)?+out.h:b.h;
      out.dp=Number.isFinite(+out.dp)?+out.dp:b.dp;
      out.dw=Number.isFinite(+out.dw)?+out.dw:b.dw;
-     out.doorNominalW=800;out.doorNominalH=2200;out.doorSide='bottom';out.doorHinge='right';out.doorSwing='in-left';
+     out.doorNominalW=out.dw;out.doorNominalH=2200;out.doorSide='bottom';out.doorHinge='right';out.doorSwing='in-left';
      out.wp=0;out.ww=0;out.shapeVersion='commonbath-v349';out.poly=defaultPoly(out);
    }
    if(roomId==='ensuite'){
@@ -642,8 +665,8 @@ function normalizeGeom(roomId,input){
      out.h=Number.isFinite(+out.h)?+out.h:b.h;
      out.slantW=Number.isFinite(+out.slantW)?+out.slantW:b.slantW;
      out.slantD=Number.isFinite(+out.slantD)?+out.slantD:b.slantD;
-     out.dw=800;out.rightWall=820;out.dp=Math.max(0,out.w-out.dw-out.rightWall);
-     out.doorNominalW=800;out.doorNominalH=2200;out.doorSide='bottom';out.doorHinge='left';out.doorSwing='in-left-wall-arc';
+     out.dw=Number.isFinite(+out.dw)&&+out.dw>0?+out.dw:b.dw;out.rightWall=Number.isFinite(+out.rightWall)?+out.rightWall:b.rightWall;out.dp=Math.max(0,out.w-out.dw-out.rightWall);
+     out.doorNominalW=out.dw;out.doorNominalH=2200;out.doorSide='bottom';out.doorHinge='left';out.doorSwing='in-left-wall-arc';
      out.wp=0;out.ww=0;out.shapeVersion='ensuite-v346';out.poly=ensuitePoly(out);
    }
    if(roomId==='entry'){
@@ -656,7 +679,7 @@ function normalizeGeom(roomId,input){
      out.dw=Number.isFinite(+out.dw)?+out.dw:b.dw;
      out.openX=Number.isFinite(+out.openX)?+out.openX:b.openX;
      out.openW=Number.isFinite(+out.openW)?+out.openW:b.openW;
-     out.doorNominalW=1200;out.doorNominalH=2200;out.doorSide='top';out.doorHinge='left';out.doorSwing='in-left-wall';
+     out.doorNominalW=out.dw;out.doorNominalH=2200;out.doorSide='top';out.doorHinge='left';out.doorSwing='in-left-wall';
      out.wp=0;out.ww=0;out.shapeVersion='entry-v345';out.poly=defaultPoly(out);
    }
    if(roomId==='house'){
@@ -668,7 +691,8 @@ function normalizeGeom(roomId,input){
  }
  return out;
 }
-function geom(){return normalizeGeom(rid,GEOMS[rid])}
+function geomForRoom(roomId){return normalizeGeom(roomId,GEOMS[roomId])}
+function geom(){return geomForRoom(rid)}
 function cloudGeometry(roomId,g){
  let x=clone(normalizeGeom(roomId,g));
  if(Array.isArray(x.poly)){
@@ -693,13 +717,17 @@ function localGeometryFromCloud(roomId,g){
  }
  return normalizeGeom(roomId,x);
 }
-function setGeom(g){let x=normalizeGeom(rid,g);GEOMS[rid]=x;localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS))}
+function setGeom(g){
+ const x=normalizeGeom(rid,g),before=geom();if(JSON.stringify(x)===JSON.stringify(before))return true;
+ try{GEOMS[rid]=x;localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));if(!saveLocal(true))throw Error('save');window.scheduleCloudSave(rid);return true}
+ catch(e){GEOMS[rid]=before;try{localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS))}catch(e){}setSaveState('도면 변경을 저장하지 못했습니다.',false);return false}
+}
 function localKey(roomId=rid,slot='cur'){return `ttobok_v3_${roomId}_${slot}`}
 function scale(){return room.clientWidth/geom().w}
 function normPoly(g){return g.poly&&g.poly.length>=3?g.poly:defaultPoly(g)}
 function onSeg(x,y,a,b){let c=(x-a[0])*(b[1]-a[1])-(y-a[1])*(b[0]-a[0]);if(Math.abs(c)>.01)return false;return x>=Math.min(a[0],b[0])-.01&&x<=Math.max(a[0],b[0])+.01&&y>=Math.min(a[1],b[1])-.01&&y<=Math.max(a[1],b[1])+.01}
 function pointInPoly(x,y,p){for(let i=0;i<p.length;i++)if(onSeg(x,y,p[i],p[(i+1)%p.length]))return true;let inside=false;for(let i=0,j=p.length-1;i<p.length;j=i++){let xi=p[i][0],yi=p[i][1],xj=p[j][0],yj=p[j][1];if(((yi>y)!=(yj>y))&&(x<(xj-xi)*(y-yi)/(yj-yi)+xi))inside=!inside}return inside}
-function insideShape(a,g){let p=normPoly(g),pts=[[a.x,a.y],[a.x+a.w,a.y],[a.x+a.w,a.y+a.h],[a.x,a.y+a.h],[a.x+a.w/2,a.y+a.h/2]];return pts.every(q=>pointInPoly(q[0],q[1],p))}
+function insideShape(a,g){return TTOBOK_GEOMETRY.rectangleInsidePolygon(a,normPoly(g))}
 function overlap(a,b){return a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y}
 function dims(e){return +e.dataset.r%180?{w:+e.dataset.d,h:+e.dataset.w}:{w:+e.dataset.w,h:+e.dataset.d}}
 function rect(e){let q=dims(e);return{x:+e.dataset.x,y:+e.dataset.y,w:q.w,h:q.h}}
@@ -713,7 +741,7 @@ function storedItemsForInventory(roomId){
  if(roomId===rid && rid!=='house')return items();
  let z=null;
  try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
- return (z?.items||[]).map(normalizeItem);
+ return sanitizeRoomItems(roomId,z?.items||[]).items;
 }
 function inventoryPlacedCount(name){
  return INVENTORY_ROOM_IDS().reduce((sum,roomId)=>{
@@ -727,50 +755,18 @@ function inventoryCanAdd(name,qty=1){
  return inventoryPlacedCount(canonical)+qty<=max;
 }
 function sanitizeRoomItems(roomId,arr){
- let counts={},changed=false,out=[];
- (arr||[]).forEach(raw=>{
-   let a=normalizeItem(raw),max=catalogMaxQty(a.n);
-   let isCatalog=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].some(v=>v[0]===a.n);
-   if(isCatalog){
-     let c=counts[a.n]||0;
-     if(c>=max){changed=true;return}
-     counts[a.n]=c+1;
-   }
-   let before=JSON.stringify(storageItem(raw)),after=JSON.stringify(storageItem(a));
-   if(before!==after)changed=true;
-   out.push(a);
- });
- return {items:out,changed};
+ if(!Array.isArray(arr))return {items:[],changed:true,invalid:true};
+ const out=arr.filter(validItem).map(normalizeItem);
+ return {items:out,changed:out.length!==arr.length};
 }
 function repairInventoryLocal(){
- let globalCounts={},changedRooms=[];
- INVENTORY_ROOM_IDS().forEach(roomId=>{
-   let z=null;try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
-   if(!z)return;
-   let next=[],changed=false;
-   (z.items||[]).forEach(raw=>{
-     let a=normalizeItem(raw),max=catalogMaxQty(a.n);
-     let isCatalog=[...FURNITURE_CATALOG,...APPLIANCE_CATALOG].some(v=>v[0]===a.n);
-     if(isCatalog){
-       let c=globalCounts[a.n]||0;
-       if(c>=max){changed=true;return}
-       globalCounts[a.n]=c+1;
-     }
-     let before=JSON.stringify(storageItem(raw)),after=JSON.stringify(storageItem(a));
-     if(before!==after)changed=true;
-     next.push(storageItem(a));
-   });
-   if(changed){
-     localStorage.setItem(localKey(roomId),JSON.stringify({...z,items:next,savedAt:Date.now()}));
-     changedRooms.push(roomId);
-   }
- });
- return changedRooms;
+ // Existing placements are user data. Quantity limits apply only when adding.
+ return [];
 }
 
 function renderCatalog(){
  function renderList(targetId,list,isAppliance=false){
-  let c=$(targetId);c.innerHTML='',visible=0;
+  let c=$(targetId);c.innerHTML='';let visible=0;if(rid==='house'){c.textContent='전체 도면은 참고 보기입니다. 가구는 각 방에서 편집해주세요.';return}
   list.forEach(v=>{
    let name=v[0],max=Math.max(1,+(v[4]||1)),placed=inventoryPlacedCount(name);
    if(placed>=max)return;
@@ -802,12 +798,13 @@ function renderCatalog(){
 }
 function updateTargets(){
  let t=$('targetRoom');t.innerHTML='';
- Object.keys(ROOM_DEFAULTS).filter(id=>id!==rid).forEach(id=>{let o=document.createElement('option');o.value=id;o.textContent=ROOM_DEFAULTS[id].name;t.appendChild(o)});
+ Object.keys(ROOM_DEFAULTS).filter(id=>id!==rid&&id!=='house').forEach(id=>{let o=document.createElement('option');o.value=id;o.textContent=ROOM_DEFAULTS[id].name;t.appendChild(o)});
 }
 function drawShape(g){
  let p=normPoly(g);$('roomShape').setAttribute('viewBox',`0 0 ${g.w} ${g.h}`);$('wallPoly').setAttribute('points',p.map(v=>v.join(',')).join(' '));
  $('polyText').value=p.map(v=>v.join(',')).join(' / ');
- $('shapeHint').textContent=rid==='house'?'집 전체 보기: 각 섹션을 통합한 전체 도면 · 주요 방 경계/개구부/고정 구조 + 대표 치수선 표시 · 세부 가구/실측은 추후 보정':rid==='master'?'안방 전체 도면: 구역별 연결 · 문없는 통로/베란다 개구는 열린 공간 · 실제 내부벽만 충돌 판정':rid==='living'?'거실·주방·복도 통합 도면: 사용자가 표시한 파란 영역의 단계형 외곽을 우선 반영 · 가전/가구는 별도 배치':rid==='laundry'?'세탁실: 좌측 출입문 + 상단 중앙 창호 + 좌하단 꺾임 구조 반영 · 꺾임 치수선은 실제 공간 바깥쪽 표시':rid==='commonbath'?'공용욕실: 내측 1,620 × 2,100 mm · 하단 800 × 2,200 mm 문 · 외부에서 밀어 들어감 · 우측하단 힌지 · 좌측 방향 개폐':rid==='ensuite'?'부부욕실: 1,680 × 2,300 mm 비정형 외곽 · 문은 밖에서 밀어 진입 · 좌측 힌지 · 열리면 좌측 벽측에 붙음':rid==='entry'?'현관: 1,300 + 510 = 1,810 mm 1차 모델 · 깊이 1,590 · 현관문 1,200×2,200 · 하단 실내 연결 개구 표시':(p.length>4?'내측 벽선: 비정형 다각형 · 실제 벽선 기준 충돌 판정':'내측 벽선: 직사각형 · 방별 독립 도면');
+ $('wallPoly').style.strokeDasharray=rid==='house'?'8 8':'';$('wallPoly').style.opacity=rid==='house'?'.35':'1';
+ $('shapeHint').textContent=rid==='house'?'전체 집은 위치 참고도입니다. 방 연결·전체 외곽은 원본 실측 도면과 재대조가 필요합니다. 가구 크기는 mm 비율이며 간격·충돌 판단은 각 방에서 해주세요.':rid==='master'?'안방 전체 도면: 구역별 연결 · 문없는 통로/베란다 개구는 열린 공간 · 실제 내부벽만 충돌 판정':rid==='living'?'거실·주방·복도 통합 도면: 사용자가 표시한 파란 영역의 단계형 외곽을 우선 반영 · 가전/가구는 별도 배치':rid==='laundry'?'세탁실: 좌측 출입문 + 상단 중앙 창호 + 좌하단 꺾임 구조 반영 · 꺾임 치수선은 실제 공간 바깥쪽 표시':rid==='commonbath'?'공용욕실: 내측 1,620 × 2,100 mm · 하단 800 × 2,200 mm 문 · 외부에서 밀어 들어감 · 우측하단 힌지 · 좌측 방향 개폐':rid==='ensuite'?'부부욕실: 1,680 × 2,300 mm 비정형 외곽 · 문은 밖에서 밀어 진입 · 좌측 힌지 · 열리면 좌측 벽측에 붙음':rid==='entry'?'현관: 1,300 + 510 = 1,810 mm 1차 모델 · 깊이 1,590 · 현관문 1,200×2,200 · 하단 실내 연결 개구 표시':(p.length>4?'내측 벽선: 비정형 다각형 · 실제 벽선 기준 충돌 판정':'내측 벽선: 직사각형 · 방별 독립 도면');
  let m=$('measures');m.innerHTML='';
  if(rid!=='smallroom1'&&rid!=='living'&&rid!=='smallroom2'&&rid!=='ensuite'&&rid!=='entry'&&rid!=='house'){
   m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`;
@@ -1151,13 +1148,16 @@ function suiteZones(){
  }
  return SUITE_ZONES[rid]||[]
 }
+function wallSegments(width,y,openings,name){
+ const intervals=openings.map(([x,w])=>[Math.max(0,x),Math.min(width,x+w)]).filter(([a,b])=>b>a).sort((a,b)=>a[0]-b[0]);
+ const out=[];let cursor=0;
+ for(const [a,b] of intervals){if(a>cursor)out.push({x:cursor,y:y-15,w:a-cursor,h:30,name});cursor=Math.max(cursor,b)}
+ if(cursor<width)out.push({x:cursor,y:y-15,w:width-cursor,h:30,name});return out;
+}
 function suiteWalls(){
  if(rid==='master'){
   let g=geom(),bedBottom=g.topH+g.bedH;
-  return [
-   {x:0,y:g.topH-15,w:g.passX,h:30,name:'상부-안방 경계벽'},
-   {x:0,y:bedBottom-15,w:g.balOpenX,h:30,name:'안방-베란다 좌측 벽'}
-  ]
+  return [...wallSegments(g.w,g.topH,[[g.passX,g.passW],[g.entryX,g.entryW]],'상부-안방 경계벽'),...wallSegments(g.w,bedBottom,[[g.balOpenX,g.balOpenW]],'안방-베란다 경계벽')]
  }
  if(rid==='house'){
   return [
@@ -1218,7 +1218,7 @@ function edgeFixtures(){
 }
 const HOUSE_ITEM_PLACEMENTS={
  master:{x:110,y:3650,sx:1,sy:1},
- living:{x:3820,y:0,sx:4680/7800,sy:1},
+ living:{x:3820,y:0,sx:1,sy:1},
  laundry:{x:7920,y:100,sx:1,sy:1},
  commonbath:{x:7840,y:2450,sx:1,sy:1},
  ensuite:{x:1950,y:1250,sx:1,sy:1},
@@ -1229,7 +1229,7 @@ const HOUSE_ITEM_PLACEMENTS={
 function savedRoomItems(roomId){
  let z=null;
  try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
- return (z?.items||[]).map(normalizeItem);
+ return sanitizeRoomItems(roomId,z?.items||[]).items;
 }
 function renderHouseSavedItems(layer,ss){
  let count=0;
@@ -1242,10 +1242,10 @@ function renderHouseSavedItems(layer,ss){
      e.className='houseSavedItem '+(a.type==='appliance'?'appliance':'furniture');
      e.style.left=(p.x+a.x*p.sx)*ss+'px';
      e.style.top=(p.y+a.y*p.sy)*ss+'px';
-     e.style.width=Math.max(12,iw*p.sx*ss)+'px';
-     e.style.height=Math.max(12,ih*p.sy*ss)+'px';
+     e.style.width=iw*ss+'px';
+     e.style.height=ih*ss+'px';
      e.title=`${roomName} · ${a.n} · ${iw}×${ih} mm`;
-     e.innerHTML=`<div>${a.n}<span class="roomTag">${roomName}</span></div>`;
+     e.innerHTML=`<div>${escapeHtml(a.n)}<span class="roomTag">${escapeHtml(roomName)}</span></div>`;
      layer.appendChild(e);
      count++;
    });
@@ -1255,6 +1255,10 @@ function renderHouseSavedItems(layer,ss){
 function renderSuite(){
  let layer=$('suiteLayer');layer.innerHTML='';let ss=scale();
  suiteZones().forEach(o=>{
+   if(rid==='house'){
+    const roomId={hzEnsuite:'ensuite',hzLaundry:'laundry',hzSmall2:'smallroom2',hzSmall1:'smallroom1',hzCommonBath:'commonbath',hzEntry:'entry'}[o.id];
+    if(roomId){const g=geomForRoom(roomId);o={...o,w:g.w,h:g.h,note:`${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`}}
+   }
    let e=document.createElement('div');
    e.className='suiteZone';
    e.style.cssText=`left:${o.x*ss}px;top:${o.y*ss}px;width:${o.w*ss}px;height:${o.h*ss}px`;
@@ -1328,7 +1332,7 @@ function renderSuite(){
   let savedCount=renderHouseSavedItems(layer,ss);
   let src=$('roomSource');
   if(src){
-    src.textContent=`집 전체 도면: 원도면 모듈에 맞춰 방 위치/외곽을 재보정 · 저장된 가구·가전 ${savedCount}개 자동 표시 · 가구 가이드는 제외`;
+    src.textContent=`전체 집은 위치 참고도 · 방별 연결 좌표와 외곽 미확정 · 저장 가구 ${savedCount}개 표시 · 실제 간격은 방별 도면에서 확인`;
   }
  }
 }
@@ -1340,7 +1344,7 @@ function renderFixed(){
 }
 function fixedHit(a){return fixedObstacles().some(o=>overlap(a,{x:o.x,y:o.y,w:o.w,h:o.h}))}
 function suiteWallHit(a){return suiteWalls().some(o=>overlap(a,{x:o.x,y:o.y,w:o.w,h:o.h}))}
-function suiteDoorHit(a){return suiteDoors().some(o=>overlap(a,{x:o.hingeX-o.w,y:o.hingeY,w:o.w,h:o.w}))}
+function suiteDoorHit(a){return suiteDoors().some(o=>TTOBOK_GEOMETRY.rectangleIntersectsSector(a,{cx:o.hingeX,cy:o.hingeY,r:o.w,sx:-1,sy:1}))}
 function doorRect(g){
  let side=g.doorSide||'top',p=+g.dp||0,w=+g.dw||0,swing=+g.doorLeafW||w,off=+g.doorHingeOffset||0,hinge=g.doorHinge||'left';if(!w)return null;
  if(side==='left')return{x:0,y:p,w:swing,h:swing};
@@ -1353,102 +1357,25 @@ function doorRect(g){
  return{x,y:0,w:swing,h:swing};
 }
 function drawOpenings(g){
- let ss=scale(),dp=+g.dp||0,dw=+g.dw||0,wp=+g.wp||0,ww=+g.ww||0,side=g.doorSide||'top',hinge=g.doorHinge||'left',winSide=g.windowSide||'bottom',hingeOff=+g.doorHingeOffset||0;
- let nominalW=+g.doorNominalW||dw,nominalH=+g.doorNominalH||0;
- let doorText=dw?(nominalH?`문 ${nominalW}×${nominalH} mm${nominalW!==dw?` · 개구 ${dw} mm`:''}`:`문 ${nominalW} mm`):'';
- if(g.doorSwing==='in-left'&&dw)doorText+=` · 외부→내부 밀기 · 우측힌지`;
- let arc=$('doorArc'),dot=$('doorHingeDot');arc.innerHTML='';dot.style.display=dw?'block':'none';
-
- if(side==='left'){
-  $('doorGap').style.cssText=`left:-5px;top:${dp*ss}px;width:10px;height:${dw*ss}px`;
-  let R=(+g.doorLeafW||dw)*ss,k=.55228475*R;
-  arc.style.cssText=`left:0;top:${dp*ss}px;width:${R}px;height:${R}px`;
-
-  if(hinge==='bottom'){
-   // 세탁실 도면처럼 좌측 벽 문이 아래쪽 힌지에서 오른쪽으로 열림
-   let hy=(dp+dw)*ss;
-   $('doorLeaf').style.cssText=`left:0;top:${hy}px;width:${R}px;height:2px;transform-origin:left top;transform:rotate(0deg)`;
-   arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C ${k} 0 ${R} ${R-k} ${R} ${R}"/></svg>`;
-   dot.style.cssText=`display:block;left:0;top:${hy}px`;
-   $('doorLabel').style.cssText=`left:8px;top:${dp*ss+4}px;writing-mode:vertical-rl;white-space:nowrap`;
-  }else{
-   // 기존: 좌측 벽 위쪽 힌지
-   $('doorLeaf').style.cssText=`left:0;top:${dp*ss}px;width:${R}px;height:2px;transform-origin:left top;transform:rotate(0deg)`;
-   arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C ${k} 0 ${R} ${R-k} ${R} ${R}"/></svg>`;
-   dot.style.cssText=`display:block;left:0;top:${dp*ss}px`;
-   $('doorLabel').style.cssText=`left:8px;top:${dp*ss+4}px`;
-  }
-  $('doorLabel').textContent=doorText;
- }else if(side==='bottom'){
-  $('doorGap').style.cssText=`left:${dp*ss}px;top:${g.h*ss-5}px;width:${dw*ss}px;height:10px`;
-  let R=dw*ss,k=.55228475*R,hy=g.h*ss;
-  arc.style.cssText=`left:${dp*ss}px;top:${(g.h-dw)*ss}px;width:${R}px;height:${R}px`;
-
-  if(hinge==='right'){
-   let hx=(dp+dw)*ss;
-   $('doorLeaf').style.cssText=`left:${hx}px;top:${hy}px;width:${R}px;height:2px;transform-origin:left top;transform:rotate(-90deg)`;
-   if(g.doorSwing==='in-left'){
-    arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}" class="commonBathDoorArcSvg">
-      <defs><marker id="doorArrowCommonBath" markerWidth="11" markerHeight="11" refX="8" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#aa9a86"/></marker></defs>
-      <path class="commonBathSwingPath" d="M 0 ${R-6} C ${Math.round(R*0.14)} ${Math.round(R*0.60)} ${Math.round(R*0.62)} ${Math.round(R*0.18)} ${R-8} ${Math.round(R*0.22)}" marker-end="url(#doorArrowCommonBath)"/>
-    </svg>`;
-   }else{
-    arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 ${R} C ${k} ${R} ${R} ${R-k} ${R} 0"/></svg>`;
-   }
-   dot.style.cssText=`display:block;left:${hx}px;top:${hy}px`;
-   $('doorLabel').style.cssText=`left:${Math.max(10,dp*ss+R*0.20)}px;top:${hy-58}px;white-space:nowrap`;
-  }else{
-   let hx=dp*ss;
-   let hxLeaf=(g.doorSwing==='in-left-wall-arc')?hx+2:hx;
-   $('doorLeaf').style.cssText=`left:${hxLeaf}px;top:${hy}px;width:${R}px;height:2px;transform-origin:left top;transform:rotate(-90deg)`;
-   if(g.doorSwing==='in-left-wall'||g.doorSwing==='in-left-wall-arc'){
-    arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}" class="ensuiteDoorArcSvg">
-      <defs><marker id="doorArrowLeftWall" markerWidth="10" markerHeight="10" refX="7" refY="4" orient="auto"><path d="M0,0 L0,8 L8,4 z" fill="#aa9a86"/></marker></defs>
-      <path class="ensuiteSwingPath" d="M ${R} ${R} C ${R} ${R-k} ${k} 0 0 0" marker-end="url(#doorArrowLeftWall)"/>
-    </svg>`;
-   }else{
-    arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M ${R} ${R} C ${R-k} ${R} 0 ${R-k} 0 0"/></svg>`;
-   }
-   dot.style.cssText=`display:block;left:${hx}px;top:${hy}px`;
-   $('doorLabel').style.cssText=`left:${dp*ss+6}px;top:${hy-24}px;white-space:nowrap`;
-  }
-  $('doorLabel').textContent=doorText;
- }else{
-  $('doorGap').style.cssText=`left:${dp*ss}px;top:-5px;width:${dw*ss}px;height:10px`;
-  let R=(+g.doorLeafW||dw)*ss,k=.55228475*R;
-
-  if(hinge==='right'){
-   let hx=(dp+dw-hingeOff)*ss;
-   arc.style.cssText=`left:${hx-R}px;top:0;width:${R}px;height:${R}px`;
-   $('doorLeaf').style.cssText=`left:${hx}px;top:0;width:${R}px;height:2px;transform-origin:left top;transform:rotate(90deg)`;
-   arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M 0 0 C 0 ${k} ${R-k} ${R} ${R} ${R}"/></svg>`;
-   dot.style.cssText=`display:block;left:${hx}px;top:0`;
-  }else{
-   let hx=(dp+hingeOff)*ss;
-   arc.style.cssText=`left:${hx}px;top:0;width:${R}px;height:${R}px`;
-   $('doorLeaf').style.cssText=`left:${hx}px;top:0;width:${R}px;height:2px;transform-origin:left top;transform:rotate(90deg)`;
-   arc.innerHTML=`<svg width="${R}" height="${R}" viewBox="0 0 ${R} ${R}"><path d="M ${R} 0 C ${R} ${k} ${k} ${R} 0 ${R}"/></svg>`;
-   dot.style.cssText=`display:block;left:${hx}px;top:0`;
-  }
-  if(rid==='smallroom2'){
-   $('doorLabel').style.cssText=`display:none`;
-  }else if(hinge==='right'){
-   $('doorLabel').style.cssText=`left:${(dp+dw)*ss-28}px;top:14px;writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap`;
-  }else{
-   $('doorLabel').style.cssText=`left:${dp*ss+4}px;top:8px`;
-  }
-  $('doorLabel').textContent=rid==='smallroom2'?'':doorText;
- }
- if(winSide==='top'){
-  $('window').style.cssText=`left:${wp*ss}px;top:-5px;width:${ww*ss}px`;
-  $('winLabel').style.cssText=`left:${wp*ss}px;top:8px`;
- }else{
-  $('window').style.cssText=`left:${wp*ss}px;bottom:-5px;width:${ww*ss}px`;
-  $('winLabel').style.cssText=`left:${wp*ss}px;bottom:8px`;
- }
- if(rid==='ensuite'||rid==='entry'){$('doorLabel').style.cssText=`display:none`;$('doorLabel').textContent='';}
- $('winLabel').textContent=(rid==='smallroom2'||rid==='entry'||rid==='ensuite')?'':(ww?`창호 ${ww} mm`:'');
- if(rid==='smallroom2')$('winLabel').style.cssText=`display:none`;
+ const ss=scale(),sector=TTOBOK_GEOMETRY.doorSector(g),side=g.doorSide||'top',dp=+g.dp||0,dw=+g.dw||0;
+ const arc=$('doorArc'),leaf=$('doorLeaf'),gap=$('doorGap'),dot=$('doorHingeDot'),label=$('doorLabel');
+ arc.innerHTML='';gap.style.display=leaf.style.display=dot.style.display=sector?'block':'none';
+ if(sector){
+  const {cx,cy,r,closed,open,sweep}=sector;
+  gap.style.cssText=(side==='left'||side==='right')?`left:${side==='left'?-5:g.w*ss-5}px;top:${dp*ss}px;width:10px;height:${dw*ss}px`:`left:${dp*ss}px;top:${side==='top'?-5:g.h*ss-5}px;width:${dw*ss}px;height:10px`;
+  const angle=Math.atan2(open.y-cy,open.x-cx)*180/Math.PI;
+  leaf.style.cssText=`left:${cx*ss}px;top:${cy*ss}px;width:${r*ss}px;transform-origin:left top;transform:rotate(${angle}deg)`;
+  dot.style.cssText=`display:block;left:${cx*ss}px;top:${cy*ss}px`;
+  arc.style.cssText=`left:0;top:0;width:${g.w*ss}px;height:${g.h*ss}px`;
+  arc.innerHTML=`<svg width="${g.w*ss}" height="${g.h*ss}" viewBox="0 0 ${g.w} ${g.h}"><path style="vector-effect:non-scaling-stroke" d="M ${closed.x} ${closed.y} A ${r} ${r} 0 0 ${sweep} ${open.x} ${open.y}"/></svg>`;
+  label.style.cssText=`left:${Math.max(8,Math.min(g.w*ss-120,cx*ss+8))}px;top:${Math.max(8,cy*ss-25)}px`;
+  label.textContent=`문짝 ${r} mm${dw!==r?` · 개구 ${dw} mm`:''}`;
+ }else label.textContent='';
+ if(['smallroom2','ensuite','entry'].includes(rid))label.style.display='none';
+ const wp=+g.wp||0,ww=+g.ww||0,top=g.windowSide==='top';
+ $('window').style.cssText=`left:${wp*ss}px;${top?'top':'bottom'}:-5px;width:${ww*ss}px;display:${ww?'block':'none'}`;
+ $('winLabel').style.cssText=`left:${wp*ss}px;${top?'top':'bottom'}:8px`;
+ $('winLabel').textContent=ww&&rid!=='smallroom2'?`창호 ${ww} mm`:'';
  renderFixed();
 }
 
@@ -1550,7 +1477,7 @@ function applyUnifiedMeasure(){
   let v={w:+$('s2W').value,h:+$('s2H').value,doorX:+$('s2DoorX').value,doorW:+$('s2DoorW').value,doorLeafW:+$('s2DoorLeafW').value,openX:+$('s2OpenX').value,openW:+$('s2OpenW').value,trw:+$('s2TrW').value,trd:+$('s2TrD').value,brw:+$('s2BrW').value,brd:+$('s2BrD').value};
   err=validateSimple(v,'작은방2');
   if(!err&&(!Number.isFinite(v.doorLeafW)||v.doorLeafW<=0||v.doorLeafW>v.doorW))err='작은방2 문짝 폭은 문틀 포함 폭 이하로 입력해주세요.';
-  if(!err&&(v.trw>=v.w||v.brw>=v.w||v.trd+v.brd>=v.h))err='작은방2 우측 꺾임 치수를 확인해주세요.';
+  if(!err&&(v.trw>=v.w||v.brw>=v.w||v.trd+v.brd>=v.h||v.doorX+v.doorW>v.w-v.trw||v.openX+v.openW>v.w-v.brw))err='작은방2 우측 꺾임 치수를 확인해주세요.';
   if(err)return alert(err);
   setGeom({...g,w:v.w,h:v.h,dp:0,dw:930,doorLeafW:800,doorFrameSide:65,doorHingeOffset:65,doorNominalW:800,doorNominalH:2200,doorSide:'top',doorHinge:'left',wp:v.openX,ww:v.openW,trw:v.trw,trd:v.trd,brw:v.brw,brd:v.brd,shapeVersion:'small2-v341'});
  }else if(rid==='master'){
@@ -1607,12 +1534,12 @@ function drawGeom(){
    });
  }
  $('zoomVal').textContent=Math.round(zoom*100)+'%';
- $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='house'?'집 전체 도면: 원도면 모듈/외곽/방 위치를 재보정 · 각 방에서 저장한 가구·가전을 전체 도면에 자동 반영 · 가구 가이드는 제외':rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 출입문 실측 65+800+65=930 mm 적용 · 힌지축 65 mm 안쪽 · 모든 주요 치수는 실제 공간 바깥 표시':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':rid==='living'?'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시':rid==='laundry'?'세탁실: 좌측 문 + 상단 창호 + 좌하단 꺾임 반영 · 꺾임 560×290 mm 초기 추정 · 가전은 목록에서 배치':rid==='commonbath'?'공용욕실: 내측 1620×2100 · 외부→내부 밀기 · 우측하단 힌지 · 좌측 방향 개폐 · 위생기구 미배치':rid==='ensuite'?'부부욕실: 1680×2300 · 문 800×2200 · 밖에서 밀어 진입 · 좌하단 힌지 기준 800 mm 1/4 원호로 열림':'현관: 원도면 1300+510 / 깊이1590 / 하단310 / 현관문1200×2200 기준 1차 도면 · 내부 겹침 방지를 위해 치수 위주 표시';
+ $('summary').textContent=`${g.name} · ${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`;$('roomSource').textContent=rid==='house'?'전체 집은 위치 참고도 · 연결 좌표 미확정 · 배치·간격 판단은 각 방에서 확인':rid==='smallroom1'?'작은방1: 실측 수정 모드 지원 · 문/하단개구/붙박이장 편집':rid==='smallroom2'?'작은방2: 출입문 실측 65+800+65=930 mm 적용 · 힌지축 65 mm 안쪽 · 모든 주요 치수는 실제 공간 바깥 표시':rid==='master'?'안방: 전체 통합 도면 · 실측 수정 모드 지원 · 문/통로/붙박이장/베란다 개구 편집':rid==='living'?'거실·주방·복도: 파란 영역 기준 단계형 비정형 외곽 · 200~400% 세부 확대 지원 · 전체/구간 치수 표시':rid==='laundry'?'세탁실: 좌측 문 + 상단 창호 + 좌하단 꺾임 반영 · 꺾임 560×290 mm 초기 추정 · 가전은 목록에서 배치':rid==='commonbath'?'공용욕실: 내측 1620×2100 · 외부→내부 밀기 · 우측하단 힌지 · 좌측 방향 개폐 · 위생기구 미배치':rid==='ensuite'?'부부욕실: 1680×2300 · 문 800×2200 · 밖에서 밀어 진입 · 좌하단 힌지 기준 800 mm 1/4 원호로 열림':'현관: 원도면 1300+510 / 깊이1590 / 하단310 / 현관문1200×2200 기준 1차 도면 · 내부 겹침 방지를 위해 치수 위주 표시';
  $('rw').value=g.w;$('rh').value=g.h;$('dp').value=g.dp||0;$('dw').value=g.dw||0;$('wp').value=g.wp||0;$('ww').value=g.ww||0;$('note').textContent=g.note||'';
  $('small2RecessEditor').style.display=rid==='smallroom2'?'block':'none';
  if(rid==='smallroom2'){$('trw').value=g.trw;$('trd').value=g.trd;$('brw').value=g.brw;$('brd').value=g.brd;$('rightClearInfo').textContent=`우측 직선 ${(g.h-g.trd-g.brd).toLocaleString()} mm (도면 3,195)`;}
  updateMeasureEditor(g);
- drawShape(g);requestAnimationFrame(()=>{drawOpenings(g);updateAll()});
+ drawShape(g);requestAnimationFrame(()=>{drawOpenings(geom());updateAll(false)});
 }
 function addFurniture(item,silent=false){
  let a=normalizeItem(item);let e=document.createElement('div');e.className='furn';Object.assign(e.dataset,{n:a.n,w:a.w,d:a.d,x:a.x,y:a.y,r:a.r,type:a.type||'furniture',id:seq++});e.textContent=a.n;room.appendChild(e);bind(e);if(!silent)select(e);return e;
@@ -1620,19 +1547,15 @@ function addFurniture(item,silent=false){
 function bind(e){
  e.onclick=()=>select(e);
  e.onpointerdown=v=>{
-   select(e);
-   try{e.setPointerCapture(v.pointerId)}catch(err){}
-   let sx=v.clientX,sy=v.clientY,ox=+e.dataset.x,oy=+e.dataset.y;
-   e.onpointermove=m=>{
-     e.dataset.x=Math.round(ox+(m.clientX-sx)/scale());
-     e.dataset.y=Math.round(oy+(m.clientY-sy)/scale());
-     updateAll()
-   };
-   e.onpointerup=()=>{
-     e.onpointermove=null;e.onpointerup=null;updateAll()
-   }
- }
+  if(v.button!=null&&v.button!==0)return;
+  select(e);try{e.setPointerCapture(v.pointerId)}catch(err){}
+  const pointerId=v.pointerId,sx=v.clientX,sy=v.clientY,ox=+e.dataset.x,oy=+e.dataset.y;
+  const stop=()=>{e.onpointermove=null;e.onpointerup=null;e.onpointercancel=null;e.onlostpointercapture=null;updateAll()};
+  e.onpointermove=m=>{if(m.pointerId!==pointerId)return;e.dataset.x=Math.round(ox+(m.clientX-sx)/scale());e.dataset.y=Math.round(oy+(m.clientY-sy)/scale());updateAll()};
+  e.onpointerup=stop;e.onpointercancel=stop;e.onlostpointercapture=stop;
+ };
 }
+
 function select(e){
  if(!e||!e.isConnected)return;
  if(selected===e){e.classList.add('sel');status();return}
@@ -1644,36 +1567,35 @@ function select(e){
 function clearFurniture(){[...room.querySelectorAll('.furn')].forEach(e=>e.remove());selected=null}
 function items(){return [...room.querySelectorAll('.furn')].map(e=>storageItem({n:e.dataset.n,w:e.dataset.w,d:e.dataset.d,x:e.dataset.x,y:e.dataset.y,r:e.dataset.r,type:e.dataset.type||'furniture'}))}
 function renderItems(arr){
+ if(!Array.isArray(arr)){setSaveState('저장된 배치 형식 오류 · 기존 배치를 보존했습니다.',false);return false}
+ const clean=sanitizeRoomItems(rid,arr);
  suppressSave=true;
- clearFurniture();
- let clean=sanitizeRoomItems(rid,arr);
- clean.items.forEach(a=>addFurniture(a,true));
- updateAll();
- suppressSave=false;
- if(clean.changed&&rid!=='house'){
-   localStorage.setItem(localKey(rid),JSON.stringify({items:clean.items.map(storageItem),savedAt:Date.now()}));
- }
+ try{clearFurniture();clean.items.forEach(a=>addFurniture(a,true));updateAll(false)}finally{suppressSave=false}
  renderCatalog();
+ if(clean.changed)setSaveState('잘못된 가구 항목은 표시하지 않았습니다. 원본 저장값은 보존됩니다.',false);
+ return true;
 }
+
 function loadLocal(){
  let z;try{z=JSON.parse(localStorage.getItem(localKey())||'null')}catch(e){z=null}
  renderItems(z?.items||[]);
  if(z?.savedAt){let d=new Date(z.savedAt);setSaveState('마지막 로컬 저장 '+d.toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}))}
 }
 function setSaveState(msg,ok=true){let e=$('saveState');if(e){e.textContent=msg;e.className='small '+(ok?'ok':'warn')}}
-function saveLocal(){localStorage.setItem(localKey(),JSON.stringify({items:items(),savedAt:Date.now()}));setSaveState('이 기기에 자동 저장됨')}
-function updateAll(){
+function saveLocal(force=false){try{const changed=persistRoom(rid,items(),force);if(changed)setSaveState('이 기기에 저장됨');return changed}catch(e){setSaveState('기기 저장 공간을 확인해주세요. 현재 화면은 유지됩니다.',false);return false}}
+function updateAll(persist=true){
  let g=geom(),fs=[...room.querySelectorAll('.furn')],s=scale();
  fs.forEach(e=>{let q=dims(e);e.style.width=q.w*s+'px';e.style.height=q.h*s+'px';e.style.left=(+e.dataset.x*s)+'px';e.style.top=(+e.dataset.y*s)+'px';e.classList.remove('bad')});
- fs.forEach((e,i)=>{let a=rect(e),dr=doorRect(g),bad=!insideShape(a,g)||(dr&&overlap(a,dr))||fixedHit(a)||suiteWallHit(a)||suiteDoorHit(a);fs.forEach((b,j)=>{if(i!==j&&overlap(a,rect(b)))bad=true});if(bad)e.classList.add('bad')});
+ fs.forEach((e,i)=>{let a=rect(e),dr=doorRect(g),bad=!insideShape(a,g)||TTOBOK_GEOMETRY.doorHit(a,g)||fixedHit(a)||suiteWallHit(a)||suiteDoorHit(a);fs.forEach((b,j)=>{if(i!==j&&overlap(a,rect(b)))bad=true});if(bad)e.classList.add('bad')});
  if(selected&&selected.isConnected)selected.classList.add('sel');
- status();if(!suppressSave){saveLocal();window.scheduleCloudSave();setSaveState('자동 저장 대기 중')}
+ status();if(persist&&!suppressSave&&saveLocal()){window.scheduleCloudSave(rid)}
 }
 function status(){
  if(!selected||!selected.isConnected){selected=null;$('status').textContent='가구를 선택하세요.';return}
- let a=rect(selected),g=geom(),n=validName(selected.dataset.n)||LEGACY_NAMES[`${+selected.dataset.w}x${+selected.dataset.d}`]||'이름 없는 기존 가구';
+ let a=rect(selected),g=geom(),clearance=TTOBOK_GEOMETRY.wallClearances(a,g),n=validName(selected.dataset.n)||LEGACY_NAMES[`${+selected.dataset.w}x${+selected.dataset.d}`]||'이름 없는 기존 가구';
  if(n!==selected.dataset.n){selected.dataset.n=n;selected.textContent=n}
- $('status').innerHTML=`<b>${n}</b> <span class="badge">${selected.dataset.type==='appliance'?'가전':'가구'}</span><br>${a.w} × ${a.h} mm<br><span class="badge">좌 ${Math.round(a.x)}</span><span class="badge">우 ${Math.round(g.w-a.x-a.w)}</span><span class="badge">상 ${Math.round(a.y)}</span><span class="badge">하 ${Math.round(g.h-a.y-a.h)}</span><br>${selected.classList.contains('bad')?'<b style="color:#b8473f">⚠ 벽체/문/고정설비/가구 충돌</b>':'✓ 방 벽체 내부 배치 가능'}<br><span class="small ok">● 선택 유지 중 · 다른 가구를 누르거나 제거할 때까지 유지됩니다.</span>`;
+ const nearest=[...room.querySelectorAll('.furn')].filter(e=>e!==selected).map(e=>{const b=rect(e),dx=Math.max(a.x-b.x-b.w,b.x-a.x-a.w,0),dy=Math.max(a.y-b.y-b.h,b.y-a.y-a.h,0);return {name:e.dataset.n,gap:Math.hypot(dx,dy)}}).sort((a,b)=>a.gap-b.gap).slice(0,3);
+ $('status').innerHTML=`<b>${escapeHtml(n)}</b> <span class="badge">${selected.dataset.type==='appliance'?'가전':'가구'}</span><br>${a.w} × ${a.h} mm<br><span class="badge">좌 ${clearance?Math.round(clearance.left):'—'}</span><span class="badge">우 ${clearance?Math.round(clearance.right):'—'}</span><span class="badge">상 ${clearance?Math.round(clearance.top):'—'}</span><span class="badge">하 ${clearance?Math.round(clearance.bottom):'—'}</span><br>${selected.classList.contains('bad')?'<b style="color:#b8473f">⚠ 벽체/문/고정설비/가구 충돌</b>':'✓ 방 벽체 내부 배치 가능'}<br><span class="small">외곽 벽까지 최소 이동 간격 · mm (내부벽/설비 제외)</span>${nearest.length?'<br>'+nearest.map(v=>`${escapeHtml(v.name)}: ${Math.round(v.gap)} mm`).join('<br>'):''}<br><span class="small ok">● 선택 유지 중 · 다른 가구를 누르거나 제거할 때까지 유지됩니다.</span>`;
 }
 function setDiagramFont(v){
  if(!['normal','large','xlarge'].includes(v))v='large';
@@ -1689,38 +1611,55 @@ function fitZoom(){
  setZoom(Math.min(1.25,avail/540));
 }
 function switchRoom(id){
- if(!ROOM_DEFAULTS[id])return;rid=id;localStorage.setItem('ttobok_current_room_v362',rid);$('roomSel').value=id;selected=null;updateTargets();drawGeom();loadLocal();window.restartCloudRoom();
+ if(!ROOM_DEFAULTS[id])return;rid=id;localStorage.setItem('ttobok_current_room_v362',rid);$('roomSel').value=id;clearFurniture();selected=null;updateTargets();drawGeom();loadLocal();window.restartCloudRoom();
  if(window.innerWidth<=760)setTimeout(()=>fitZoom(),90);
 }
-function parsePoly(t){let p=t.split('/').map(v=>v.trim()).filter(Boolean).map(v=>v.split(',').map(Number));if(p.length<3||p.some(v=>v.length!==2||v.some(n=>!Number.isFinite(n))))throw Error('꼭짓점 형식을 확인해주세요.');return p}
+function parsePoly(t){let p=t.split('/').map(v=>v.trim()).filter(Boolean).map(v=>v.split(',').map(Number));if(!TTOBOK_GEOMETRY.validatePolygon(p))throw Error('꼭짓점 형식을 확인해주세요.');return p}
 async function transferSelected(mode){
- if(!selected||!selected.isConnected)return alert('먼저 가구를 선택해주세요.');
- let target=$('targetRoom').value;if(!target||target===rid)return;
- let a=normalizeItem({n:selected.dataset.n,w:selected.dataset.w,d:selected.dataset.d,x:100,y:120,r:selected.dataset.r});
- if(mode==='copy'&&!inventoryCanAdd(a.n,1))return alert(`${a.n}은(는) 보유 수량이 모두 배치되어 있어 복사할 수 없습니다.`);
- let z;try{z=JSON.parse(localStorage.getItem(localKey(target))||'null')}catch(e){z=null}
- let targetItems=(z?.items||[]).map(normalizeItem);targetItems.push(a);localStorage.setItem(localKey(target),JSON.stringify({items:targetItems.map(storageItem)}));
- let cloudOk=false;try{if(window.cloudAppendItem)cloudOk=await window.cloudAppendItem(target,a)}catch(e){}
- if(mode==='move'){let e=selected;selected=null;e.remove();updateAll()}
+ if(rid==='house')return alert('가구 이동은 각 방에서 해주세요.');
+ const source=selected,sourceRoom=rid,target=$('targetRoom').value;
+ if(!source||!source.isConnected)return alert('먼저 가구를 선택해주세요.');
+ if(!ROOM_DEFAULTS[target]||target===sourceRoom||target==='house')return;
+ const a=normalizeItem({n:source.dataset.n,w:source.dataset.w,d:source.dataset.d,x:100,y:120,r:source.dataset.r,type:source.dataset.type});
+ if(mode==='copy'&&!inventoryCanAdd(a.n,1))return alert('보유 수량이 모두 배치되어 있습니다.');
+ try{if(window.prepareCloudTransfer&&!await window.prepareCloudTransfer(target))return setSaveState('대상 방의 공동 배치를 먼저 확인해주세요.',false)}catch(e){return setSaveState('대상 방을 불러오지 못해 이동을 보류했습니다.',false)}
+ if(rid!==sourceRoom||!source.isConnected)return setSaveState('방 또는 선택 가구가 변경되어 이동을 취소했습니다.',false);
+ const sourceRaw=localStorage.getItem(localKey(sourceRoom)),targetRaw=localStorage.getItem(localKey(target));
+ const targetItems=readLocalRoom(target).items;targetItems.push(a);
+ try{
+  backupLocalRoom(sourceRoom);backupLocalRoom(target);
+  persistRoom(target,targetItems,true);
+  if(mode==='move'){
+   const remaining=[...room.querySelectorAll('.furn')].filter(e=>e!==source).map(e=>storageItem({n:e.dataset.n,w:e.dataset.w,d:e.dataset.d,x:e.dataset.x,y:e.dataset.y,r:e.dataset.r,type:e.dataset.type}));
+   persistRoom(sourceRoom,remaining,true);
+   for(const id of [sourceRoom,target]){const z=readObject(localKey(id));z.pendingRooms=[...new Set([...(z.pendingRooms||[]),sourceRoom,target])];localStorage.setItem(localKey(id),JSON.stringify(z))}
+  }
+ }catch(e){
+  try{if(targetRaw===null)localStorage.removeItem(localKey(target));else localStorage.setItem(localKey(target),targetRaw);if(sourceRaw!==null)localStorage.setItem(localKey(sourceRoom),sourceRaw)}catch(rollbackError){}
+  setSaveState('기기 저장 실패 · 이동을 취소했습니다. 저장 공간을 확인해주세요.',false);return false;
+ }
+ if(mode==='move'){if(selected===source)selected=null;source.remove();updateAll(false)}
  renderCatalog();
- $('transferMsg').textContent=`${a.n} → ${ROOM_DEFAULTS[target].name} ${mode==='move'?'이동':'복사'} 완료${cloudOk?' · 공동 동기화':' · 로컬 저장'}`;
+ let cloudOk=false;
+ try{if(window.flushCloudRooms)cloudOk=await window.flushCloudRooms(mode==='move'?[sourceRoom,target]:[target])}catch(e){}
+ $('transferMsg').textContent=`${a.n} → ${ROOM_DEFAULTS[target].name} ${mode==='move'?'이동':'복사'} 완료${cloudOk?' · 공동 저장':' · 로컬 저장 (공동 저장 대기)'}`;
 }
 
 $('roomSel').onchange=e=>switchRoom(e.target.value);
-$('applyRoom').onclick=()=>{let g=geom();if(rid==='house')return alert('집 항목은 현재 전체 통합 보기입니다. 전체 실측은 추후 별도 편집 기능에서 반영하고, 현재는 각 방 수정 결과를 모아 확인하는 용도로 사용해주세요.');if(rid==='master')return alert('안방은 아래 「실측 도면 수정 모드」에서 전체 폭과 구역별 치수를 수정해주세요.');if(rid==='living')return alert('거실·주방·복도는 아래 「실측 도면 수정 모드」에서 비정형 외곽을 함께 수정해주세요.');if(rid==='laundry')return alert('세탁실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이, 문·창호, 좌하단 꺾임을 수정해주세요.');if(rid==='commonbath')return alert('공용욕실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이와 하단 문을 수정해주세요.');if(rid==='ensuite')return alert('부부욕실은 아래 「실측 도면 수정 모드」에서 전체 크기·사선·하단 문을 수정해주세요.');if(rid==='entry')return alert('현관은 아래 「실측 도면 수정 모드」에서 전체 크기·현관문·실내 연결부를 수정해주세요.');let nw=+$('rw').value||g.w,nh=+$('rh').value||g.h;if(rid==='smallroom2')setGeom({...g,w:nw,h:nh});else setGeom({...g,w:nw,h:nh,poly:defaultPoly({w:nw,h:nh})});drawGeom()};
-$('applyOpen').onclick=()=>{if(rid==='house')return alert('집 항목은 개구부를 개별 편집하지 않습니다. 각 섹션 도면에서 수정한 뒤 전체 보기에서 반영 상태를 확인해주세요.');if(rid==='master')return alert('안방 문·통로·베란다 개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='living')return alert('거실·주방·복도 창호/개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='laundry')return alert('세탁실 문/창호 위치와 폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='commonbath')return alert('공용욕실 문 위치/폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='ensuite')return alert('부부욕실 문은 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='entry')return alert('현관문/실내 연결부는 「실측 도면 수정 모드」에서 수정해주세요.');setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom()};
+$('applyRoom').onclick=()=>{let g=geom();if(rid==='house')return alert('집 항목은 현재 전체 통합 보기입니다. 전체 실측은 추후 별도 편집 기능에서 반영하고, 현재는 각 방 수정 결과를 모아 확인하는 용도로 사용해주세요.');if(rid==='master')return alert('안방은 아래 「실측 도면 수정 모드」에서 전체 폭과 구역별 치수를 수정해주세요.');if(rid==='living')return alert('거실·주방·복도는 아래 「실측 도면 수정 모드」에서 비정형 외곽을 함께 수정해주세요.');if(rid==='laundry')return alert('세탁실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이, 문·창호, 좌하단 꺾임을 수정해주세요.');if(rid==='commonbath')return alert('공용욕실은 아래 「실측 도면 수정 모드」에서 내부 폭/깊이와 하단 문을 수정해주세요.');if(rid==='ensuite')return alert('부부욕실은 아래 「실측 도면 수정 모드」에서 전체 크기·사선·하단 문을 수정해주세요.');if(rid==='entry')return alert('현관은 아래 「실측 도면 수정 모드」에서 전체 크기·현관문·실내 연결부를 수정해주세요.');let nw=+$('rw').value,nh=+$('rh').value;if(!Number.isFinite(nw)||!Number.isFinite(nh)||nw<500||nh<500)return alert('방의 가로와 세로는 500 mm 이상으로 입력해주세요.');if(rid==='smallroom2'&&(g.trw>=nw||g.brw>=nw||g.trd+g.brd>=nh||g.dw>nw-g.trw||g.wp+g.ww>nw-g.brw))return alert('방 크기가 문·창·꺾임 치수보다 작습니다. 실측 도면 수정 모드에서 함께 수정해주세요.');if(rid==='smallroom2')setGeom({...g,w:nw,h:nh});else setGeom({...g,w:nw,h:nh,poly:defaultPoly({w:nw,h:nh})});drawGeom()};
+$('applyOpen').onclick=()=>{if(rid==='smallroom2')return alert('아기방 문은 65+800+65 mm 실측 확정값입니다. 창과 꺾임은 실측 도면 수정 모드에서 변경해주세요.');if(rid==='house')return alert('집 항목은 개구부를 개별 편집하지 않습니다. 각 섹션 도면에서 수정한 뒤 전체 보기에서 반영 상태를 확인해주세요.');if(rid==='master')return alert('안방 문·통로·베란다 개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='living')return alert('거실·주방·복도 창호/개구는 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='laundry')return alert('세탁실 문/창호 위치와 폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='commonbath')return alert('공용욕실 문 위치/폭은 아래 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='ensuite')return alert('부부욕실 문은 「실측 도면 수정 모드」에서 수정해주세요.');if(rid==='entry')return alert('현관문/실내 연결부는 「실측 도면 수정 모드」에서 수정해주세요.');setGeom({...geom(),dp:+$('dp').value||0,dw:+$('dw').value||0,wp:+$('wp').value||0,ww:+$('ww').value||0});drawGeom()};
 
 $('applyMeasure').onclick=applyUnifiedMeasure;
 $('resetMeasure').onclick=()=>{
  if(!confirm(`${ROOM_DEFAULTS[rid].name} 실측값을 기본 도면값으로 되돌릴까요?`))return;
- delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom();
+ setGeom(clone(ROOM_DEFAULTS[rid]));drawGeom();
  setSaveState(`${ROOM_DEFAULTS[rid].name} 기본 도면값 복원`);
 };
 $('applyRecess').onclick=()=>{if(rid!=='smallroom2')return;let g=geom(),trw=+$('trw').value,trd=+$('trd').value,brw=+$('brw').value,brd=+$('brd').value;if([trw,trd,brw,brd].some(v=>!Number.isFinite(v)||v<0)||trw>=g.w||brw>=g.w||trd+brd>=g.h)return alert('꺾임 치수를 확인해주세요.');setGeom({...g,trw,trd,brw,brd});drawGeom()};
 $('applyPoly').onclick=()=>{if(rid==='house')return alert('집 항목은 현재 통합 보기입니다. 외곽 수정보다는 개별 방 수정 후 전체 보기를 확인해주세요.');if(rid==='smallroom2')return alert('작은방2는 우측 꺾임 치수 입력을 사용해주세요.');if(rid==='ensuite')return alert('부부욕실은 실측 도면 수정 모드의 사선 치수를 사용해주세요.');if(rid==='entry')return alert('현관은 실측 도면 수정 모드의 전용 치수를 사용해주세요.');try{let g=geom(),p=parsePoly($('polyText').value);setGeom(rid==='living'?{...g,customPoly:p,poly:p}:{...g,poly:p});drawGeom()}catch(e){alert(e.message)}};
 $('rectPoly').onclick=()=>{let g=geom();setGeom(rid==='living'?{...g,customPoly:null,poly:livingPoly(g)}:rid==='house'?{...g,poly:housePoly(g),shapeVersion:'house-v362'}:{...g,poly:defaultPoly(g)});drawGeom()};
-$('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원할까요?')){delete GEOMS[rid];localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}};
-$('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!w||!d)return alert('가로와 깊이를 입력해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
+$('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원할까요?')){setGeom(clone(ROOM_DEFAULTS[rid]));drawGeom()}};
+$('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!Number.isFinite(w)||!Number.isFinite(d)||w<=0||d<=0)return alert('가로와 깊이는 0보다 큰 숫자로 입력해주세요.');if(rid==='house')return alert('각 방에서 가구를 추가해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
 $('zoomOut').onclick=()=>setZoom(zoom-(zoom>1.5?.25:.1));$('zoomIn').onclick=()=>setZoom(zoom>1.5?zoom+.25:zoom+.1);$('fit').onclick=fitZoom;
 $('leftView').onclick=()=>{let st=document.querySelector('.stage');if(st)st.scrollTo({left:0,behavior:'smooth'})};
 $('mobileView').onclick=()=>{
@@ -1754,8 +1693,7 @@ $('del').onclick=async()=>{
  selected=null;
  e.remove();
 
- // 삭제 직후 로컬 상태를 먼저 확정해 오래된 클라우드 스냅샷이 되살리지 못하게 한다.
- saveLocal();
+ if(!saveLocal()){room.appendChild(e);select(e);updateAll(false);setSaveState('제거 내용을 저장하지 못해 가구를 복원했습니다.',false);return}
  renderCatalog();
  status();
  setSaveState(`${n} 제거 중...`);
@@ -1769,8 +1707,8 @@ $('del').onclick=async()=>{
 };
 $('clear').onclick=async()=>{
  if(!confirm('현재 방 가구를 모두 비울까요?'))return;
- clearFurniture();
- saveLocal();
+ const before=items();clearFurniture();
+ if(!saveLocal(true)){renderItems(before);setSaveState('전체 제거를 저장하지 못해 배치를 복원했습니다.',false);return}
  renderCatalog();
  status();
  setSaveState('전체 제거 중...');
@@ -1784,7 +1722,7 @@ $('clear').onclick=async()=>{
 };
 
 async function saveCurrentNow(showAlert=false){
- saveLocal();
+ if(!saveLocal(true))return false;
  setSaveState('공동 저장 중...');
  let ok=false;
  try{if(window.flushCloudSave)ok=await window.flushCloudSave()}catch(e){ok=false}
@@ -1792,10 +1730,18 @@ async function saveCurrentNow(showAlert=false){
  if(showAlert)alert(ok?'현재 배치를 저장하고 공동 동기화했습니다.':'현재 배치를 이 기기에 저장했습니다.');
  return ok;
 }
+$('restoreBackup').onclick=()=>{
+ const saved=readObject('ttobok_v363_recovery_'+rid).backups?.[0];
+ if(!saved)return alert('이 방의 복구 백업이 없습니다.');
+ if(!confirm(new Date(saved.backedUpAt).toLocaleString('ko-KR')+' 이전 배치를 복구할까요?'))return;
+ const before=items(),beforeGeom=geom();
+ try{backupLocalRoom(rid);if(saved.geometry&&!setGeom(saved.geometry))return;renderItems(saved.items);if(!saveLocal(true)){setGeom(beforeGeom);renderItems(before);return}window.scheduleCloudSave(rid);drawGeom()}
+ catch(e){setSaveState('복구 내용을 저장하지 못했습니다.',false)}
+};
 $('copyRoom').onclick=()=>transferSelected('copy');$('moveRoom').onclick=()=>transferSelected('move');$('saveCurrent').onclick=()=>saveCurrentNow(true);
 document.querySelectorAll('[data-save]').forEach(b=>b.onclick=async()=>{localStorage.setItem(localKey(rid,b.dataset.save),JSON.stringify({geometry:geom(),items:items(),savedAt:Date.now()}));await saveCurrentNow(false);alert(b.dataset.save+' 배치안을 백업하고 현재 배치도 저장했습니다.')});
-document.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{let z=JSON.parse(localStorage.getItem(localKey(rid,b.dataset.load))||'null');if(!z)return alert('저장된 배치안이 없습니다.');if(z.geometry)setGeom(z.geometry);drawGeom();renderItems(z.items||[]);saveLocal();window.scheduleCloudSave()});
-window.addEventListener('resize',()=>{drawOpenings(geom());updateAll();if(window.innerWidth<=760)setTimeout(()=>fitZoom(),80)});
+document.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{let z=readObject(localKey(rid,b.dataset.load));if(!Array.isArray(z.items))return alert('저장된 배치안이 없거나 형식이 올바르지 않습니다.');backupLocalRoom(rid);if(z.geometry)setGeom(z.geometry);drawGeom();renderItems(z.items||[]);saveLocal();window.scheduleCloudSave()});
+window.addEventListener('resize',()=>{drawOpenings(geom());updateAll(false);if(window.innerWidth<=760)setTimeout(()=>fitZoom(),80)});
 
 window.TTOBOK_APP={
  normalizeItem,storageItem,geom,setGeom,items,renderItems,repairInventoryLocal,getRoom:()=>rid,
@@ -1803,25 +1749,27 @@ window.TTOBOK_APP={
  getRoomIds:()=>Object.keys(ROOM_DEFAULTS),
  getRoomName:(roomId)=>ROOM_DEFAULTS[roomId]?.name||roomId,
  getGeomForRoom:(roomId)=>normalizeGeom(roomId,GEOMS[roomId]||ROOM_DEFAULTS[roomId]),
- getLocalRoomData:(roomId)=>{
-   let z=null;try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
-   return {geometry:normalizeGeom(roomId,GEOMS[roomId]||ROOM_DEFAULTS[roomId]),items:(z?.items||[]).map(normalizeItem),savedAt:+(z?.savedAt||0)};
- },
- getLocalSavedAt:(roomId)=>{
-   let z=null;try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
-   return +(z?.savedAt||0);
+ getLocalRoomData:readLocalRoom,
+ getLocalSavedAt:roomId=>readLocalRoom(roomId).savedAt,
+ backupLocalRoom,
+ markRoomDirty:roomId=>persistRoom(roomId,readLocalRoom(roomId).items,true),
+ markCloudSaved:(roomId,revision,baseVersion)=>{
+  const z=readObject(localKey(roomId));z.baseVersion=baseVersion;
+  if((+z.localRevision||0)===revision){z.dirty=false;delete z.pendingRooms;}
+  localStorage.setItem(localKey(roomId),JSON.stringify(z));
  },
  applyCloudRoomData:(roomId,z)=>{
-   if(z?.geometry){GEOMS[roomId]=localGeometryFromCloud(roomId,z.geometry);localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS))}
-   let clean=sanitizeRoomItems(roomId,z?.items||[]),arr=clean.items;
-   localStorage.setItem(localKey(roomId),JSON.stringify({items:arr.map(storageItem),savedAt:+(z?.clientSavedAt||Date.now())}));
-   if(roomId===rid){drawGeom();renderItems(arr);setSaveState(clean.changed?'공동 배치 중복 항목 정리 후 적용함':'공동 배치를 이 기기에 적용함')}
+  const clean=sanitizeRoomItems(roomId,z?.items);
+  if(clean.changed)throw Error('공동 배치에 잘못된 가구 항목이 있습니다.');
+  if(z.geometry){GEOMS[roomId]=localGeometryFromCloud(roomId,z.geometry);localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS))}
+  const prev=readLocalRoom(roomId);
+  localStorage.setItem(localKey(roomId),JSON.stringify({items:clean.items.map(storageItem),geometry:geomForRoom(roomId),savedAt:+z.clientSavedAt||0,dirty:false,localRevision:prev.localRevision,baseVersion:cloudVersion(z)}));
+  if(roomId===rid){drawGeom();renderItems(clean.items);setSaveState('공동 배치를 이 기기에 적용함')}
  },
  onCloudGeometry:(roomId,g)=>{if(roomId!==rid)return;let clean=localGeometryFromCloud(roomId,g);GEOMS[roomId]=clean;localStorage.setItem('ttobok_geometry_v37',JSON.stringify(GEOMS));drawGeom()}
 };
 
-document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveLocal()});
-window.addEventListener('pagehide',()=>saveLocal());
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden'&&readLocalRoom(rid).dirty)window.flushCloudSave?.().catch(()=>{})});
 setDiagramFont(diagramFont);
 let repairedRooms=repairInventoryLocal();
 $('roomSel').value=rid;
@@ -1833,188 +1781,155 @@ if(window.innerWidth<=760)setTimeout(()=>fitZoom(),140);
 <script src="firebase-config.js"></script>
 <script type="module">
 const A=window.TTOBOK_APP,cfg=window.TTOBOK_FIREBASE_CONFIG,dot=document.getElementById('dot'),txt=document.getElementById('syncText');
-const TTOBOK_ALLOWED_EMAILS=["komorebi0802@gmail.com", "pinknote6@gmail.com", "komorebi58@gmail.com", "komors551124@gmail.com"];
+const TTOBOK_ALLOWED_EMAILS=["komorebi0802@gmail.com","pinknote6@gmail.com","komorebi58@gmail.com","komors551124@gmail.com"];
 const TTOBOK_FAMILY_ID='parks-family';
 const isAllowedAccount=u=>!!u&&TTOBOK_ALLOWED_EMAILS.includes(String(u.email||'').trim().toLowerCase());
-let auth,db,user,fid=TTOBOK_FAMILY_ID,unsub,timer,M,applying=false;window.TTOBOK_IS_LOGGED_IN=false;
+let auth,db,user,unsub,M,applying=false,session=0,saveQueue=Promise.resolve();
+const timers=new Map();
+window.TTOBOK_IS_LOGGED_IN=false;
 localStorage.setItem('ttobok_family_id',TTOBOK_FAMILY_ID);
-window.scheduleCloudSave=()=>{if(applying||!db||!user||!fid)return;clearTimeout(timer);timer=setTimeout(()=>save().catch(e=>{dot.className='dot err';txt.textContent='현재 방 공동 저장 실패 · '+(e?.code||'오류')}),650)};
-window.flushCloudSave=async()=>{if(applying||!db||!user||!fid)return false;clearTimeout(timer);let ts=await save();return !!ts};
-window.restartCloudRoom=()=>{if(user&&fid)listen()};
+const version=z=>JSON.stringify([z?.revision||0,z?.clientSavedAt||0,z?.updatedClientId||'']);
+const reportError=e=>{dot.className='dot err';txt.textContent=e?.code==='sync/conflict'?'다른 기기의 변경과 충돌 · 로컬 보존됨 · 공동 배치 불러오기 또는 전체 올리기를 선택하세요':'공동 저장 실패 · 로컬 보존됨 · '+(e?.code||e?.message||'연결 확인 필요')};
+function stopListening(){if(unsub)unsub();unsub=null;for(const t of timers.values())clearTimeout(t);timers.clear()}
+function roomIds(){return A.getRoomIds().filter(id=>id!=='house')}
+function validCloud(z){return z&&Array.isArray(z.items)&&z.items.every(a=>a&&typeof a==='object')}
+function sameContent(local,remote){return JSON.stringify(local.items.map(A.storageItem))===JSON.stringify(remote.items.map(A.storageItem))&&(!remote.geometry||JSON.stringify(A.cloudGeometry(remote.roomId||A.getRoom(),local.geometry))===JSON.stringify(remote.geometry))}
+function queueSave(ids,force=false){
+ const mySession=session;
+ const run=async()=>{
+  if(!M||!db||!isAllowedAccount(user)||session!==mySession)return false;
+  const expanded=new Set(ids);
+  for(const id of expanded)for(const related of A.getLocalRoomData(id).pendingRooms||[])if(roomIds().includes(related))expanded.add(related);
+  const f=M.f,owner=user,targets=[...expanded].filter(id=>id!=='house').map(id=>({id,local:A.getLocalRoomData(id)})).filter(x=>x.local.dirty||force&&x.local.hasLocalData);
+  if(!targets.length)return true;
+  const committed=await f.runTransaction(db,async tx=>{
+   const reads=[];for(const t of targets)reads.push(await tx.get(f.doc(db,'families',TTOBOK_FAMILY_ID,'rooms',t.id)));
+   if(session!==mySession||user?.uid!==owner.uid)throw Object.assign(new Error('로그인 상태가 변경되었습니다.'),{code:'sync/session-changed'});
+   const result=[];
+   for(let i=0;i<targets.length;i++){
+    const {id,local}=targets[i],snap=reads[i],old=snap.exists()?snap.data():null;
+    if(old&&!validCloud(old))throw Object.assign(new Error('공동 배치 형식 확인 필요'),{code:'sync/invalid-data'});
+    if(!force&&old&&local.baseVersion!==version(old)&&!sameContent(local,old))throw Object.assign(new Error(id),{code:'sync/conflict'});
+    const payload={roomId:id,geometry:A.cloudGeometry(id,local.geometry),items:local.items.map(A.storageItem),revision:(Number(old?.revision)||0)+1,clientSavedAt:local.savedAt||Date.now(),updatedAt:f.serverTimestamp(),updatedBy:owner.displayName||owner.email||owner.uid,updatedClientId:TTOBOK_CLIENT_ID};
+    tx.set(f.doc(db,'families',TTOBOK_FAMILY_ID,'rooms',id),payload,{merge:true});
+    result.push({id,localRevision:local.localRevision,baseVersion:version(payload)});
+   }
+   return result;
+  });
+  if(session!==mySession)return false;
+  for(const c of committed)A.markCloudSaved(c.id,c.localRevision,c.baseVersion);
+  dot.className='dot on';txt.textContent='공동 저장 완료 · '+TTOBOK_FAMILY_ID;
+  for(const c of committed)if(A.getLocalRoomData(c.id).dirty)window.scheduleCloudSave(c.id);
+  return true;
+ };
+ const result=saveQueue.then(run,run);saveQueue=result.catch(()=>{});return result;
+}
+window.scheduleCloudSave=(roomId=A.getRoom())=>{
+ if(applying||roomId==='house'||!db||!user)return;
+ clearTimeout(timers.get(roomId));
+ timers.set(roomId,setTimeout(()=>{timers.delete(roomId);queueSave([roomId]).catch(reportError)},650));
+};
+window.flushCloudRooms=async ids=>{
+ for(const id of ids){clearTimeout(timers.get(id));timers.delete(id)}
+ try{return await queueSave(ids)}catch(e){reportError(e);throw e}
+};
+window.flushCloudSave=(roomId=A.getRoom())=>window.flushCloudRooms([roomId]);
+window.restartCloudRoom=()=>{if(user&&db)listen()};
+window.prepareCloudTransfer=async roomId=>{
+ if(!user||!db)return true;
+ const mySession=session,before=A.getLocalRoomData(roomId);
+ const snap=await M.f.getDocFromServer(M.f.doc(db,'families',TTOBOK_FAMILY_ID,'rooms',roomId));
+ if(mySession!==session||A.getLocalRoomData(roomId).localRevision!==before.localRevision)return false;
+ if(!snap.exists())return true;
+ const z=snap.data();if(!validCloud(z))throw Object.assign(new Error(roomId),{code:'sync/invalid-data'});
+ if(before.dirty&&before.baseVersion!==version(z)){reportError({code:'sync/conflict'});return false}
+ if(!before.dirty){A.backupLocalRoom(roomId);A.applyCloudRoomData(roomId,z)}
+ return true;
+};
+function listen(){
+ if(unsub)unsub();unsub=null;
+ const roomId=A.getRoom(),mySession=session;if(roomId==='house')return;
+ unsub=M.f.onSnapshot(M.f.doc(db,'families',TTOBOK_FAMILY_ID,'rooms',roomId),{includeMetadataChanges:true},snap=>{
+  if(applying||mySession!==session||roomId!==A.getRoom()||!user||snap.metadata?.hasPendingWrites||snap.metadata?.fromCache)return;
+  const local=A.getLocalRoomData(roomId);
+  if(!snap.exists()){
+   if(local.dirty)window.scheduleCloudSave(roomId);
+   else txt.textContent='공동 배치 없음 · 현재 배치 저장으로 업로드';
+   return;
+  }
+  const z=snap.data();if(!validCloud(z)){reportError({code:'sync/invalid-data'});return}
+  if(local.dirty){
+   if(sameContent(local,z)){A.markCloudSaved(roomId,local.localRevision,version(z));return}
+   if(local.baseVersion===version(z)){window.scheduleCloudSave(roomId);return}
+   reportError({code:'sync/conflict'});return;
+  }
+  if(z.updatedClientId===TTOBOK_CLIENT_ID&&local.baseVersion===version(z))return;
+  applying=true;
+  try{if(local.items.length&&!sameContent(local,z))A.backupLocalRoom(roomId);A.applyCloudRoomData(roomId,z);dot.className='dot on';txt.textContent='공동 배치 적용 · '+TTOBOK_FAMILY_ID}
+  catch(e){reportError(e)}finally{applying=false}
+ },reportError);
+}
 async function init(){
  try{
   const app=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-app.js');
   const a=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-auth.js');
   const f=await import('https://www.gstatic.com/firebasejs/12.3.0/firebase-firestore.js');
-  M={a,f};let x=app.initializeApp(cfg);auth=a.getAuth(x);db=f.getFirestore(x);
+  M={a,f};const x=app.initializeApp(cfg);auth=a.getAuth(x);db=f.getFirestore(x);
   a.onAuthStateChanged(auth,async u=>{
-   if(u&&!isAllowedAccount(u)){
-    user=null;window.TTOBOK_IS_LOGGED_IN=false;
-    dot.className='dot err';document.getElementById('login').textContent='Google 로그인';
-    txt.textContent='등록되지 않은 Google 계정';
-    alert(`이 앱은 등록된 가족 계정만 사용할 수 있습니다.\n\n로그인 계정: ${u.email||'확인 불가'}`);
-    try{await a.signOut(auth)}catch(e){}
-    return;
-   }
+   session++;stopListening();user=null;window.TTOBOK_IS_LOGGED_IN=false;
+   document.getElementById('login').textContent='Google 로그인';dot.className='dot';
+   if(u&&!isAllowedAccount(u)){txt.textContent='등록되지 않은 가족 계정';try{await a.signOut(auth)}catch(e){}return}
    user=u;window.TTOBOK_IS_LOGGED_IN=!!u;
-   if(u){
-    dot.className='dot on';
-    document.getElementById('login').textContent='로그아웃';
-    txt.textContent='가족 전용 동기화 · '+(u.email||u.displayName||'로그인');
-    listen();
-   }else{
-    dot.className='dot';
-    document.getElementById('login').textContent='Google 로그인';
-    txt.textContent='등록된 가족 계정 로그인 필요';
-   }
+   if(u){document.getElementById('login').textContent='로그아웃';dot.className='dot on';txt.textContent='가족 공동 배치 확인 중...';listen();for(const id of roomIds())if(A.getLocalRoomData(id).dirty)window.scheduleCloudSave(id)}
+   else txt.textContent='가족 계정 로그인 필요 · 로컬 배치는 보존됩니다';
   });
- }catch(e){dot.className='dot err';txt.textContent='Firebase 연결 오류'}
+ }catch(e){reportError({code:'Firebase 연결 오류'})}
 }
 document.getElementById('login').onclick=async()=>{
+ if(!M||!auth){alert('Firebase 연결을 확인한 뒤 다시 시도해주세요.');return}
  if(user)return M.a.signOut(auth);
- let provider=new M.a.GoogleAuthProvider();
- provider.setCustomParameters({prompt:'select_account'});
- try{await M.a.signInWithPopup(auth,provider)}catch(e){
-  if(e?.code!=='auth/popup-closed-by-user')alert('Google 로그인에 실패했습니다: '+(e?.message||e?.code||'오류'));
- }
+ const provider=new M.a.GoogleAuthProvider();provider.setCustomParameters({prompt:'select_account'});
+ try{await M.a.signInWithPopup(auth,provider)}catch(e){if(e?.code!=='auth/popup-closed-by-user')alert('Google 로그인 실패: '+(e?.code||e?.message||'연결 오류'))}
 };
 document.getElementById('family').textContent='가족: parks-family';
-document.getElementById('family').onclick=()=>alert('이 앱은 parks-family 전용으로 고정되어 있습니다.');
-async function save(){
- let f=M.f,roomId=A.getRoom(),clientSavedAt=Date.now(),payload={
-   roomId,
-   geometry:A.cloudGeometry(roomId,A.geom()),
-   items:A.items().map(A.storageItem),
-   clientSavedAt,
-   updatedAt:f.serverTimestamp(),
-   updatedBy:user.displayName||user.email||user.uid,
-   updatedClientId:TTOBOK_CLIENT_ID
- };
- await f.setDoc(f.doc(db,'families',fid,'rooms',roomId),payload,{merge:true});
- return clientSavedAt;
-}
-function listen(){
- let f=M.f;if(unsub)unsub();let roomId=A.getRoom();
- unsub=f.onSnapshot(f.doc(db,'families',fid,'rooms',roomId),snap=>{
-  if(roomId!==A.getRoom())return;
-
-  let local=A.getLocalRoomData(roomId),localItems=local.items||[];
-
-  if(!snap.exists()){
-   if(localItems.length){
-    txt.textContent='이 기기 배치를 공동 저장 중...';
-    save().catch(()=>{});
-   }else{
-    txt.textContent='공동 동기화 · '+fid+' · 아직 저장된 배치 없음';
-   }
-   return;
-  }
-
-  let z=snap.data(),cloudItems=(z.items||[]).map(A.normalizeItem);
-  let localSavedAt=+(local.savedAt||0),cloudSavedAt=+(z.clientSavedAt||0);
-
-  // 이 탭/기기가 방금 저장한 Firestore echo는 다시 renderItems() 하지 않는다.
-  // 그렇지 않으면 선택된 가구 DOM이 새로 만들어지면서 선택 테두리가 즉시 사라진다.
-  if(z.updatedClientId && z.updatedClientId===TTOBOK_CLIENT_ID){
-   txt.textContent='공동 동기화 · 현재 기기 저장 완료 · '+fid;
-   return;
-  }
-
-  // 삭제/이동 직후 예전 클라우드 스냅샷이 도착해 가구가 되살아나는 현상 방지.
-  // 로컬이 더 최신이면 절대 예전 클라우드 배치를 화면에 다시 적용하지 않고 로컬을 재저장한다.
-  if(localSavedAt && localSavedAt>cloudSavedAt+25){
-   txt.textContent='최신 로컬 배치를 공동 저장 중...';
-   save().catch(()=>{});
-   return;
-  }
-
-  // 새 휴대폰의 빈 로컬 상태가 PC의 공동 배치를 덮어쓰지 않도록 보호.
-  // 반대로 클라우드가 비어 있고 이 기기에 실제 가구가 있으면 기존 PC/태블릿 배치를 공동 저장한다.
-  if(cloudItems.length===0 && localItems.length>0){
-   txt.textContent='이 기기의 기존 배치를 공동 저장 중...';
-   save().catch(()=>{});
-   return;
-  }
-
-  applying=true;
-  A.applyCloudRoomData(roomId,z);
-  applying=false;
-  txt.textContent='공동 동기화 · '+fid+' · '+(z.updatedBy||user.displayName||'가족');
- },()=>{dot.className='dot err';txt.textContent='권한/동기화 오류'});
-}
-
+document.getElementById('family').onclick=()=>alert('parks-family 전용 공동 배치입니다.');
 window.pushAllRooms=async()=>{
- if(!db||!user||!fid)return {ok:false,count:0,failed:['로그인/가족 코드 확인 필요']};
- let f=M.f,ids=A.getRoomIds(),count=0,failed=[];
- txt.textContent='전체 방 공동 저장 중...';
- for(const roomId of ids){
-   try{
-     let local=A.getLocalRoomData(roomId);
-     let payload={
-       roomId,
-       geometry:A.cloudGeometry(roomId,local.geometry),
-       items:(local.items||[]).map(A.storageItem),
-       clientSavedAt:Date.now(),
-       updatedAt:f.serverTimestamp(),
-       updatedBy:user.displayName||user.email||user.uid,
-       updatedClientId:TTOBOK_CLIENT_ID
-     };
-     await f.setDoc(f.doc(db,'families',fid,'rooms',roomId),payload,{merge:true});
-     count++;
-   }catch(e){
-     failed.push(`${A.getRoomName(roomId)}(${e?.code||e?.message||'오류'})`);
+ if(!user||!db)return {ok:false,count:0,failed:['로그인 필요']};
+ const ids=roomIds().filter(id=>A.getLocalRoomData(id).hasLocalData);
+ try{const ok=await queueSave(ids,true);return {ok,count:ok?ids.length:0,failed:[]}}catch(e){reportError(e);return {ok:false,count:0,failed:[e.code||e.message]}}
+};
+window.pullAllRooms=()=>{
+ if(!user||!db)return Promise.resolve(false);
+ const mySession=session,ids=roomIds(),beforeById=new Map(ids.map(id=>[id,A.getLocalRoomData(id)]));
+ const run=async()=>{
+  if(mySession!==session)return false;
+  let count=0;applying=true;
+  for(const id of ids){clearTimeout(timers.get(id));timers.delete(id)}
+  try{
+   for(const id of ids){
+    const before=beforeById.get(id),snap=await M.f.getDocFromServer(M.f.doc(db,'families',TTOBOK_FAMILY_ID,'rooms',id));
+    if(mySession!==session)return false;
+    if(A.getLocalRoomData(id).localRevision!==before.localRevision)continue;
+    if(!snap.exists())continue;
+    const z=snap.data();if(!validCloud(z))throw Object.assign(new Error(id),{code:'sync/invalid-data'});
+    A.backupLocalRoom(id);A.applyCloudRoomData(id,z);count++;
    }
- }
- if(failed.length){
-   txt.textContent=`공동 저장 ${count}개 성공 · ${failed.length}개 실패`;
-   return {ok:false,count,failed};
- }
- txt.textContent=`전체 ${count}개 방 공동 저장 완료 · ${fid}`;
- return {ok:true,count,failed:[]};
+   txt.textContent=`공동 배치 ${count}개 방 불러옴 · 이전 로컬 배치 백업됨`;return true;
+  }finally{applying=false;if(mySession===session){listen();for(const id of ids)if(A.getLocalRoomData(id).dirty)window.scheduleCloudSave(id)}}
+ };
+ const result=saveQueue.then(run,run);saveQueue=result.catch(()=>{});return result;
 };
-
-window.pullAllRooms=async()=>{
- if(!db||!user||!fid)return false;
- let f=M.f,ids=A.getRoomIds(),count=0,preserved=0;
- txt.textContent='공동 배치 불러오는 중...';
- for(const roomId of ids){
-   let snap=await f.getDoc(f.doc(db,'families',fid,'rooms',roomId));
-   if(!snap.exists())continue;
-   let z=snap.data(),cloudItems=(z.items||[]).map(A.normalizeItem),local=A.getLocalRoomData(roomId);
-   if(cloudItems.length===0 && (local.items||[]).length>0){preserved++;continue}
-   A.applyCloudRoomData(roomId,z);count++;
- }
- txt.textContent=`공동 배치 ${count}개 방 불러옴${preserved?` · 로컬 보호 ${preserved}개`:''} · ${fid}`;
- return true;
-};
-
 document.getElementById('syncPull').onclick=async()=>{
  if(!user)return alert('먼저 Google 로그인을 해주세요.');
- if(!fid)return alert('먼저 가족 코드를 설정해주세요.');
- try{await window.pullAllRooms()}catch(e){dot.className='dot err';txt.textContent='공동 배치 불러오기 실패';alert('공동 배치를 불러오지 못했습니다. 로그인과 가족 코드를 확인해주세요.')}
+ if(!confirm('공동 배치를 불러올까요? 이 기기의 이전 배치는 복구 백업으로 보존됩니다.'))return;
+ try{await window.pullAllRooms()}catch(e){reportError(e)}
 };
 document.getElementById('syncAll').onclick=async()=>{
  if(!user)return alert('먼저 Google 로그인을 해주세요.');
- if(!fid)return alert('먼저 가족 코드를 설정해주세요.');
- if(!confirm('이 기기에 저장된 모든 방의 현재 배치를 가족 공동 저장소에 올릴까요?'))return;
- try{
-   let r=await window.pushAllRooms();
-   if(r.ok){
-     alert(`전체 ${r.count}개 방의 현재 배치를 공동 저장했습니다.`);
-   }else{
-     dot.className='dot err';
-     alert(`공동 저장: ${r.count}개 방 성공\n실패: ${r.failed.join('\n')}`);
-   }
- }catch(e){
-   dot.className='dot err';txt.textContent='전체 방 공동 저장 실패';
-   alert('전체 방 공동 저장에 실패했습니다: '+(e?.code||e?.message||'알 수 없는 오류'));
- }
+ if(!confirm('이 기기에 저장된 방의 배치로 공동 배치를 덮어쓸까요? 다른 기기의 변경보다 이 기기의 배치를 우선합니다.'))return;
+ const r=await window.pushAllRooms();alert(r.ok?`${r.count}개 방 공동 저장 완료`:'공동 저장 실패 · 로컬 배치 보존됨');
 };
-
-window.cloudAppendItem=async(target,item)=>{
- if(!db||!user||!fid)return false;let f=M.f,ref=f.doc(db,'families',fid,'rooms',target),snap=await f.getDoc(ref),z=snap.exists()?snap.data():{},arr=(z.items||[]).map(A.normalizeItem);arr.push(A.normalizeItem(item));
- await f.setDoc(ref,{roomId:target,items:arr.map(A.storageItem),updatedAt:f.serverTimestamp(),updatedBy:user.displayName||user.email||user.uid},{merge:true});return true;
-};
+window.addEventListener('online',()=>{if(user)for(const id of roomIds())if(A.getLocalRoomData(id).dirty)window.scheduleCloudSave(id)});
 init();
 </script>
 <script>
@@ -2069,5 +1984,5 @@ installBtn?.addEventListener('click',async()=>{
 });
 refreshInstallButton();
 </script>
-<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js');</script>
+<script>if('serviceWorker' in navigator)navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'}).catch(()=>{});</script>
 </body></html>

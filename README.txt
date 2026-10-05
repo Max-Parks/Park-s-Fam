@@ -1,17 +1,44 @@
-또복이 Family Room Planner PWA V1
-1. Firebase 프로젝트 생성
-2. Authentication > Google 로그인 활성화
-3. Firestore Database 생성
-4. 웹 앱 등록 후 firebaseConfig를 firebase-config.js에 입력
-5. firestore.rules 적용
-6. 폴더 전체를 GitHub Pages/Firebase Hosting에 배포
-7. 두 휴대폰에서 로그인 후 같은 가족 코드 입력
-8. Android Chrome에서 '앱 설치' 또는 '홈 화면에 추가'
+또복이 Family Room Planner V3.63
 
-보안: 포함된 Rules는 초기 테스트용입니다. 공개 실사용 전에는 두 사람의 Firebase UID만 허용하도록 강화하세요.
+실행: https://max-parks.github.io/Park-s-Fam/
+기존 GitHub Pages 앱과 park-s-home Firebase 프로젝트를 사용합니다.
+설치 APK는 이 웹 주소를 여는 기존 앱입니다. APK 서명이나 패키지는 변경하지 않았습니다.
 
-V1.1
-- Park's home Firebase Web App config 적용
-- Google Authentication / Cloud Firestore 연결 준비 완료
-- Firestore 리전: 사용자가 생성한 (default) DB
-- 배포 후 두 기기에서 동일 가족 코드를 사용하면 공동 동기화
+이번 수정
+- 화면 확대/다시 그리기가 저장 시각을 바꾸지 않습니다.
+- 방별 저장 대기열, 버전 충돌 확인, 방 이동의 묶음 저장을 적용했습니다.
+- 다른 기기에서 비운 방을 이전 가구로 되살리던 문제를 수정했습니다.
+- 손상된 저장값과 저장 공간 부족을 처리하고 이전 로컬 배치 복구 기능을 추가했습니다.
+- 안방의 이전 버전 자동 변환이 기존 배치와 실측값을 지우지 않도록 수정했습니다.
+- 문짝의 실제 90도 회전 영역, 꺾인 벽 충돌, 가구 면 전체의 외벽 간격을 계산합니다.
+- 전체 집 도면은 방 사이 연결 실측이 확인되지 않은 참고도임을 표시합니다.
+
+데이터 사용
+로그인 전에도 이 브라우저에 배치를 저장할 수 있습니다.
+공동 저장 충돌 시 로컬 배치를 보존합니다.
+‘공동 배치 불러오기’는 서버의 배치를 적용하고 이전 로컬 배치를 백업합니다.
+‘전체 방 공동 저장’은 이 기기에 저장된 방의 내용으로 서버를 덮어쓰므로 확인 후 사용하세요.
+‘이전 로컬 배치 복구’는 방별 최신 백업을 복구합니다(최대 5회 보관).
+브라우저 데이터 삭제 시 로컬 배치와 로컬 백업도 삭제됩니다.
+
+개발/검증
+Node.js 22 이상에서 npm test
+브라우저 확인: npm install --no-save playwright@1.62.1
+                 npx playwright install chromium
+                 npm run test:browser
+GitHub Actions verify-planner.yml에 회귀 테스트와 PC/모바일 Chromium 확인 절차를 준비했습니다.
+로컬 회귀 테스트 43개 통과. 실제 브라우저 검증과 배포 결과는 docs/review-v3.63.md에 기록합니다.
+브라우저 테스트는 Firebase 네트워크 요청을 차단하고 임시 브라우저 데이터를 사용합니다.
+
+Firebase
+firebase-config.js는 기존 웹 앱의 공개 클라이언트 설정입니다.
+.firebaserc와 firebase.json은 기존 프로젝트의 Firestore 규칙 배포 설정입니다.
+firestore.rules는 등록 가족 계정과 parks-family 방 문서만 허용하도록 제한합니다.
+GitHub에 rules 파일을 올리는 것만으로 Firebase 운영 규칙이 바뀌지는 않습니다.
+2026-10-05 Firebase 콘솔에서 규칙을 게시했습니다. 기존 운영 규칙의 가족 계정 제한을
+유지하면서 방 ID와 저장 데이터 형식을 검사합니다. geometry가 없는 이전 앱 저장도 허용합니다.
+규칙 플레이그라운드에서 가족 읽기·기존 형식 저장 허용, 비로그인·미등록 계정 읽기 및
+방 ID가 일치하지 않는 저장 차단을 확인했습니다. 실제 두 기기 동기화는 별도 확인이 필요합니다.
+
+검토 내용과 남은 실측 항목: docs/review-v3.63.md
+아기방 기본 치수 참고도: docs/babyroom-v363-reference.svg
