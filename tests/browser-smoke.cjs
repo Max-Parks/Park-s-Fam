@@ -39,7 +39,13 @@ const server=http.createServer((req,res)=>{
    if(mobile)await page.locator('#mobileView').click();
    for(const id of ['smallroom1','master','living','laundry','commonbath','ensuite','entry','house','smallroom2'])await page.locator('#roomSel').selectOption(id);
    await page.reload();await page.waitForFunction(()=>!!window.TTOBOK_APP);assert.equal(await page.locator('.furn').count(),0);
-   if(!mobile){await page.goto(base+'/docs/babyroom-v363-reference.svg');await page.screenshot({path:path.join(root,'test-results','babyroom-reference.png'),fullPage:true})}
+   if(!mobile){
+    // Chromium can stall a full-page screenshot of a standalone SVG document.
+    // Decode the unchanged SVG in an HTML image before capturing its full size.
+    await page.setContent(`<html><body style="margin:0"><img src="${base}/docs/babyroom-v363-reference.svg" width="1120" height="1450" alt="아기방 기본 치수 검토도"></body></html>`);
+    await page.locator('img').evaluate(image=>image.decode());
+    await page.screenshot({path:path.join(root,'test-results','babyroom-reference.png'),fullPage:true});
+   }
    assert.deepEqual(errors,[],`${viewport.width}px JavaScript errors`);await context.close();console.log(`Browser passed: ${viewport.width}x${viewport.height}`);
   }
  }finally{await browser.close();server.close()}
