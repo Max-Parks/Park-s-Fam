@@ -1,0 +1,1 @@
+{"name":"ttobok-room-planner","version":"3.63.0","private":true,"scripts":{"test":"node --test tests/*.test.cjs","test:browser":"node tests/browser-smoke.cjs"}}

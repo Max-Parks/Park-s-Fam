@@ -1,1 +1,21 @@
-rules_version = '2'; service cloud.firestore { match /databases/{database}/documents { match /families/{familyId}/{document=**} { allow read, write: if request.auth != null; } } }
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isFamily() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && request.auth.token.email in [
+          'komorebi0802@gmail.com', 'pinknote6@gmail.com',
+          'komorebi58@gmail.com', 'komors551124@gmail.com'
+        ];
+    }
+    match /families/{familyId}/rooms/{roomId} {
+      allow read: if familyId == 'parks-family' && isFamily();
+      allow create, update: if familyId == 'parks-family' && isFamily()
+        && roomId in ['smallroom2', 'smallroom1', 'master', 'living', 'laundry', 'commonbath', 'ensuite', 'entry', 'house']
+        && request.resource.data.roomId == roomId
+        && request.resource.data.items is list
+        && (!('geometry' in request.resource.data) || request.resource.data.geometry is map);
+    }
+  }
+}
