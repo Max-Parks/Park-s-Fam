@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1120" height="1450" viewBox="0 0 1120 1450" role="img" aria-labelledby="title desc">
+  <title id="title">아기방 V3.63 기본 치수 검토도</title>
+  <desc id="desc">현재 앱 기본값 2700×3590 밀리미터. 우상단 440×310, 우하단 550×85 꺾임은 실측이 필요한 초기값. 출입문은 기존 사용자 실측 기록 65+800+65=930, 힌지축 65, 회전 반경 800. 가구 배치와 전체 집 연결은 포함하지 않는다.</desc>
+  <defs>
+    <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M 0 0 L 10 5 L 0 10 z" fill="#526174"/></marker>
+    <pattern id="hatch" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="10" stroke="#e4a35a" stroke-width="3"/></pattern>
+    <style>
+      text{font-family:Arial,'Noto Sans KR','Malgun Gothic',sans-serif;fill:#253449;font-size:20px}
+      .dim{stroke:#526174;stroke-width:1.5;marker-start:url(#arrow);marker-end:url(#arrow)}
+      .ext{stroke:#a8b2bf;stroke-width:1;stroke-dasharray:4 4}
+      .small{font-size:17px;fill:#58677a}.uncertain{fill:#a45610;font-size:18px}.blue{fill:#236bb2}
+    </style>
+  </defs>
+  <rect width="1120" height="1450" fill="#f6f8fb"/>
+  <rect x="38" y="32" width="1044" height="1386" rx="18" fill="white"/>
+  <text x="82" y="88" style="font-size:31px;font-weight:700">아기방 · 기본 치수 검토도</text>
+  <text x="82" y="124" class="small">V3.63 · 2026-10-05 · 단위 mm · 현재 앱 기본값 기준</text>
+  <text x="82" y="159" class="small">새 실측 원본 대조 전 참고도입니다. 저장한 사용자 수정 치수는 앱에서 확인하세요.</text>
+
+  <line class="ext" x1="180" y1="264" x2="180" y2="194"/><line class="ext" x1="828" y1="338" x2="828" y2="194"/>
+  <line class="dim" x1="180" y1="211" x2="828" y2="211"/><text x="504" y="200" text-anchor="middle">전체 폭 2,700</text>
+  <rect x="180" y="270" width="648" height="861.6" fill="none" stroke="#bac4d0" stroke-dasharray="6 6"/>
+  <rect x="722.4" y="270" width="105.6" height="74.4" fill="url(#hatch)" opacity=".6"/>
+  <rect x="696" y="1111.2" width="132" height="20.4" fill="url(#hatch)" opacity=".6"/>
+  <polygon points="180,270 722.4,270 722.4,344.4 828,344.4 828,1111.2 696,1111.2 696,1131.6 180,1131.6" fill="#f5f8fc" stroke="#263950" stroke-width="4" stroke-linejoin="round"/>
+  <polyline points="722.4,270 722.4,344.4 828,344.4" fill="none" stroke="#c77826" stroke-width="4"/>
+  <polyline points="828,1111.2 696,1111.2 696,1131.6" fill="none" stroke="#c77826" stroke-width="4"/>
+  <line x1="180" y1="270" x2="403.2" y2="270" stroke="white" stroke-width="7"/>
+  <path d="M 195.6 270 L 387.6 270 A 192 192 0 0 1 195.6 462 Z" fill="#dcecfb" opacity=".8"/>
+  <path d="M 387.6 270 A 192 192 0 0 1 195.6 462" fill="none" stroke="#236bb2" stroke-width="2" stroke-dasharray="6 5"/>
+  <line x1="195.6" y1="270" x2="195.6" y2="462" stroke="#236bb2" stroke-width="5"/>
+  <circle cx="195.6" cy="270" r="5" fill="#236bb2"/>
+  <line x1="180" y1="257" x2="403.2" y2="257" stroke="#236bb2" stroke-width="2"/>
+  <text x="290" y="244" text-anchor="middle" class="blue" style="font-size:17px">개구 930</text>
+  <text x="258" y="487" class="blue">문짝 800 · 힌지축 65</text>
+  <text x="258" y="516" class="small">기존 실측 기록: 65 + 800 + 65</text>
+  <text x="642" y="376" text-anchor="end" class="uncertain">위 꺾임 440 × 310</text>
+  <text x="642" y="403" text-anchor="end" class="uncertain">초기값 · 실측 필요</text>
+  <path d="M 654 368 L 700 328 L 722.4 328" fill="none" stroke="#c77826" stroke-width="1.5"/>
+  <text x="502" y="720" text-anchor="middle" style="font-size:26px;font-weight:700">작은방 2 · 아기방</text>
+  <text x="502" y="757" text-anchor="middle" class="small">내측 벽선 기준 / 가구 배치 미포함</text>
+
+  <line class="ext" x1="174" y1="270" x2="92" y2="270"/><line class="ext" x1="174" y1="1131.6" x2="92" y2="1131.6"/>
+  <line class="dim" x1="110" y1="270" x2="110" y2="1131.6"/>
+  <text transform="translate(93 700.8) rotate(-90)" text-anchor="middle">좌측 3,590</text>
+  <line class="ext" x1="836" y1="344.4" x2="946" y2="344.4"/><line class="ext" x1="836" y1="1111.2" x2="946" y2="1111.2"/>
+  <line class="dim" x1="909" y1="344.4" x2="909" y2="1111.2"/>
+  <text transform="translate(938 727.8) rotate(-90)" text-anchor="middle">우측 직선 3,195 = 3,590 − 310 − 85</text>
+  <line x1="180" y1="1131.6" x2="696" y2="1131.6" stroke="#48a7b8" stroke-width="6"/>
+  <text x="438" y="1101" text-anchor="middle" class="small">하단 창호 기본 폭 2,150</text>
+  <line class="ext" x1="180" y1="1141" x2="180" y2="1208"/><line class="ext" x1="696" y1="1141" x2="696" y2="1208"/>
+  <line class="dim" x1="180" y1="1190" x2="696" y2="1190"/>
+  <text x="438" y="1175" text-anchor="middle">하단 유효 폭 2,150</text>
+  <text x="749" y="1168" class="uncertain">아래 꺾임 550 × 85</text>
+  <text x="749" y="1194" class="uncertain">초기값 · 실측 필요</text>
+  <path d="M 768 1147 L 764 1123" fill="none" stroke="#c77826" stroke-width="1.5"/>
+
+  <line x1="82" y1="1260" x2="1034" y2="1260" stroke="#dce2e9"/>
+  <text x="82" y="1298" class="small">파랑: 기존 사용자 실측 기록  ·  주황: 실측이 필요한 꺾임 초기값</text>
+  <text x="82" y="1331" class="small">외곽 전체 치수는 기존 앱 값 유지. 창호 프레임·개폐 방향과 방 연결은 별도 확인이 필요합니다.</text>
+  <text x="82" y="1364" class="small">이 도면은 시공도나 가구 구매용 최종 실측도가 아닙니다. 검토 기록: review-v3.63.md</text>
+</svg>
