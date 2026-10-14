@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
-<title>또복이 Family Room Planner V3.63</title>
+<title>또복이 Family Room Planner V3.64</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
 <meta name="application-name" content="또복이 Family Room Planner">
@@ -18,6 +18,8 @@
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Noto Sans KR",sans-serif;background:var(--bg);color:var(--ink)}
 header{padding:12px 16px;background:#fff;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:20}
 h1{font-size:18px;margin:0 0 4px}.small,.sub{font-size:11px;color:var(--muted)}
+[hidden]{display:none!important}
+.plannerMain{min-width:0}
 .app{display:grid;grid-template-columns:330px 1fr;min-height:calc(100vh - 70px)}
 aside{background:#fff;border-right:1px solid var(--line);padding:12px;overflow:auto}
 .stage{padding:16px;overflow:auto;display:flex;justify-content:flex-start;align-items:flex-start;scrollbar-gutter:stable}
@@ -132,11 +134,50 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
   }
 }
 
+.toolbar{margin:8px 10px;min-width:0;justify-content:flex-start;z-index:25}
+.editControls,.viewControls{display:flex;align-items:center;gap:6px;width:100%;min-width:0}
+.editControls button{flex-shrink:0;min-height:44px}
+.selectionName{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:13px;font-weight:700}
+#rot{background:var(--accent);border-color:var(--accent);color:white;font-weight:700}
+button:disabled{opacity:.45;cursor:default}
+.viewControls{overflow-x:auto;padding-bottom:2px}
+.viewControls>*{flex-shrink:0;white-space:nowrap}
+.houseLegend{align-self:stretch;margin:12px;padding:16px;background:white;border:1px solid var(--line);border-radius:12px}
+.houseLegend h2{font-size:16px;margin:0 0 6px}
+.houseLegendList{display:grid;grid-template-columns:repeat(auto-fit,minmax(215px,1fr));gap:8px 16px}
+.houseLegendEntry{display:flex;align-items:flex-start;gap:8px;min-width:0;padding:8px 0;border-top:1px solid #eee;font-size:13px}
+.houseLegendEntry small{display:block;color:var(--muted);margin-top:3px;line-height:1.5;overflow-wrap:anywhere}
+.houseMarker,.legendMarker{display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;min-width:22px;height:22px;border:1px solid #697867;border-radius:50%;background:#fff;color:#344531;font:700 11px system-ui;white-space:nowrap}
+.legendMarker.furniture{background:#dfe8db;border-radius:5px}
+.legendMarker.fixed{background:#e2e0da;border-color:#77746d;border-radius:5px}
+body[data-room="house"] .stage{flex-direction:column}
+body[data-room="house"] .roomShell{padding:68px 62px 44px}
+body[data-room="house"] .suiteZone{overflow:visible;z-index:8;background:transparent}
+.houseMarker{min-width:18px;height:18px;font-size:10px}
+body[data-room="house"] .houseSavedItem{align-items:flex-start;justify-content:flex-start}
+body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data-room="house"] .houseSavedItem{padding:0;font-size:10px;white-space:nowrap;overflow:hidden;line-height:1}
+@media(max-width:760px){
+ .stage{padding-bottom:410px}
+ .toolbar{position:fixed;left:6px;right:6px;bottom:calc(231px + env(safe-area-inset-bottom,0px));margin:0;z-index:40;gap:4px;box-shadow:0 3px 18px #0002}
+ .editControls{gap:4px}
+ .editControls button{padding:7px;min-height:44px;font-size:13px}
+ .selectionName{font-size:12px}
+ .viewControls{gap:4px}
+ .mobileMoveControls{flex-wrap:nowrap;margin:0;padding-top:4px;gap:5px}
+ .mobileMoveControls>span{display:none}
+ .mobileMoveControls button{min-height:40px;min-width:40px;padding:3px}
+ aside{height:calc(225px + env(safe-area-inset-bottom,0px));padding-bottom:calc(8px + env(safe-area-inset-bottom,0px))}
+ body.mobile-focus .toolbar{max-height:none;overflow:visible;bottom:calc(6px + env(safe-area-inset-bottom,0px))}
+ body.mobile-focus .stage{padding-bottom:185px}
+ body.mobile-focus .roomShell{padding-bottom:60px}
+ body.mobile-focus .houseLegend{position:relative;z-index:1000}
+}
+
 </style>
 </head>
 <body data-diagram-font="large">
 <header>
-<h1>또복이 Family Room Planner <small>V3.63</small></h1>
+<h1>또복이 Family Room Planner <small>V3.64</small></h1>
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">가족 전용 · 로그인 필요</span><button id="login">Google 로그인</button><button id="family">가족: parks-family</button><button id="syncPull" title="가족 공동 저장소의 배치를 이 기기로 다시 불러옵니다">↻ 공동 배치 불러오기</button><button id="installApp" class="installBtn" type="button">📲 Android APK 설치</button></div>
 </header>
@@ -321,13 +362,24 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </div></div>
 </aside>
 
-<main class="stage"><div class="roomShell">
+<main class="plannerMain"><div class="stage"><div class="roomShell">
 <div id="room">
 <svg id="roomShape" class="roomShape" viewBox="0 0 2700 3590" preserveAspectRatio="none"><polygon id="wallPoly" class="wallPoly"></polygon><g id="measures"></g></svg>
 <div id="window" class="window"></div><div id="winLabel" class="label winLabel"></div>
 <div id="doorGap" class="doorGap"></div><div id="doorLeaf" class="doorLeaf"></div><div id="doorArc" class="doorArc"></div><div id="doorHingeDot" class="doorHingeDot"></div><div id="doorLabel" class="label doorLabel"></div><div id="suiteLayer"></div><div id="edgeLayer"></div><div id="fixedLayer"></div>
 </div>
-<div class="toolbar">
+</div>
+<section id="houseLegend" class="houseLegend" aria-label="전체 도면 설명" hidden>
+<h2>전체 도면 · 번호별 설명</h2>
+<p class="small">방 이름과 치수는 아래 목록에서 확인하세요. 숫자는 공간, F는 배치 가구·가전, G는 고정 구조물입니다. 가구 편집은 방 선택에서 해당 방을 열어주세요.</p>
+<div id="houseLegendList" class="houseLegendList"></div>
+</section></div>
+<div class="toolbar" aria-label="도면 편집 도구">
+<div class="editControls">
+<span id="selectionName" class="selectionName" aria-live="polite">가구를 선택하세요</span>
+<button id="rot" type="button" disabled>↻ 90° 회전</button><button id="dup" disabled>＋ 복제</button><button id="del" disabled>× 제거</button>
+</div>
+<div class="viewControls">
 <label class="small" style="display:flex;align-items:center;gap:5px">글자
 <select id="fontSizeSel" class="fontSizeSel">
 <option value="normal">보통</option>
@@ -336,15 +388,16 @@ body[data-diagram-font="xlarge"] .furn{font-size:18px}
 </select></label>
 <button id="zoomOut">－ 축소</button><span id="zoomVal" class="zoomVal">100%</span><button id="zoomIn">＋ 확대</button><button id="fit">화면 기준</button><button id="leftView" title="도면 왼쪽 바깥 치수부터 보기">← 좌측 보기</button>
 <button id="z200">200%</button><button id="z300">300%</button><button id="z400">400%</button>
-<button id="rot">↻ 90°</button><button id="dup">＋ 복제</button><button id="del">× 제거</button><button id="clear">전체 비우기</button>
+<button id="clear">전체 비우기</button>
+</div>
 <div id="mobileMoveControls" class="mobileMoveControls">
   <span class="small"><b>선택 가구 미세이동</b></span>
   <select id="moveStep" aria-label="가구 이동 간격"><option value="10">10mm</option><option value="50" selected>50mm</option><option value="100">100mm</option></select>
   <button id="mvLeft" title="왼쪽 이동">←</button><button id="mvUp" title="위 이동">↑</button><button id="mvDown" title="아래 이동">↓</button><button id="mvRight" title="오른쪽 이동">→</button>
 </div>
 </div>
-<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다. 태블릿에서 왼쪽 치수가 안 보이면 「← 좌측 보기」를 누르면 바깥 치수 시작점으로 이동합니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 도면만 전체화면으로 볼 수 있습니다. 가구를 선택한 뒤 하단의 ← ↑ ↓ → 버튼으로 10/50/100 mm씩 정확하게 이동할 수 있습니다.</div>
-</div></main>
+<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다. 태블릿에서 왼쪽 치수가 안 보이면 「← 좌측 보기」를 누르면 바깥 치수 시작점으로 이동합니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 도면만 전체화면으로 볼 수 있습니다. 가구를 누른 뒤 하단의 「↻ 90° 회전」으로 방향을 바꾸세요. ← ↑ ↓ → 버튼으로 10/50/100 mm씩 이동할 수 있습니다.</div>
+</main>
 </div>
 
 <script src="geometry-core.js"></script>
@@ -810,81 +863,11 @@ function drawShape(g){
   m.innerHTML=`<line class="measureLine" x1="0" y1="-70" x2="${g.w}" y2="-70"/><text class="measureText" x="${g.w/2}" y="-90" text-anchor="middle">${g.w} mm</text><line class="measureLine" x1="-70" y1="0" x2="-70" y2="${g.h}"/><text class="measureText" x="-100" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 -100 ${g.h/2})">${g.h} mm</text>`;
  }
  if(rid==='house'){
-  let topY=-430,bottomY=g.h+260,leftX=-280,rightX=g.w+235,subBottom=g.h+150,subRight=g.w+120;
-  m.innerHTML+=`
-  <line class="measureExt" x1="0" y1="0" x2="0" y2="${topY+25}"/>
-  <line class="measureExt" x1="${g.w}" y1="0" x2="${g.w}" y2="${topY+25}"/>
-  <line class="measureLine" x1="0" y1="${topY}" x2="${g.w}" y2="${topY}"/>
-  <text class="measureText" x="${g.w/2}" y="${topY-40}" text-anchor="middle">집 전체 폭 ${g.w.toLocaleString()} mm</text>
-
-  <line class="measureExt" x1="0" y1="0" x2="${leftX+25}" y2="0"/>
-  <line class="measureExt" x1="0" y1="${g.h}" x2="${leftX+25}" y2="${g.h}"/>
-  <line class="measureLine" x1="${leftX}" y1="0" x2="${leftX}" y2="${g.h}"/>
-  <text class="measureText" x="${leftX-45}" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 ${leftX-45} ${g.h/2})">집 전체 깊이 ${g.h.toLocaleString()} mm</text>
-
-  <line class="measureExt" x1="0" y1="${g.h}" x2="0" y2="${bottomY-22}"/>
-  <line class="measureExt" x1="${g.w}" y1="${g.h}" x2="${g.w}" y2="${bottomY-22}"/>
-  <line class="measureLine" x1="0" y1="${bottomY}" x2="${g.w}" y2="${bottomY}"/>
-  <text class="measureText" x="${g.w/2}" y="${bottomY+70}" text-anchor="middle">하단 기준 폭 ${g.w.toLocaleString()} mm</text>
-
-  <line class="measureExt" x1="${g.w}" y1="5710" x2="${rightX-22}" y2="5710"/>
-  <line class="measureExt" x1="${g.w}" y1="${g.h}" x2="${rightX-22}" y2="${g.h}"/>
-  <line class="measureLine" x1="${rightX}" y1="5710" x2="${rightX}" y2="${g.h}"/>
-  <text class="measureTextSub" x="${rightX+48}" y="${(5710+g.h)/2}" text-anchor="middle" transform="rotate(-90 ${rightX+48} ${(5710+g.h)/2})">우측 하부 약 5,220 mm</text>
-
-  <line class="measureExt" x1="0" y1="${g.h}" x2="0" y2="${subBottom-12}"/>
-  <line class="measureExt" x1="3600" y1="${g.h}" x2="3600" y2="${subBottom-12}"/>
-  <line class="measureLine" x1="0" y1="${subBottom}" x2="3600" y2="${subBottom}"/>
-  <text class="measureTextSub" x="1800" y="${subBottom+48}" text-anchor="middle">안방/베란다 폭 3,600</text>
-
-  <line class="measureExt" x1="8210" y1="${g.h}" x2="8210" y2="${subBottom-12}"/>
-  <line class="measureExt" x1="10910" y1="${g.h}" x2="10910" y2="${subBottom-12}"/>
-  <line class="measureLine" x1="8210" y1="${subBottom}" x2="10910" y2="${subBottom}"/>
-  <text class="measureTextSub" x="9560" y="${subBottom+48}" text-anchor="middle">작은방2 폭 2,700</text>
-
-  <line class="measureExt" x1="10910" y1="${g.h}" x2="10910" y2="${subBottom-12}"/>
-  <line class="measureExt" x1="13610" y1="${g.h}" x2="13610" y2="${subBottom-12}"/>
-  <line class="measureLine" x1="10910" y1="${subBottom}" x2="13610" y2="${subBottom}"/>
-  <text class="measureTextSub" x="12260" y="${subBottom+48}" text-anchor="middle">작은방1 폭 2,700</text>
-
-  <line class="measureExt" x1="${g.w}" y1="6300" x2="${subRight-15}" y2="6300"/>
-  <line class="measureExt" x1="${g.w}" y1="9890" x2="${subRight-15}" y2="9890"/>
-  <line class="measureLine" x1="${subRight}" y1="6300" x2="${subRight}" y2="9890"/>
-  <text class="measureTextSub" x="${subRight+42}" y="8095" text-anchor="middle" transform="rotate(-90 ${subRight+42} 8095)">침실 깊이 3,590</text>
-
-  <line class="measureExt" x1="0" y1="0" x2="0" y2="-330"/>
-  <line class="measureExt" x1="3820" y1="0" x2="3820" y2="-330"/>
-  <line class="measureExt" x1="8500" y1="0" x2="8500" y2="-330"/>
-  <line class="measureExt" x1="11340" y1="0" x2="11340" y2="-330"/>
-  <line class="measureExt" x1="14220" y1="0" x2="14220" y2="-330"/>
-  <line class="measureLine" x1="0" y1="-285" x2="3820" y2="-285"/>
-  <line class="measureLine" x1="3820" y1="-285" x2="8500" y2="-285"/>
-  <line class="measureLine" x1="8500" y1="-285" x2="11340" y2="-285"/>
-  <line class="measureLine" x1="11340" y1="-285" x2="14220" y2="-285"/>
-  <text class="measureTextSub" x="1910" y="-305" text-anchor="middle">3,820</text>
-  <text class="measureTextSub" x="6160" y="-305" text-anchor="middle">4,680</text>
-  <text class="measureTextSub" x="9920" y="-305" text-anchor="middle">2,840</text>
-  <text class="measureTextSub" x="12780" y="-305" text-anchor="middle">2,880</text>
-
-  <line class="measureExt" x1="0" y1="0" x2="0" y2="-250"/>
-  <line class="measureExt" x1="3600" y1="0" x2="3600" y2="-250"/>
-  <line class="measureLine" x1="0" y1="-210" x2="3600" y2="-210"/>
-  <text class="measureTextSub" x="1800" y="-230" text-anchor="middle">안방 구간 3,600</text>
-
-  <line class="measureExt" x1="7240" y1="430" x2="7240" y2="-160"/>
-  <line class="measureExt" x1="8840" y1="430" x2="8840" y2="-160"/>
-  <line class="measureLine" x1="7240" y1="-120" x2="8840" y2="-120"/>
-  <text class="measureTextSub" x="8040" y="-140" text-anchor="middle">세탁실 폭 1,600</text>
-
-  <line class="measureExt" x1="8120" y1="2570" x2="8120" y2="2380"/>
-  <line class="measureExt" x1="9740" y1="2570" x2="9740" y2="2380"/>
-  <line class="measureLine" x1="8120" y1="2420" x2="9740" y2="2420"/>
-  <text class="measureTextSub" x="8930" y="2400" text-anchor="middle">공용욕실 폭 1,620</text>
-
-  <line class="measureExt" x1="10020" y1="3320" x2="10020" y2="3160"/>
-  <line class="measureExt" x1="11830" y1="3320" x2="11830" y2="3160"/>
-  <line class="measureLine" x1="10020" y1="3200" x2="11830" y2="3200"/>
-  <text class="measureTextSub" x="10925" y="3180" text-anchor="middle">현관 폭 1,810</text>`;
+  const ss=scale(),off=30/ss,fs=14/ss,stroke=3/ss;
+  m.innerHTML=`<line class="measureLine" x1="0" y1="${-off}" x2="${g.w}" y2="${-off}"/>
+  <text class="measureText" style="font-size:${fs}px;stroke-width:${stroke}px" x="${g.w/2}" y="${-off-8/ss}" text-anchor="middle">전체 폭 ${g.w.toLocaleString()} mm</text>
+  <line class="measureLine" x1="${-off}" y1="0" x2="${-off}" y2="${g.h}"/>
+  <text class="measureText" style="font-size:${fs}px;stroke-width:${stroke}px" x="${-off-8/ss}" y="${g.h/2}" text-anchor="middle" transform="rotate(-90 ${-off-8/ss} ${g.h/2})">전체 깊이 ${g.h.toLocaleString()} mm</text>`;
  }
  if(rid==='smallroom2'){
   let tx=g.w-g.trw,by=g.h-g.brd,
@@ -1231,7 +1214,7 @@ function savedRoomItems(roomId){
  try{z=JSON.parse(localStorage.getItem(localKey(roomId))||'null')}catch(e){}
  return sanitizeRoomItems(roomId,z?.items||[]).items;
 }
-function renderHouseSavedItems(layer,ss){
+function renderHouseSavedItems(layer,ss,legend=[]){
  let count=0;
  Object.entries(HOUSE_ITEM_PLACEMENTS).forEach(([roomId,p])=>{
    let roomName=ROOM_DEFAULTS[roomId]?.name||roomId;
@@ -1245,7 +1228,9 @@ function renderHouseSavedItems(layer,ss){
      e.style.width=iw*ss+'px';
      e.style.height=ih*ss+'px';
      e.title=`${roomName} · ${a.n} · ${iw}×${ih} mm`;
-     e.innerHTML=`<div>${escapeHtml(a.n)}<span class="roomTag">${escapeHtml(roomName)}</span></div>`;
+     const marker='F'+(count+1);
+     e.textContent=marker;
+     legend.push({marker,name:a.n,note:`${roomName} · ${iw.toLocaleString()} × ${ih.toLocaleString()} mm`,kind:'furniture'});
      layer.appendChild(e);
      count++;
    });
@@ -1253,8 +1238,9 @@ function renderHouseSavedItems(layer,ss){
  return count;
 }
 function renderSuite(){
- let layer=$('suiteLayer');layer.innerHTML='';let ss=scale();
- suiteZones().forEach(o=>{
+ let layer=$('suiteLayer');layer.innerHTML='';let ss=scale(),legend=[];
+ $('houseLegend').hidden=rid!=='house';
+ suiteZones().forEach((o,i)=>{
    if(rid==='house'){
     const roomId={hzEnsuite:'ensuite',hzLaundry:'laundry',hzSmall2:'smallroom2',hzSmall1:'smallroom1',hzCommonBath:'commonbath',hzEntry:'entry'}[o.id];
     if(roomId){const g=geomForRoom(roomId);o={...o,w:g.w,h:g.h,note:`${g.w.toLocaleString()} × ${g.h.toLocaleString()} mm`}}
@@ -1263,7 +1249,12 @@ function renderSuite(){
    e.className='suiteZone';
    e.style.cssText=`left:${o.x*ss}px;top:${o.y*ss}px;width:${o.w*ss}px;height:${o.h*ss}px`;
    if(rid==='house'&&o.poly){let cp=houseZoneClip(o.id);if(cp)e.style.clipPath=cp;}
-   if(o.hideText){
+   if(rid==='house'){
+     const marker=String(i+1).padStart(2,'0');
+     e.innerHTML=`<span class="houseMarker">${marker}</span>`;
+     e.title=`${o.name} · ${o.note||''}`;
+     legend.push({marker,name:o.name,note:o.note||'',kind:'room'});
+   }else if(o.hideText){
      e.style.background='transparent';
      e.style.border='1px dashed #c9c4b8';
      e.innerHTML='';
@@ -1329,7 +1320,9 @@ function renderSuite(){
    e.title=`${o.name} · ${o.w.toLocaleString()} mm`;
    layer.appendChild(e);
   });
-  let savedCount=renderHouseSavedItems(layer,ss);
+  [...fixedObstacles(),...edgeFixtures()].forEach((o,i)=>legend.push({marker:'G'+(i+1),name:o.name,note:o.note||'',kind:'fixed'}));
+  let savedCount=renderHouseSavedItems(layer,ss,legend);
+  $('houseLegendList').innerHTML=legend.map(o=>`<div class="houseLegendEntry"><span class="legendMarker ${o.kind}">${o.marker}</span><div><b>${escapeHtml(o.name)}</b><small>${escapeHtml(o.note)}</small></div></div>`).join('');
   let src=$('roomSource');
   if(src){
     src.textContent=`전체 집은 위치 참고도 · 방별 연결 좌표와 외곽 미확정 · 저장 가구 ${savedCount}개 표시 · 실제 간격은 방별 도면에서 확인`;
@@ -1338,8 +1331,8 @@ function renderSuite(){
 }
 function renderFixed(){
  let layer=$('fixedLayer');layer.innerHTML='';let edge=$('edgeLayer');edge.innerHTML='';let ss=scale();
- fixedObstacles().forEach(o=>{let e=document.createElement('div');e.className='fixedObs';e.style.left=o.x*ss+'px';e.style.top=o.y*ss+'px';e.style.width=o.w*ss+'px';e.style.height=o.h*ss+'px';e.innerHTML=`${o.name}<small>${o.note||''}</small>`;layer.appendChild(e)});
- edgeFixtures().forEach(o=>{let e=document.createElement('div');e.className='edgeFixture';e.style.left=o.x*ss+'px';e.style.top=o.y*ss+'px';e.style.width=o.w*ss+'px';e.style.height=o.h*ss+'px';e.innerHTML=`${o.name}<small>${o.note||''}</small>`;edge.appendChild(e)});
+ fixedObstacles().forEach((o,i)=>{let e=document.createElement('div');e.className='fixedObs';e.style.left=o.x*ss+'px';e.style.top=o.y*ss+'px';e.style.width=o.w*ss+'px';e.style.height=o.h*ss+'px';if(rid==='house'){e.textContent='G'+(i+1);e.title=o.name+' · '+(o.note||'')}else e.innerHTML=`${o.name}<small>${o.note||''}</small>`;layer.appendChild(e)});
+ edgeFixtures().forEach((o,i)=>{let e=document.createElement('div');e.className='edgeFixture';e.style.left=o.x*ss+'px';e.style.top=o.y*ss+'px';e.style.width=o.w*ss+'px';e.style.height=o.h*ss+'px';if(rid==='house'){e.textContent='G'+(fixedObstacles().length+i+1);e.title=o.name+' · '+(o.note||'')}else e.innerHTML=`${o.name}<small>${o.note||''}</small>`;edge.appendChild(e)});
  renderSuite();
 }
 function fixedHit(a){return fixedObstacles().some(o=>overlap(a,{x:o.x,y:o.y,w:o.w,h:o.h}))}
@@ -1522,6 +1515,7 @@ function applyUnifiedMeasure(){
 }
 
 function drawGeom(){
+ document.body.dataset.room=rid;
  let g=geom(),stage=document.querySelector('.stage'),shell=document.querySelector('.roomShell');
  room.style.aspectRatio=g.w+'/'+g.h;room.style.width=(540*zoom)+'px';
  if(stage)stage.style.justifyContent='flex-start';
@@ -1591,6 +1585,10 @@ function updateAll(persist=true){
  status();if(persist&&!suppressSave&&saveLocal()){window.scheduleCloudSave(rid)}
 }
 function status(){
+ const hasSelection=rid!=='house'&&selected&&selected.isConnected;
+ ['rot','dup','del','mvLeft','mvRight','mvUp','mvDown'].forEach(id=>$(id).disabled=!hasSelection);
+ $('selectionName').textContent=rid==='house'?'가구 편집은 각 방에서':hasSelection?selected.dataset.n:'가구를 선택하세요';
+ $('selectionName').title=$('selectionName').textContent;
  if(!selected||!selected.isConnected){selected=null;$('status').textContent='가구를 선택하세요.';return}
  let a=rect(selected),g=geom(),clearance=TTOBOK_GEOMETRY.wallClearances(a,g),n=validName(selected.dataset.n)||LEGACY_NAMES[`${+selected.dataset.w}x${+selected.dataset.d}`]||'이름 없는 기존 가구';
  if(n!==selected.dataset.n){selected.dataset.n=n;selected.textContent=n}
@@ -1606,7 +1604,7 @@ function setDiagramFont(v){
 function setZoom(v){zoom=Math.max(.45,Math.min(4,v));localStorage.setItem('ttobok_zoom_v37',zoom);drawGeom()}
 function fitZoom(){
  let stage=document.querySelector('.stage');
- let reserve=(window.innerWidth>760&&window.innerWidth<=1600)?520:220;
+ let reserve=rid==='house'?140:(window.innerWidth>760&&window.innerWidth<=1600)?520:220;
  let avail=Math.max(260,stage.clientWidth-reserve);
  setZoom(Math.min(1.25,avail/540));
 }

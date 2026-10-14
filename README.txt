@@ -1,10 +1,15 @@
-또복이 Family Room Planner V3.63
+또복이 Family Room Planner V3.64
 
 실행: https://max-parks.github.io/Park-s-Fam/
 기존 GitHub Pages 앱과 park-s-home Firebase 프로젝트를 사용합니다.
 설치 APK는 이 웹 주소를 여는 기존 앱입니다. APK 서명이나 패키지는 변경하지 않았습니다.
 
-이번 수정
+이번 수정 (V3.64)
+- 전체 도면의 방 이름·치수·가구 설명을 도면 밖 번호별 목록으로 옮겼습니다.
+- 휴대폰 일반/전체화면에서 90° 회전 버튼이 항상 보이도록 편집 도구를 분리했습니다.
+- 선택 가구 이름과 편집 가능 상태를 표시합니다.
+
+이전 수정 (V3.63)
 - 화면 확대/다시 그리기가 저장 시각을 바꾸지 않습니다.
 - 방별 저장 대기열, 버전 충돌 확인, 방 이동의 묶음 저장을 적용했습니다.
 - 다른 기기에서 비운 방을 이전 가구로 되살리던 문제를 수정했습니다.
@@ -27,7 +32,8 @@ Node.js 22 이상에서 npm test
                  npx playwright install chromium
                  npm run test:browser
 GitHub Actions verify-planner.yml에 회귀 테스트와 PC/모바일 Chromium 확인 절차를 준비했습니다.
-로컬 회귀 테스트 43개 통과. 실제 브라우저 검증과 배포 결과는 docs/review-v3.63.md에 기록합니다.
+로컬 회귀 테스트 45개 통과. V3.64는 PC·태블릿·휴대폰 두 크기에서 버튼 노출과 회전을 검사합니다.
+최종 CI·병합 결과는 GitHub Pull requests 및 Actions에서 확인합니다.
 브라우저 테스트는 Firebase 네트워크 요청을 차단하고 임시 브라우저 데이터를 사용합니다.
 
 Firebase
