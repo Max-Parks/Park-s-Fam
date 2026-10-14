@@ -52,11 +52,9 @@ test('custom names remain text in selection details and whole-house overlays', (
   app.run('select(chosen)');
   assert.ok(!/<img\b/i.test(app.node('status').innerHTML), 'selection details must not insert the name as HTML');
   assert.match(app.node('status').innerHTML, /&lt;img\b/, 'selection details must still display the supplied name');
-  const layer = new FixtureElement();
-  app.context.auditLayer = layer;
-  app.run('renderHouseSavedItems(auditLayer, 1)');
-  assert.ok(!/<img\b/i.test(layer.innerHTML), 'whole-house labels must not insert the name as HTML');
-  assert.match(layer.innerHTML, /&lt;img\b/, 'whole-house labels must still display the supplied name');
+  app.run("switchRoom('house')");app.flushFrames();
+  assert.ok(!/<img\b/i.test(app.node('houseLegendList').innerHTML), 'whole-house legend must not insert the name as HTML');
+  assert.match(app.node('houseLegendList').innerHTML, /&lt;img\b/, 'external legend must still display the supplied name');
 });
 
 test('the custom furniture form rejects negative sizes', () => {
