@@ -1,4 +1,4 @@
-const CACHE='ttobok-v364-app-1';
+const CACHE='ttobok-v364-app-2';
 const APP_SHELL=[
   './',
   './index.html',

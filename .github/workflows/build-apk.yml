@@ -46,6 +46,7 @@ jobs:
           rm -rf android-apk
           mkdir -p android-apk/app/src/main/res/values
           mkdir -p android-apk/app/src/main/res/drawable
+          mkdir -p android-apk/app/src/main/java/com/maxparks/ttobokhome
 
           cat > android-apk/gradle.properties <<'EOF'
           android.useAndroidX=true
@@ -90,8 +91,8 @@ jobs:
                   applicationId 'com.maxparks.ttobokhome'
                   minSdk 23
                   targetSdk 35
-                  versionCode 1
-                  versionName '1.0.0'
+                  versionCode 364
+                  versionName '3.64'
               }
           
               signingConfigs {
@@ -117,7 +118,7 @@ jobs:
           }
           
           dependencies {
-              implementation 'com.google.androidbrowserhelper:androidbrowserhelper:2.7.3'
+              implementation 'androidx.browser:browser:1.10.0'
           }
           EOF
 
@@ -130,36 +131,25 @@ jobs:
                   android:icon="@drawable/app_icon"
                   android:label="@string/app_name"
                   android:supportsRtl="true"
-                  android:theme="@android:style/Theme.Translucent.NoTitleBar"
+                  android:theme="@android:style/Theme.Material.Light.NoActionBar"
                   android:usesCleartextTraffic="false">
           
-                  <meta-data
-                      android:name="asset_statements"
-                      android:resource="@string/asset_statements" />
-          
                   <activity
+                      android:name=".MainActivity"
+                      android:exported="false"
+                      android:label="@string/app_name" />
+                  <!-- Preserve existing home-screen shortcuts when updating the old APK. -->
+                  <activity-alias
                       android:name="com.google.androidbrowserhelper.trusted.LauncherActivity"
+                      android:targetActivity=".MainActivity"
                       android:exported="true"
                       android:label="@string/app_name">
-          
-                      <meta-data
-                          android:name="android.support.customtabs.trusted.DEFAULT_URL"
-                          android:value="@string/launch_url" />
-                      <meta-data
-                          android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
-                          android:value="customtabs" />
-                      <meta-data
-                          android:name="android.support.customtabs.trusted.DISPLAY_MODE"
-                          android:value="standalone" />
-                      <meta-data
-                          android:name="android.support.customtabs.trusted.SCREEN_ORIENTATION"
-                          android:value="any" />
           
                       <intent-filter>
                           <action android:name="android.intent.action.MAIN" />
                           <category android:name="android.intent.category.LAUNCHER" />
                       </intent-filter>
-                  </activity>
+                  </activity-alias>
               </application>
           </manifest>
           EOF
@@ -167,9 +157,118 @@ jobs:
           cat > android-apk/app/src/main/res/values/strings.xml <<'EOF'
           <resources>
               <string name="app_name">또복이 집도면</string>
-              <string name="launch_url">https://max-parks.github.io/Park-s-Fam/</string>
-              <string name="asset_statements">[{&quot;relation&quot;:[&quot;delegate_permission/common.handle_all_urls&quot;],&quot;target&quot;:{&quot;namespace&quot;:&quot;web&quot;,&quot;site&quot;:&quot;https://max-parks.github.io&quot;}}]</string>
+              <string name="launch_url" translatable="false">https://max-parks.github.io/Park-s-Fam/</string>
+              <string name="launch_hint">기본 브라우저로 집도면을 엽니다. 같은 브라우저의 로그인과 저장된 배치를 사용합니다.</string>
+              <string name="launch_opening">집도면을 여는 중입니다.</string>
+              <string name="launch_returned">도면이 보이지 않으면 다시 열거나 브라우저로 열어주세요.</string>
+              <string name="launch_failed">브라우저를 열지 못했습니다. 삼성 인터넷 등 사용 가능한 브라우저를 확인한 뒤 다시 시도해주세요.</string>
+              <string name="launch_retry">다시 열기</string>
+              <string name="launch_browser">브라우저로 열기</string>
           </resources>
+          EOF
+
+          cat > android-apk/app/src/main/java/com/maxparks/ttobokhome/MainActivity.java <<'EOF'
+          package com.maxparks.ttobokhome;
+
+          import android.app.Activity;
+          import android.content.Intent;
+          import android.net.Uri;
+          import android.os.Bundle;
+          import android.util.Log;
+          import android.view.View;
+          import android.widget.Button;
+          import android.widget.LinearLayout;
+          import android.widget.ScrollView;
+          import android.widget.TextView;
+          import androidx.browser.customtabs.CustomTabsIntent;
+
+          public final class MainActivity extends Activity {
+              private static final String TAG = "TtobokLauncher";
+              private static final String STATUS_KEY = "launch_status";
+              private TextView status;
+
+              @Override
+              protected void onCreate(Bundle savedInstanceState) {
+                  super.onCreate(savedInstanceState);
+                  ScrollView scroll = new ScrollView(this);
+                  scroll.setFillViewport(true);
+                  scroll.setOnApplyWindowInsetsListener((view, insets) -> {
+                      view.setPadding(insets.getSystemWindowInsetLeft(),
+                              insets.getSystemWindowInsetTop(),
+                              insets.getSystemWindowInsetRight(),
+                              insets.getSystemWindowInsetBottom());
+                      return insets;
+                  });
+                  LinearLayout content = new LinearLayout(this);
+                  content.setOrientation(LinearLayout.VERTICAL);
+                  int padding = Math.round(24 * getResources().getDisplayMetrics().density);
+                  content.setPadding(padding, padding, padding, padding);
+                  scroll.addView(content);
+
+                  TextView title = new TextView(this);
+                  title.setText(R.string.app_name);
+                  title.setTextSize(24);
+                  content.addView(title);
+                  TextView hint = new TextView(this);
+                  hint.setText(R.string.launch_hint);
+                  hint.setTextSize(16);
+                  hint.setPadding(0, padding, 0, padding);
+                  content.addView(hint);
+                  status = new TextView(this);
+                  status.setTextSize(16);
+                  status.setAccessibilityLiveRegion(View.ACCESSIBILITY_LIVE_REGION_POLITE);
+                  status.setText(savedInstanceState == null
+                          ? getString(R.string.launch_returned)
+                          : savedInstanceState.getString(STATUS_KEY,
+                                  getString(R.string.launch_returned)));
+                  content.addView(status);
+                  Button retry = new Button(this);
+                  retry.setText(R.string.launch_retry);
+                  retry.setOnClickListener(view -> openPlanner(false));
+                  content.addView(retry);
+                  Button browser = new Button(this);
+                  browser.setText(R.string.launch_browser);
+                  browser.setOnClickListener(view -> openPlanner(true));
+                  content.addView(browser);
+                  setContentView(scroll);
+                  // Restore/rotation and returning from a browser never auto-launch again.
+                  if (savedInstanceState == null) openPlanner(false);
+              }
+
+              private void openPlanner(boolean fullBrowser) {
+                  Uri url = Uri.parse(getString(R.string.launch_url));
+                  status.setText(R.string.launch_opening);
+                  if (!fullBrowser) {
+                      try {
+                          // An implicit intent respects the default browser, including Samsung
+                          // Internet. Do not bind to or prefer a separate Chrome/TWA provider.
+                          new CustomTabsIntent.Builder().setShowTitle(true).build()
+                                  .launchUrl(this, url);
+                          status.setText(R.string.launch_returned);
+                          return;
+                      } catch (RuntimeException error) {
+                          Log.w(TAG, "Custom Tab failed; trying ordinary browser", error);
+                      }
+                  }
+                  try {
+                      Intent intent = new Intent(Intent.ACTION_VIEW, url);
+                      intent.addCategory(Intent.CATEGORY_BROWSABLE);
+                      startActivity(intent);
+                      status.setText(R.string.launch_returned);
+                  } catch (RuntimeException error) {
+                      Log.e(TAG, "Browser launch failed", error);
+                      status.setText(R.string.launch_failed);
+                  }
+                  // Keep this visible recovery screen behind the browser. Never silently finish
+                  // or retry from onResume if a provider closes or cannot handle the intent.
+              }
+
+              @Override
+              protected void onSaveInstanceState(Bundle state) {
+                  state.putString(STATUS_KEY, status.getText().toString());
+                  super.onSaveInstanceState(state);
+              }
+          }
           EOF
 
           echo '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' | base64 --decode > android-apk/app/src/main/res/drawable/app_icon.png
@@ -191,6 +290,31 @@ jobs:
 
       - name: Build signed release APK
         run: gradle -p android-apk :app:assembleRelease --no-daemon
+
+      - name: Enable emulator acceleration
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      - name: Verify APK browser launch and no-browser recovery
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
+          script: python3 scripts/diagnose_apk.py --apk android-apk/app/build/outputs/apk/release/app-release.apk --output apk-diagnostics --require-recovery
+
+      - name: Upload APK launch diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ttobok-apk-launch-diagnostics
+          path: apk-diagnostics/
+          if-no-files-found: ignore
 
       - name: Prepare APK
         run: |
