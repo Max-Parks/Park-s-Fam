@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=5,user-scalable=yes,viewport-fit=cover">
 <title>또복이 Family Room Planner V3.64</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#6d7d66">
@@ -173,6 +173,79 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
  body.mobile-focus .houseLegend{position:relative;z-index:1000}
 }
 
+/* Keep the drawing and its controls in view while the catalog scrolls. */
+body{height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden}
+header{flex:none;padding-top:max(8px,env(safe-area-inset-top,0px))}
+.app{flex:1;min-height:0;overflow:hidden}
+aside{min-height:0;overscroll-behavior:contain}
+.plannerMain{display:flex;flex-direction:column;min-height:0;overflow:hidden}
+.stage{flex:1;min-height:0;overscroll-behavior:contain}
+.toolbar{position:static;flex:none}
+.plannerHelp{flex:none;max-height:58px;overflow:auto;padding:0 10px 8px;line-height:1.5}
+.mobilePanelBar{display:none}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,.furn:focus-visible{outline:3px solid #385b31;outline-offset:3px}
+input[readonly]{background:#f1f1ed;color:#64685f}
+@media(min-width:761px) and (max-width:1280px){
+ .app{grid-template-columns:280px minmax(0,1fr)}
+ .roomShell{padding:80px 62px}
+}
+@media(pointer:coarse){
+ button{min-height:44px}
+ input,select{min-height:44px;font-size:16px}
+ .mobileMoveControls{display:flex;align-items:center;justify-content:center;gap:5px;width:100%}
+ .mobileMoveControls button{min-width:44px;min-height:44px;font-size:20px}
+}
+@media(max-width:760px){
+ body{--panel-height:52px}
+ body.panel-open{--panel-height:225px}
+ header{padding-left:max(10px,env(safe-area-inset-left,0px));padding-right:10px}
+ h1{padding-right:106px;font-size:14px;min-height:34px}
+ .sync{gap:4px;font-size:11px}
+ .sync button{min-height:36px;padding:5px 8px}
+ .mobileViewBtn{top:max(8px,env(safe-area-inset-top,0px));font-size:12px;min-height:40px}
+ .plannerMain{height:100%;padding-bottom:calc(var(--panel-height) + env(safe-area-inset-bottom,0px))}
+ .stage{padding:6px 0}
+ .roomShell{padding:76px 62px 75px}
+ aside{height:calc(var(--panel-height) + env(safe-area-inset-bottom,0px));padding:0 8px calc(4px + env(safe-area-inset-bottom,0px))}
+ .mobilePanelBar{display:flex;position:sticky;top:0;z-index:2;background:white;padding:4px 0}
+ #mobilePanel{width:100%;min-height:44px;text-align:left;font-size:14px;font-weight:700}
+ body:not(.panel-open) aside .card{display:none}
+ .toolbar{position:static;margin:4px 6px 6px;box-shadow:none}
+ .plannerHelp{display:none}
+ body.mobile-focus .plannerMain{padding:0}
+ body.mobile-focus .stage{padding:54px 0 185px}
+ body.mobile-focus .roomShell{padding:70px 62px 60px}
+ body.mobile-focus .toolbar{position:fixed;margin:0}
+}
+/* A phone turned sideways has room for a side panel, not two bottom panels. */
+@media(min-width:600px) and (max-width:1100px) and (max-height:500px){
+ header{padding:6px 10px}
+ h1{font-size:14px;min-height:0;padding-right:112px;margin-bottom:2px}
+ .sync{gap:4px;margin-top:3px}
+ .sync button{min-height:30px;padding:4px 7px}
+ .app{display:grid;grid-template-columns:280px minmax(0,1fr)}
+ aside{position:static;height:auto;border-right:1px solid var(--line);padding:8px;overflow:auto}
+ .mobilePanelBar{display:none}
+ body:not(.panel-open) aside .card{display:block}
+ .plannerMain{height:auto;padding:0}
+ .stage{padding:6px 0}
+ .roomShell{padding:65px 62px}
+ .mobileViewBtn{display:block;font-size:12px;min-height:38px}
+ .toolbar{position:static;display:grid;grid-template-columns:minmax(0,1fr) 206px;gap:4px;margin:4px 6px 6px;padding:6px}
+ .editControls{grid-column:1/-1}
+ .viewControls{grid-column:1;gap:4px}
+ .mobileMoveControls{display:flex;width:auto;grid-column:2;border:0;padding:0;margin:0;gap:2px;flex-wrap:nowrap}
+ .mobileMoveControls>span{display:none}
+ .mobileMoveControls select{min-width:64px;width:64px;padding:4px;font-size:12px}
+ .mobileMoveControls button{min-width:32px;min-height:40px;padding:3px;font-size:18px}
+ .plannerHelp{display:none}
+ body.mobile-focus header,body.mobile-focus aside{display:none}
+ body.mobile-focus .app{display:block}
+ body.mobile-focus .stage{position:fixed;inset:0;z-index:1000;background:var(--bg);display:block;padding:54px 0 125px;overflow:auto}
+ body.mobile-focus .toolbar{position:fixed;z-index:1001;left:6px;right:6px;bottom:calc(6px + env(safe-area-inset-bottom,0px));margin:0}
+ body.mobile-focus .mobileViewBtn{z-index:1002}
+}
+body.mobile-focus .mobileViewBtn{top:max(8px,env(safe-area-inset-top,0px));right:max(8px,env(safe-area-inset-right,0px))}
 </style>
 </head>
 <body data-diagram-font="large">
@@ -181,13 +254,14 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 <div id="summary" class="sub"></div>
 <div class="sync"><span id="dot" class="dot"></span><span id="syncText">가족 전용 · 로그인 필요</span><button id="login">Google 로그인</button><button id="family">가족: parks-family</button><button id="syncPull" title="가족 공동 저장소의 배치를 이 기기로 다시 불러옵니다">↻ 공동 배치 불러오기</button><button id="installApp" class="installBtn" type="button">📲 Android APK 설치</button></div>
 </header>
-<button id="mobileView" class="mobileViewBtn" type="button">📱 도면 크게</button>
+<button id="mobileView" class="mobileViewBtn" type="button" aria-pressed="false">📱 도면 크게</button>
 
 <div class="app">
 <aside>
+<div class="mobilePanelBar"><button id="mobilePanel" type="button" aria-expanded="false">☰ 방 선택 · 가구 · 저장 열기</button></div>
 <div class="card">
 <h2>방 선택 · 도면 편집</h2><div id="roomSource" class="small" style="margin-bottom:6px"></div>
-<select id="roomSel">
+<select id="roomSel" aria-label="방 선택">
 <option value="house">집 · 전체 도면</option>
 <option value="smallroom2">작은방 2 · 아기방</option>
 <option value="smallroom1">작은방 1</option>
@@ -198,11 +272,11 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 <option value="ensuite">부부욕실</option>
 <option value="entry">현관</option>
 </select>
-<div class="row" style="margin-top:7px">가로 <input id="rw" type="number"> 세로 <input id="rh" type="number"><button id="applyRoom">적용</button></div>
+<div class="row" style="margin-top:7px">가로 <input id="rw" type="number" aria-label="방 가로 (mm)"> 세로 <input id="rh" type="number" aria-label="방 세로 (mm)"><button id="applyRoom">적용</button></div>
 <details style="margin-top:8px"><summary>✏️ 문·창 치수 편집</summary>
 <div class="small">현재는 상단 문 / 하단 창 기준(mm)</div>
-<div class="row">문 시작 <input id="dp" type="number"> 폭 <input id="dw" type="number"></div>
-<div class="row" style="margin-top:5px">창 시작 <input id="wp" type="number"> 폭 <input id="ww" type="number"><button id="applyOpen">적용</button></div>
+<div class="row">문 시작 <input id="dp" type="number" aria-label="문 시작 위치 (mm)"> 폭 <input id="dw" type="number" aria-label="문 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">창 시작 <input id="wp" type="number" aria-label="창 시작 위치 (mm)"> 폭 <input id="ww" type="number" aria-label="창 폭 (mm)"><button id="applyOpen">적용</button></div>
 </details>
 
 <details id="measureEditor" style="margin-top:8px">
@@ -211,52 +285,52 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 
 <div id="small1MeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>작은방1 · 전체 / 문 / 하단 개구</b></div>
-<div class="row" style="margin-top:5px">내부 폭 <input id="s1W" type="number"> 내부 깊이 <input id="s1H" type="number"></div>
-<div class="row" style="margin-top:5px">문 시작 <input id="s1DoorX" type="number"> 문 폭 <input id="s1DoorW" type="number"></div>
-<div class="row" style="margin-top:5px">하단 개구 시작 <input id="s1OpenX" type="number"> 폭 <input id="s1OpenW" type="number"></div>
+<div class="row" style="margin-top:5px">내부 폭 <input id="s1W" type="number" aria-label="작은방 1 내부 폭 (mm)"> 내부 깊이 <input id="s1H" type="number" aria-label="작은방 1 내부 깊이 (mm)"></div>
+<div class="row" style="margin-top:5px">문 시작 <input id="s1DoorX" type="number" aria-label="작은방 1 문 시작 위치 (mm)"> 문 폭 <input id="s1DoorW" type="number" aria-label="작은방 1 문 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">하단 개구 시작 <input id="s1OpenX" type="number" aria-label="작은방 1 하단 개구 시작 위치 (mm)"> 폭 <input id="s1OpenW" type="number" aria-label="작은방 1 하단 개구 폭 (mm)"></div>
 <div class="shapeHint"><b>상단 붙박이장</b></div>
-<div class="row" style="margin-top:5px">시작 X <input id="s1ClosetX" type="number"> 폭 <input id="s1ClosetW" type="number"></div>
-<div class="row" style="margin-top:5px">깊이 <input id="s1ClosetD" type="number"></div>
+<div class="row" style="margin-top:5px">시작 X <input id="s1ClosetX" type="number" aria-label="작은방 1 붙박이장 시작 X (mm)"> 폭 <input id="s1ClosetW" type="number" aria-label="작은방 1 붙박이장 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">깊이 <input id="s1ClosetD" type="number" aria-label="작은방 1 붙박이장 깊이 (mm)"></div>
 <div id="s1Info" class="small" style="margin-top:4px"></div>
 </div>
 
 <div id="small2MeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>작은방2 · 전체 / 문 / 하단 개구</b></div>
-<div class="row" style="margin-top:5px">내부 폭 <input id="s2W" type="number"> 내부 깊이 <input id="s2H" type="number"></div>
-<div class="row" style="margin-top:5px">문 시작 <input id="s2DoorX" type="number" value="0" readonly> 문틀 포함 폭 <input id="s2DoorW" type="number" value="930" readonly></div>
-<div class="row" style="margin-top:5px">좌 문틀 <input id="s2DoorFrameL" type="number" value="65" readonly> 문짝 <input id="s2DoorLeafW" type="number" value="800" readonly> 우 문틀 <input id="s2DoorFrameR" type="number" value="65" readonly></div>
+<div class="row" style="margin-top:5px">내부 폭 <input id="s2W" type="number" aria-label="작은방 2 내부 폭 (mm)"> 내부 깊이 <input id="s2H" type="number" aria-label="작은방 2 내부 깊이 (mm)"></div>
+<div class="row" style="margin-top:5px">문 시작 <input id="s2DoorX" type="number" value="0" readonly aria-label="작은방 2 문 시작 위치 (mm)"> 문틀 포함 폭 <input id="s2DoorW" type="number" value="930" readonly aria-label="작은방 2 문틀 포함 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">좌 문틀 <input id="s2DoorFrameL" type="number" value="65" readonly aria-label="작은방 2 왼쪽 문틀 폭 (mm)"> 문짝 <input id="s2DoorLeafW" type="number" value="800" readonly aria-label="작은방 2 문짝 폭 (mm)"> 우 문틀 <input id="s2DoorFrameR" type="number" value="65" readonly aria-label="작은방 2 오른쪽 문틀 폭 (mm)"></div>
 <div class="small" style="margin-top:4px">실측 확정: 65 + 800 + 65 = 930 mm · 상단 좌측</div>
-<div class="row" style="margin-top:5px">하단 개구 시작 <input id="s2OpenX" type="number"> 폭 <input id="s2OpenW" type="number"></div>
+<div class="row" style="margin-top:5px">하단 개구 시작 <input id="s2OpenX" type="number" aria-label="작은방 2 하단 개구 시작 위치 (mm)"> 폭 <input id="s2OpenW" type="number" aria-label="작은방 2 하단 개구 폭 (mm)"></div>
 <div class="shapeHint"><b>우측 상/하단 꺾임</b></div>
-<div class="row" style="margin-top:5px">우상단 가로 <input id="s2TrW" type="number"> 깊이 <input id="s2TrD" type="number"></div>
-<div class="row" style="margin-top:5px">우하단 가로 <input id="s2BrW" type="number"> 깊이 <input id="s2BrD" type="number"></div>
+<div class="row" style="margin-top:5px">우상단 가로 <input id="s2TrW" type="number" aria-label="작은방 2 우상단 꺾임 가로 (mm)"> 깊이 <input id="s2TrD" type="number" aria-label="작은방 2 우상단 꺾임 깊이 (mm)"></div>
+<div class="row" style="margin-top:5px">우하단 가로 <input id="s2BrW" type="number" aria-label="작은방 2 우하단 꺾임 가로 (mm)"> 깊이 <input id="s2BrD" type="number" aria-label="작은방 2 우하단 꺾임 깊이 (mm)"></div>
 <div id="s2Info" class="small" style="margin-top:4px"></div>
 </div>
 
 <div id="masterMeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>안방 · 전체 / 세로 구역</b></div>
-<div class="row" style="margin-top:5px">전체 폭 <input id="msW" type="number"> 상부 깊이 <input id="msTopH" type="number"></div>
-<div class="row" style="margin-top:5px">안방 깊이 <input id="msBedH" type="number"> 베란다 깊이 <input id="msBalH" type="number"></div>
+<div class="row" style="margin-top:5px">전체 폭 <input id="msW" type="number" aria-label="안방 전체 폭 (mm)"> 상부 깊이 <input id="msTopH" type="number" aria-label="안방 상부 깊이 (mm)"></div>
+<div class="row" style="margin-top:5px">안방 깊이 <input id="msBedH" type="number" aria-label="안방 침실 깊이 (mm)"> 베란다 깊이 <input id="msBalH" type="number" aria-label="안방 베란다 깊이 (mm)"></div>
 <div class="shapeHint"><b>드레스룸 / 파우더룸 / 화장대</b></div>
-<div class="row" style="margin-top:5px">드레스룸 폭 <input id="msDressW" type="number"> 화장대 폭 <input id="msVanityW" type="number"></div>
+<div class="row" style="margin-top:5px">드레스룸 폭 <input id="msDressW" type="number" aria-label="안방 드레스룸 폭 (mm)"> 화장대 폭 <input id="msVanityW" type="number" aria-label="안방 화장대 폭 (mm)"></div>
 <div id="msPowderInfo" class="small" style="margin-top:4px"></div>
 <div class="shapeHint"><b>문 없는 통로 / 안방 출입문</b></div>
-<div class="row" style="margin-top:5px">통로 시작 <input id="msPassX" type="number"> 폭 <input id="msPassW" type="number"></div>
-<div class="row" style="margin-top:5px">출입문 시작 <input id="msDoorX" type="number"> 개구 폭 <input id="msDoorW" type="number"></div>
+<div class="row" style="margin-top:5px">통로 시작 <input id="msPassX" type="number" aria-label="안방 통로 시작 위치 (mm)"> 폭 <input id="msPassW" type="number" aria-label="안방 통로 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">출입문 시작 <input id="msDoorX" type="number" aria-label="안방 출입문 시작 위치 (mm)"> 개구 폭 <input id="msDoorW" type="number" aria-label="안방 출입문 개구 폭 (mm)"></div>
 <div id="msOverlapInfo" class="small" style="margin-top:4px"></div>
 <div class="shapeHint"><b>붙박이장 / 베란다</b></div>
-<div class="row" style="margin-top:5px">붙박이장 깊이 <input id="msClosetW" type="number"> 길이 <input id="msClosetH" type="number"></div>
-<div class="row" style="margin-top:5px">베란다 개구 시작 <input id="msBalX" type="number"> 폭 <input id="msBalW" type="number"></div>
+<div class="row" style="margin-top:5px">붙박이장 깊이 <input id="msClosetW" type="number" aria-label="안방 붙박이장 깊이 (mm)"> 길이 <input id="msClosetH" type="number" aria-label="안방 붙박이장 길이 (mm)"></div>
+<div class="row" style="margin-top:5px">베란다 개구 시작 <input id="msBalX" type="number" aria-label="안방 베란다 개구 시작 위치 (mm)"> 폭 <input id="msBalW" type="number" aria-label="안방 베란다 개구 폭 (mm)"></div>
 </div>
 
 <div id="livingMeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>거실·주방·복도 · 파란 영역 기준 통합 도면</b></div>
-<div class="row" style="margin-top:5px">전체 폭 <input id="lvW" type="number"> 전체 깊이 <input id="lvH" type="number"></div>
+<div class="row" style="margin-top:5px">전체 폭 <input id="lvW" type="number" aria-label="거실 전체 폭 (mm)"> 전체 깊이 <input id="lvH" type="number" aria-label="거실 전체 깊이 (mm)"></div>
 <div class="shapeHint"><b>상부 주방 영역 꺾임</b></div>
-<div class="row" style="margin-top:5px">상단 폭 <input id="lvTopW" type="number"> 2단 폭 <input id="lvUpperW" type="number"></div>
-<div class="row" style="margin-top:5px">1단 깊이 <input id="lvStepY" type="number"> 복도 시작 Y <input id="lvCorrY" type="number"></div>
+<div class="row" style="margin-top:5px">상단 폭 <input id="lvTopW" type="number" aria-label="거실 상단 폭 (mm)"> 2단 폭 <input id="lvUpperW" type="number" aria-label="거실 2단 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">1단 깊이 <input id="lvStepY" type="number" aria-label="거실 1단 깊이 (mm)"> 복도 시작 Y <input id="lvCorrY" type="number" aria-label="거실 복도 시작 Y (mm)"></div>
 <div class="shapeHint"><b>복도 / 하부 거실 영역</b></div>
-<div class="row" style="margin-top:5px">복도 높이 <input id="lvCorrH" type="number"> 하부 거실 폭 <input id="lvLivingW" type="number"></div>
+<div class="row" style="margin-top:5px">복도 높이 <input id="lvCorrH" type="number" aria-label="거실 복도 높이 (mm)"> 하부 거실 폭 <input id="lvLivingW" type="number" aria-label="하부 거실 폭 (mm)"></div>
 <div id="lvInfo" class="small" style="margin-top:4px"></div>
 <div id="lvDimSummary" class="shapeHint" style="margin-top:7px"></div>
 <div class="small" style="margin-top:6px">※ 도면에 표시되는 수치는 현재 모델의 초기값입니다. 원도면에서 직접 확인된 값과 비율로 잡은 값이 섞여 있으므로 실제 실측 후 숫자만 수정하면 됩니다.</div>
@@ -265,13 +339,13 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 
 <div id="laundryMeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>세탁실 · 내측 공간</b></div>
-<div class="row" style="margin-top:5px">내부 폭 <input id="laW" type="number"> 내부 깊이 <input id="laH" type="number"></div>
+<div class="row" style="margin-top:5px">내부 폭 <input id="laW" type="number" aria-label="세탁실 내부 폭 (mm)"> 내부 깊이 <input id="laH" type="number" aria-label="세탁실 내부 깊이 (mm)"></div>
 <div class="shapeHint"><b>좌측 출입문</b></div>
-<div class="row" style="margin-top:5px">문 시작 Y <input id="laDoorY" type="number"> 문 폭 <input id="laDoorW" type="number"></div>
+<div class="row" style="margin-top:5px">문 시작 Y <input id="laDoorY" type="number" aria-label="세탁실 문 시작 Y (mm)"> 문 폭 <input id="laDoorW" type="number" aria-label="세탁실 문 폭 (mm)"></div>
 <div class="shapeHint"><b>상단 창호</b></div>
-<div class="row" style="margin-top:5px">창 시작 X <input id="laWinX" type="number"> 창 폭 <input id="laWinW" type="number"></div>
+<div class="row" style="margin-top:5px">창 시작 X <input id="laWinX" type="number" aria-label="세탁실 창 시작 X (mm)"> 창 폭 <input id="laWinW" type="number" aria-label="세탁실 창 폭 (mm)"></div>
 <div class="shapeHint"><b>좌하단 꺾임 구조</b></div>
-<div class="row" style="margin-top:5px">꺾임 가로 <input id="laNotchW" type="number"> 꺾임 깊이 <input id="laNotchD" type="number"></div>
+<div class="row" style="margin-top:5px">꺾임 가로 <input id="laNotchW" type="number" aria-label="세탁실 꺾임 가로 (mm)"> 꺾임 깊이 <input id="laNotchD" type="number" aria-label="세탁실 꺾임 깊이 (mm)"></div>
 <div id="laInfo" class="small" style="margin-top:4px"></div>
 <div class="small" style="margin-top:6px">문/창호/좌하단 꺾임 모두 실측값으로 수정할 수 있습니다. 좌하단 꺾임 560 × 290 mm는 현재 이미지 비율을 이용한 초기값입니다.</div>
 </div>
@@ -279,34 +353,35 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 
 <div id="commonBathMeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>공용욕실 · 내측 공간</b></div>
-<div class="row" style="margin-top:5px">내부 폭 <input id="cbW" type="number"> 내부 깊이 <input id="cbH" type="number"></div>
+<div class="row" style="margin-top:5px">내부 폭 <input id="cbW" type="number" aria-label="공용욕실 내부 폭 (mm)"> 내부 깊이 <input id="cbH" type="number" aria-label="공용욕실 내부 깊이 (mm)"></div>
 <div class="shapeHint"><b>하단 출입문</b></div>
-<div class="row" style="margin-top:5px">문 시작 X <input id="cbDoorX" type="number"> 문 폭 <input id="cbDoorW" type="number"></div>
+<div class="row" style="margin-top:5px">문 시작 X <input id="cbDoorX" type="number" aria-label="공용욕실 문 시작 X (mm)"> 문 폭 <input id="cbDoorW" type="number" aria-label="공용욕실 문 폭 (mm)"></div>
 <div id="cbInfo" class="small" style="margin-top:4px"></div>
 <div class="small" style="margin-top:6px">도면에서 내측 1,620 × 2,100 mm와 800 × 2,200 mm 출입문을 확인했습니다. 문은 하단 우측 힌지에서 욕실 안쪽으로 열리는 형태입니다. 위생기구는 아직 고정 배치하지 않습니다.</div>
 </div>
 
 <div id="ensuiteMeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>부부욕실 · 비정형 내측 공간</b></div>
-<div class="row" style="margin-top:5px">전체 폭 <input id="ebW" type="number"> 전체 깊이 <input id="ebH" type="number"></div>
+<div class="row" style="margin-top:5px">전체 폭 <input id="ebW" type="number" aria-label="부부욕실 전체 폭 (mm)"> 전체 깊이 <input id="ebH" type="number" aria-label="부부욕실 전체 깊이 (mm)"></div>
 <div class="shapeHint"><b>좌상단 사선</b></div>
-<div class="row" style="margin-top:5px">사선 가로 진행 <input id="ebSlantW" type="number"> 사선 세로 진행 <input id="ebSlantD" type="number"></div>
+<div class="row" style="margin-top:5px">사선 가로 진행 <input id="ebSlantW" type="number" aria-label="부부욕실 사선 가로 진행 (mm)"> 사선 세로 진행 <input id="ebSlantD" type="number" aria-label="부부욕실 사선 세로 진행 (mm)"></div>
 <div class="shapeHint"><b>하단 출입문</b></div>
-<div class="row" style="margin-top:5px">문 시작 X <input id="ebDoorX" type="number"> 문 폭 <input id="ebDoorW" type="number"></div>
-<div class="row" style="margin-top:5px">문 우측 벽 <input id="ebRightWall" type="number" readonly></div>
+<div class="row" style="margin-top:5px">문 시작 X <input id="ebDoorX" type="number" readonly aria-describedby="ebDoorXHint" aria-label="부부욕실 문 시작 X, 자동 계산 (mm)"> 문 폭 <input id="ebDoorW" type="number" aria-label="부부욕실 문 폭 (mm)"></div>
+<div id="ebDoorXHint" class="small">문 시작 X는 전체 폭 − 문 폭 − 우측 벽 820 mm로 자동 계산됩니다.</div>
+<div class="row" style="margin-top:5px">문 우측 벽 <input id="ebRightWall" type="number" readonly aria-label="부부욕실 문 우측 벽 (mm)"></div>
 <div id="ebInfo" class="small" style="margin-top:4px"></div>
 <div class="small" style="margin-top:6px">도면에서 폭 1,680 mm, 세로 2,300 mm, 출입문 800 × 2,200 mm, 문 우측 벽 820 mm를 기준으로 잡았습니다. 문 시작 60 mm는 1,680−800−820으로 계산했습니다. 좌상단 사선 630 × 860 mm는 도면 비율을 이용한 초기 추정값이라 실측 후 수정해주세요. 위생기구는 아직 고정 배치하지 않습니다.</div>
 </div>
 
 <div id="entryMeasurePanel" class="measurePanel">
 <div class="shapeHint"><b>현관 · 1차 내측 공간</b></div>
-<div class="row" style="margin-top:5px">유효부 폭 <input id="enClearW" type="number"> 우측 구간 <input id="enSideW" type="number"></div>
-<div class="row" style="margin-top:5px">전체 폭 <input id="enW" type="number" readonly> 전체 깊이 <input id="enH" type="number"></div>
+<div class="row" style="margin-top:5px">유효부 폭 <input id="enClearW" type="number" aria-label="현관 유효부 폭 (mm)"> 우측 구간 <input id="enSideW" type="number" aria-label="현관 우측 구간 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">전체 폭 <input id="enW" type="number" readonly aria-label="현관 전체 폭, 자동 계산 (mm)"> 전체 깊이 <input id="enH" type="number" aria-label="현관 전체 깊이 (mm)"></div>
 <div class="shapeHint"><b>현관문 / 실내 연결부</b></div>
-<div class="row" style="margin-top:5px">현관문 시작 X <input id="enDoorX" type="number"> 문 폭 <input id="enDoorW" type="number"></div>
-<div class="row" style="margin-top:5px">하단 연결 개구 시작 <input id="enOpenX" type="number"> 폭 <input id="enOpenW" type="number"></div>
+<div class="row" style="margin-top:5px">현관문 시작 X <input id="enDoorX" type="number" aria-label="현관문 시작 X (mm)"> 문 폭 <input id="enDoorW" type="number" aria-label="현관문 폭 (mm)"></div>
+<div class="row" style="margin-top:5px">하단 연결 개구 시작 <input id="enOpenX" type="number" aria-label="현관 하단 연결 개구 시작 위치 (mm)"> 폭 <input id="enOpenW" type="number" aria-label="현관 하단 연결 개구 폭 (mm)"></div>
 <div class="shapeHint"><b>하단 턱/바닥 구간</b></div>
-<div class="row" style="margin-top:5px">깊이 <input id="enThresholdD" type="number"></div>
+<div class="row" style="margin-top:5px">깊이 <input id="enThresholdD" type="number" aria-label="현관 하단 턱 깊이 (mm)"></div>
 <div id="enInfo" class="small" style="margin-top:4px"></div>
 <div class="small" style="margin-top:6px">원도면에서 1,300 mm + 510 mm 구간, 세로 1,590 mm, 하단 310 mm, 현관문 1,200 × 2,200 mm를 확인해 1차 모델로 적용했습니다. 전체 폭 1,810 mm는 1,300+510으로 계산한 값입니다. 하단 실내 연결 개구 1,300 mm와 현관문 열림 방향은 원도면 형상을 이용한 1차 해석이므로 실측/현장 확인 후 조정할 수 있습니다.</div>
 </div>
@@ -319,13 +394,13 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 <div id="shapeHint" class="shapeHint"></div>
 <details id="small2RecessEditor" style="margin-top:8px"><summary>↳ 작은방2 우측 꺾임 치수</summary>
 <div class="small" style="margin:5px 0">가구가 닿는 내측선 기준(mm)입니다.</div>
-<div class="row">우상단 가로 <input id="trw" type="number"> 깊이 <input id="trd" type="number"></div>
-<div class="row" style="margin-top:5px">우하단 가로 <input id="brw" type="number"> 깊이 <input id="brd" type="number"></div>
+<div class="row">우상단 가로 <input id="trw" type="number" aria-label="작은방 2 우상단 꺾임 가로 (mm)"> 깊이 <input id="trd" type="number" aria-label="작은방 2 우상단 꺾임 깊이 (mm)"></div>
+<div class="row" style="margin-top:5px">우하단 가로 <input id="brw" type="number" aria-label="작은방 2 우하단 꺾임 가로 (mm)"> 깊이 <input id="brd" type="number" aria-label="작은방 2 우하단 꺾임 깊이 (mm)"></div>
 <div class="row" style="margin-top:5px"><button id="applyRecess">꺾임 적용</button><span id="rightClearInfo" class="small"></span></div>
 </details>
 <details style="margin-top:8px"><summary>📐 고급 내측 벽선 좌표</summary>
 <div class="small">작은방2는 위 꺾임 입력을 사용하세요. 다른 방의 비정형 벽선용입니다.</div>
-<textarea id="polyText"></textarea>
+<textarea id="polyText" aria-label="내측 벽선 꼭짓점 좌표 X, Y (mm)"></textarea>
 <div class="row"><button id="applyPoly">좌표 적용</button><button id="rectPoly">직사각형으로</button></div>
 </details>
 <button id="reset" style="margin-top:7px">기본 도면값 복원</button>
@@ -340,14 +415,14 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 <div id="applianceCatalog"></div>
 <hr style="border:0;border-top:1px solid #eee">
 <div class="small">사용자 가구</div>
-<div class="row"><input id="nn" placeholder="가구명" style="width:110px"><input id="nw" type="number" placeholder="가로"><input id="nd" type="number" placeholder="깊이"><button id="addCustom">＋</button></div>
+<div class="row"><input id="nn" placeholder="가구명" style="width:110px" aria-label="사용자 가구 이름"><input id="nw" type="number" placeholder="가로" aria-label="사용자 가구 가로 (mm)"><input id="nd" type="number" placeholder="깊이" aria-label="사용자 가구 깊이 (mm)"><button id="addCustom" aria-label="사용자 가구 추가">＋</button></div>
 </div>
 
 <div class="card">
 <h2>선택 가구</h2><div id="status">가구를 선택하세요.</div>
 <div id="transferBox" style="margin-top:8px;border-top:1px solid #eee;padding-top:8px">
 <div class="small">다른 방으로 보내기</div>
-<div class="row" style="margin-top:5px"><select id="targetRoom"></select><button id="copyRoom">복사</button><button id="moveRoom">이동</button></div>
+<div class="row" style="margin-top:5px"><select id="targetRoom" aria-label="가구를 복사하거나 이동할 대상 방"></select><button id="copyRoom">복사</button><button id="moveRoom">이동</button></div>
 <div id="transferMsg" class="small" style="margin-top:4px"></div>
 </div>
 </div>
@@ -381,7 +456,7 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 </div>
 <div class="viewControls">
 <label class="small" style="display:flex;align-items:center;gap:5px">글자
-<select id="fontSizeSel" class="fontSizeSel">
+<select id="fontSizeSel" class="fontSizeSel" aria-label="도면 글자 크기">
 <option value="normal">보통</option>
 <option value="large">크게</option>
 <option value="xlarge">매우 크게</option>
@@ -392,11 +467,11 @@ body[data-room="house"] .fixedObs,body[data-room="house"] .edgeFixture,body[data
 </div>
 <div id="mobileMoveControls" class="mobileMoveControls">
   <span class="small"><b>선택 가구 미세이동</b></span>
-  <select id="moveStep" aria-label="가구 이동 간격"><option value="10">10mm</option><option value="50" selected>50mm</option><option value="100">100mm</option></select>
+  <select id="moveStep" aria-label="가구 이동 간격 (mm)"><option value="10">10mm</option><option value="50" selected>50mm</option><option value="100">100mm</option></select>
   <button id="mvLeft" title="왼쪽 이동">←</button><button id="mvUp" title="위 이동">↑</button><button id="mvDown" title="아래 이동">↓</button><button id="mvRight" title="오른쪽 이동">→</button>
 </div>
 </div>
-<div class="small" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다. 태블릿에서 왼쪽 치수가 안 보이면 「← 좌측 보기」를 누르면 바깥 치수 시작점으로 이동합니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 도면만 전체화면으로 볼 수 있습니다. 가구를 누른 뒤 하단의 「↻ 90° 회전」으로 방향을 바꾸세요. ← ↑ ↓ → 버튼으로 10/50/100 mm씩 이동할 수 있습니다.</div>
+<div class="small plannerHelp" style="text-align:center">가구·가전을 끌어 이동하세요. 빨간색은 벽체/붙박이장/문 열림영역/다른 항목 충돌입니다.<br>글자 크기는 보통/크게/매우 크게 중 선택할 수 있습니다. 치수 점선은 실제 공간 바깥쪽에 표시되며, 큰 도면은 200~400%로 확대해 확인할 수 있습니다. 태블릿에서 왼쪽 치수가 안 보이면 「← 좌측 보기」를 누르면 바깥 치수 시작점으로 이동합니다.<br><b>휴대폰:</b> 우측 상단의 「📱 도면 크게」를 누르면 도면만 전체화면으로 볼 수 있습니다. 가구를 누른 뒤 하단의 「↻ 90° 회전」으로 방향을 바꾸세요. ← ↑ ↓ → 버튼으로 10/50/100 mm씩 이동할 수 있습니다.</div>
 </main>
 </div>
 
@@ -1536,10 +1611,13 @@ function drawGeom(){
  drawShape(g);requestAnimationFrame(()=>{drawOpenings(geom());updateAll(false)});
 }
 function addFurniture(item,silent=false){
- let a=normalizeItem(item);let e=document.createElement('div');e.className='furn';Object.assign(e.dataset,{n:a.n,w:a.w,d:a.d,x:a.x,y:a.y,r:a.r,type:a.type||'furniture',id:seq++});e.textContent=a.n;room.appendChild(e);bind(e);if(!silent)select(e);return e;
+ let a=normalizeItem(item);let e=document.createElement('div');e.className='furn';Object.assign(e.dataset,{n:a.n,w:a.w,d:a.d,x:a.x,y:a.y,r:a.r,type:a.type||'furniture',id:seq++});e.textContent=a.n;e.setAttribute('role','button');e.setAttribute('tabindex','0');e.setAttribute('aria-label',`${a.n} (${a.w} × ${a.d} mm)`);e.setAttribute('aria-pressed','false');room.appendChild(e);bind(e);
+ if(!silent){select(e);setMobilePanel(false);e.focus?.({preventScroll:true})}
+ return e;
 }
 function bind(e){
  e.onclick=()=>select(e);
+ e.onkeydown=v=>{if(v.key==='Enter'||v.key===' '){v.preventDefault();select(e)}};
  e.onpointerdown=v=>{
   if(v.button!=null&&v.button!==0)return;
   select(e);try{e.setPointerCapture(v.pointerId)}catch(err){}
@@ -1586,6 +1664,7 @@ function updateAll(persist=true){
 }
 function status(){
  const hasSelection=rid!=='house'&&selected&&selected.isConnected;
+ room.querySelectorAll('.furn').forEach(e=>e.setAttribute('aria-pressed',hasSelection&&e===selected?'true':'false'));
  ['rot','dup','del','mvLeft','mvRight','mvUp','mvDown'].forEach(id=>$(id).disabled=!hasSelection);
  $('selectionName').textContent=rid==='house'?'가구 편집은 각 방에서':hasSelection?selected.dataset.n:'가구를 선택하세요';
  $('selectionName').title=$('selectionName').textContent;
@@ -1601,16 +1680,17 @@ function setDiagramFont(v){
  localStorage.setItem('ttobok_diagram_font_v328',v);
  if($('fontSizeSel'))$('fontSizeSel').value=v;
 }
-function setZoom(v){zoom=Math.max(.45,Math.min(4,v));localStorage.setItem('ttobok_zoom_v37',zoom);drawGeom()}
+function compactLayout(){return window.innerWidth<=760||(window.innerWidth<=1100&&window.innerHeight<=500)}
+function setZoom(v){zoom=Math.max(.2,Math.min(4,v));localStorage.setItem('ttobok_zoom_v37',zoom);drawGeom()}
 function fitZoom(){
  let stage=document.querySelector('.stage');
- let reserve=rid==='house'?140:(window.innerWidth>760&&window.innerWidth<=1600)?520:220;
- let avail=Math.max(260,stage.clientWidth-reserve);
+ let reserve=rid==='house'||window.innerWidth<=1280?140:window.innerWidth<=1600?550:440;
+ let avail=Math.max(120,stage.clientWidth-reserve);
  setZoom(Math.min(1.25,avail/540));
 }
 function switchRoom(id){
  if(!ROOM_DEFAULTS[id])return;rid=id;localStorage.setItem('ttobok_current_room_v362',rid);$('roomSel').value=id;clearFurniture();selected=null;updateTargets();drawGeom();loadLocal();window.restartCloudRoom();
- if(window.innerWidth<=760)setTimeout(()=>fitZoom(),90);
+ if(window.innerWidth<=1280)setTimeout(()=>fitZoom(),90);
 }
 function parsePoly(t){let p=t.split('/').map(v=>v.trim()).filter(Boolean).map(v=>v.split(',').map(Number));if(!TTOBOK_GEOMETRY.validatePolygon(p))throw Error('꼭짓점 형식을 확인해주세요.');return p}
 async function transferSelected(mode){
@@ -1660,12 +1740,22 @@ $('reset').onclick=()=>{if(confirm('현재 방 도면을 기본값으로 복원�
 $('addCustom').onclick=()=>{let w=+$('nw').value,d=+$('nd').value;if(!Number.isFinite(w)||!Number.isFinite(d)||w<=0||d<=0)return alert('가로와 깊이는 0보다 큰 숫자로 입력해주세요.');if(rid==='house')return alert('각 방에서 가구를 추가해주세요.');addFurniture({n:$('nn').value||'사용자 가구',w,d,x:100,y:120});updateAll()};
 $('zoomOut').onclick=()=>setZoom(zoom-(zoom>1.5?.25:.1));$('zoomIn').onclick=()=>setZoom(zoom>1.5?zoom+.25:zoom+.1);$('fit').onclick=fitZoom;
 $('leftView').onclick=()=>{let st=document.querySelector('.stage');if(st)st.scrollTo({left:0,behavior:'smooth'})};
-$('mobileView').onclick=()=>{
- document.body.classList.toggle('mobile-focus');
- let on=document.body.classList.contains('mobile-focus');
+function setMobilePanel(open){
+ document.body.classList[open?'add':'remove']('panel-open');
+ $('mobilePanel').setAttribute('aria-expanded',String(open));
+ $('mobilePanel').textContent=open?'⌄ 편집 패널 접기':'☰ 방 선택 · 가구 · 저장 열기';
+ const panel=document.querySelector('aside');
+ if(panel&&window.innerWidth<=760&&!(window.innerWidth>=600&&window.innerHeight<=500))panel.scrollTop=0;
+}
+$('mobilePanel').onclick=()=>setMobilePanel(!document.body.classList.contains('panel-open'));
+function setMobileFocus(on){
+ document.body.classList[on?'add':'remove']('mobile-focus');
  $('mobileView').textContent=on?'✕ 전체화면 닫기':'📱 도면 크게';
+ $('mobileView').setAttribute('aria-pressed',String(on));
  setTimeout(()=>fitZoom(),80);
-};
+}
+$('mobileView').onclick=()=>setMobileFocus(!document.body.classList.contains('mobile-focus'));
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.body.classList.contains('mobile-focus'))setMobileFocus(false)});
 $('z200').onclick=()=>setZoom(2);$('z300').onclick=()=>setZoom(3);$('z400').onclick=()=>setZoom(4);
 $('fontSizeSel').onchange=e=>setDiagramFont(e.target.value);
 
@@ -1739,7 +1829,7 @@ $('restoreBackup').onclick=()=>{
 $('copyRoom').onclick=()=>transferSelected('copy');$('moveRoom').onclick=()=>transferSelected('move');$('saveCurrent').onclick=()=>saveCurrentNow(true);
 document.querySelectorAll('[data-save]').forEach(b=>b.onclick=async()=>{localStorage.setItem(localKey(rid,b.dataset.save),JSON.stringify({geometry:geom(),items:items(),savedAt:Date.now()}));await saveCurrentNow(false);alert(b.dataset.save+' 배치안을 백업하고 현재 배치도 저장했습니다.')});
 document.querySelectorAll('[data-load]').forEach(b=>b.onclick=()=>{let z=readObject(localKey(rid,b.dataset.load));if(!Array.isArray(z.items))return alert('저장된 배치안이 없거나 형식이 올바르지 않습니다.');backupLocalRoom(rid);if(z.geometry)setGeom(z.geometry);drawGeom();renderItems(z.items||[]);saveLocal();window.scheduleCloudSave()});
-window.addEventListener('resize',()=>{drawOpenings(geom());updateAll(false);if(window.innerWidth<=760)setTimeout(()=>fitZoom(),80)});
+window.addEventListener('resize',()=>{if(!compactLayout()&&document.body.classList.contains('mobile-focus'))setMobileFocus(false);drawOpenings(geom());updateAll(false);if(window.innerWidth<=1280)setTimeout(()=>fitZoom(),80)});
 
 window.TTOBOK_APP={
  normalizeItem,storageItem,geom,setGeom,items,renderItems,repairInventoryLocal,getRoom:()=>rid,
@@ -1773,7 +1863,7 @@ let repairedRooms=repairInventoryLocal();
 $('roomSel').value=rid;
 renderCatalog();updateTargets();drawGeom();loadLocal();
 if(repairedRooms.length)setSaveState(`중복/구형 가구 ${repairedRooms.length}개 방 자동 정리됨 · 현재 배치를 저장하면 공동 저장소에도 반영됩니다.`);
-if(window.innerWidth<=760)setTimeout(()=>fitZoom(),140);
+if(window.innerWidth<=1280)setTimeout(()=>fitZoom(),140);
 </script>
 
 <script src="firebase-config.js"></script>
