@@ -30,3 +30,33 @@ test('rotation controls report selection, rotate saved dimensions and reset when
  assert.equal(app.node('rot').disabled,true);
  assert.match(app.node('selectionName').textContent,/각 방/);
 });
+
+test('keyboard users can select a saved furniture item and rotate it', () => {
+ const app=createApp({storage:{[key]:{items:[desk],savedAt:123}}});
+ const item=app.node('room').querySelector('.furn');
+ assert.equal(item.getAttribute('tabindex'),'0');
+ assert.equal(item.getAttribute('role'),'button');
+ item.onkeydown({key:'Enter',preventDefault(){}});
+ assert.equal(app.node('rot').disabled,false);
+ app.node('rot').onclick();
+ assert.equal(JSON.parse(app.localStorage.getItem(key)).items[0].r,90);
+ assert.equal(item.getAttribute('aria-pressed'),'true');
+});
+
+test('leaving mobile width exits diagram focus mode without touching saved furniture', () => {
+ const app=createApp({storage:{[key]:{items:[desk],savedAt:123}}});
+ app.window.innerWidth=390;app.window.innerHeight=844;
+ app.node('mobileView').onclick();
+ assert.equal(app.document.body.classList.contains('mobile-focus'),true);
+ app.window.innerWidth=1200;app.window.innerHeight=900;
+ app.dispatchWindow('resize',{});
+ assert.equal(app.document.body.classList.contains('mobile-focus'),false);
+ assert.deepEqual(JSON.parse(app.localStorage.getItem(key)).items,[desk]);
+});
+
+test('Escape closes mobile diagram focus mode', () => {
+ const app=createApp();app.window.innerWidth=390;app.window.innerHeight=844;
+ app.node('mobileView').onclick();
+ app.document.body.dispatch('keydown',{key:'Escape'});
+ assert.equal(app.document.body.classList.contains('mobile-focus'),false);
+});

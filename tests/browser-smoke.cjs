@@ -11,30 +11,111 @@ const server=http.createServer((req,res)=>{
  const base=`http://127.0.0.1:${server.address().port}`,browser=await chromium.launch({headless:true});
  fs.mkdirSync(path.join(root,'test-results'),{recursive:true});
  try{
-  for(const viewport of [{width:1440,height:1000},{width:1024,height:768},{width:390,height:844},{width:360,height:740}]){
-   const context=await browser.newContext({viewport,hasTouch:viewport.width<600,isMobile:viewport.width<600,serviceWorkers:'block'});
-   const page=await context.newPage(),errors=[],mobile=viewport.width<600;page.setDefaultTimeout(15000);
-   page.on('pageerror',e=>errors.push(e.message));page.on('dialog',d=>d.accept());
+  // CSS viewport approximations for Galaxy Z Flip5, Tab S8 (SM-X700), and
+  // Tab S9 FE 5G (SM-X516N), including display scaling / split windows.
+  // Physical display pixels do not establish CSS viewport size. These Chromium
+  // responsive/touch checks do not replace verification on the actual devices.
+  const viewports=[
+   {width:1440,height:1000},{width:1024,height:768},{width:390,height:844},{width:360,height:740},{width:320,height:568},{width:740,height:360},{width:844,height:390},
+   {width:360,height:880,touch:true},{width:880,height:360,touch:true},{width:412,height:1006,touch:true},{width:1006,height:412,touch:true},
+   {width:800,height:1280,touch:true},{width:1280,height:800,touch:true},{width:768,height:1229,touch:true},{width:1229,height:768,touch:true},
+   {width:640,height:1024,touch:true},{width:1024,height:640,touch:true}
+  ];
+  for(const scenario of viewports){
+   const viewport={width:scenario.width,height:scenario.height},size=`${viewport.width}x${viewport.height}`;
+   const mobile=viewport.width<=760||(viewport.width<=1100&&viewport.height<=500),hasTouch=scenario.touch??mobile;
+   const context=await browser.newContext({viewport,hasTouch,isMobile:mobile,deviceScaleFactor:1,serviceWorkers:'block'});
+   const page=await context.newPage(),errors=[];page.setDefaultTimeout(15000);
+   page.on('pageerror',e=>errors.push(e.stack||e.message));page.on('dialog',d=>d.accept());
    await page.route('https://**/*',route=>route.abort()); // No production Firebase or user data.
    await page.goto(base);await page.waitForFunction(()=>!!window.TTOBOK_APP);
-   await page.locator('#nn').fill('테스트 책상');await page.locator('#nw').fill('600');await page.locator('#nd').fill('400');
-   await page.locator('#addCustom').click();assert.equal(await page.locator('.furn').count(),1);
-   const before=await page.locator('.furn').evaluate(e=>({x:+e.dataset.x,y:+e.dataset.y}));
+   const panel=async open=>{
+    const toggle=page.locator('#mobilePanel');
+    if(await toggle.isVisible()&&(await toggle.getAttribute('aria-expanded')==='true')!==open)await toggle.click();
+   };
+   const chooseRoom=async id=>{await panel(true);await page.locator('#roomSel').selectOption(id);await panel(false)};
    const reachable=async selector=>{
     const info=await page.locator(selector).evaluate(e=>{
      const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
      return {left:r.left,right:r.right,top:r.top,bottom:r.bottom,width:innerWidth,height:innerHeight,hit:!!hit&&(hit===e||e.contains(hit))};
     });
-    assert.ok(info.left>=0&&info.right<=info.width&&info.top>=0&&info.bottom<=info.height&&info.hit,`${viewport.width}px ${selector} must be visible and tappable without scrolling: ${JSON.stringify(info)}`);
+    assert.ok(info.left>=-1&&info.right<=info.width+1&&info.top>=-1&&info.bottom<=info.height+1&&info.hit,`${size} ${selector} must be visible and tappable without scrolling: ${JSON.stringify(info)}`);
    };
+   const usablePlan=async()=>{
+    await page.evaluate(()=>new Promise(requestAnimationFrame));
+    const layout=await page.evaluate(()=>{
+     const stage=document.querySelector('.stage'),r=stage.getBoundingClientRect();
+     const left=Math.max(0,r.left),right=Math.min(innerWidth,r.right),top=Math.max(0,r.top),bottom=Math.min(innerHeight,r.bottom),x=(left+right)/2;
+     let run=0,visibleHeight=0;
+     for(let y=Math.ceil(top);y<bottom;y+=2){const hit=document.elementFromPoint(x,y);run=hit&&stage.contains(hit)?run+2:0;visibleHeight=Math.max(visibleHeight,run)}
+     return {visibleHeight,documentWidth:document.documentElement.scrollWidth,viewportWidth:innerWidth};
+    });
+    assert.ok(layout.documentWidth<=layout.viewportWidth+1,`${size} must not scroll the document horizontally: ${JSON.stringify(layout)}`);
+    assert.ok(layout.visibleHeight>=100,`${size} must leave at least 100px of usable plan height: ${JSON.stringify(layout)}`);
+   };
+   if(await page.locator('#mobilePanel').isVisible()){
+    assert.equal(await page.locator('#mobilePanel').getAttribute('aria-expanded'),'false','mobile controls should initially leave room for the plan');
+    await reachable('#mobilePanel');
+   }
+   await usablePlan();
+   const names=await page.locator('#rw,#rh,#nn,#nw,#nd,#roomSel,#targetRoom').evaluateAll(elements=>elements.map(e=>{
+    const labelled=(e.getAttribute('aria-labelledby')||'').split(/\s+/).map(id=>document.getElementById(id)?.textContent||'').join(' ');
+    return {id:e.id,name:(labelled||e.getAttribute('aria-label')||Array.from(e.labels||[],label=>label.textContent).join(' ')||e.getAttribute('title')||e.getAttribute('placeholder')||'').trim()};
+   }));
+   assert.equal(names.length,7);for(const control of names)assert.ok(control.name,`${size} #${control.id} needs an accessible name`);
+   if(mobile){
+    for(const catalog of ['#furnitureCatalog','#applianceCatalog']){
+     await panel(true);await page.locator(`${catalog} button`).first().click();
+     assert.equal(await page.locator('.furn.sel').count(),1,`${size} catalog addition must select the new item`);
+     if(await page.locator('#mobilePanel').isVisible())assert.equal(await page.locator('#mobilePanel').getAttribute('aria-expanded'),'false',`${size} ${catalog} addition must close the panel`);
+     assert.equal(await page.evaluate(()=>document.activeElement?.matches('.furn.sel')),true,`${size} catalog addition must focus the selected item`);
+     await usablePlan();await reachable('#rot');await reachable('#del');
+     await page.locator('#del').click();assert.equal(await page.locator('.furn').count(),0);
+    }
+   }
+   await panel(true);
+   await page.locator('#nn').fill('테스트 책상');await page.locator('#nw').fill('600');await page.locator('#nd').fill('400');
+   await page.locator('#addCustom').scrollIntoViewIfNeeded();
+   const portraitPanel=await page.locator('#mobilePanel').isVisible(),catalogScroll=await page.locator('aside').evaluate(e=>e.scrollTop);
+   await page.locator('#addCustom').click();assert.equal(await page.locator('.furn').count(),1);
+   if(portraitPanel)assert.equal(await page.locator('#mobilePanel').getAttribute('aria-expanded'),'false','adding furniture must return to the plan');
+   else assert.ok(Math.abs(await page.locator('aside').evaluate(e=>e.scrollTop)-catalogScroll)<=1,`${size} adding furniture must preserve the sidebar scroll position`);
+   await reachable('#rot');await usablePlan();
+   const before=await page.locator('.furn').evaluate(e=>({x:+e.dataset.x,y:+e.dataset.y}));
    const tapRotate=async()=>{
     await reachable('#rot');const b=await page.locator('#rot').boundingBox();
     await page.touchscreen.tap(b.x+b.width/2,b.y+b.height/2);
    };
-   if(mobile){
+   if(hasTouch&&!mobile){
+    // A tablet can use the wide layout while still requiring touch selection.
+    await chooseRoom('living');await chooseRoom('smallroom2');
+    await page.locator('.furn').scrollIntoViewIfNeeded();await reachable('.furn');
+    const box=await page.locator('.furn').boundingBox();await page.touchscreen.tap(box.x+box.width/2,box.y+box.height/2);
+    assert.equal(await page.locator('.furn.sel').count(),1,`${size} touch must select furniture`);
+    if(await page.locator('#mobileMoveControls').isVisible()){
+     const x=Number(await page.locator('.furn').getAttribute('data-x')),step=Number(await page.locator('#moveStep').inputValue());
+     await reachable('#mvRight');const button=await page.locator('#mvRight').boundingBox();await page.touchscreen.tap(button.x+button.width/2,button.y+button.height/2);
+     assert.equal(Number(await page.locator('.furn').getAttribute('data-x')),x+step,`${size} tablet touch nudge must use the selected step`);
+    }
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'90');
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'0');
-    await page.screenshot({path:path.join(root,'test-results',`mobile-normal-${viewport.width}.png`)});
+   }
+   if(mobile){
+    await usablePlan();for(const selector of ['#rot','#dup','#del','#mobileView'])await reachable(selector);
+    await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'90');
+    await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'0');
+    await page.screenshot({path:path.join(root,'test-results',`mobile-normal-${size}.png`)});
+    await page.locator('#mobileView').click();await reachable('#rot');await usablePlan();
+    await page.keyboard.press('Escape');
+    await page.waitForFunction(()=>!document.body.classList.contains('mobile-focus'));
+    await reachable('#mobileView');await usablePlan();
+    // A phone rotated or resized while focused must restore the normal desktop UI.
+    await page.locator('#mobileView').click();await page.setViewportSize({width:1440,height:1000});
+    await page.waitForFunction(()=>!document.body.classList.contains('mobile-focus'));
+    assert.equal(await page.locator('header').isVisible(),true);assert.equal(await page.locator('aside').isVisible(),true);
+    assert.match(await page.locator('.stage').evaluate(e=>getComputedStyle(e).overflowY),/auto|scroll/,'desktop plan must remain scrollable after leaving focus mode');
+    await page.locator('#roomSel').selectOption('living');await page.locator('#roomSel').selectOption('smallroom2');
+    await page.setViewportSize(viewport);await page.locator('.furn').click();await usablePlan();
     await page.locator('#mobileView').click();await page.locator('#mvRight').click();
    }
    else{
@@ -48,14 +129,14 @@ const server=http.createServer((req,res)=>{
    await page.locator('#zoomIn').click();await page.evaluate(()=>new Promise(requestAnimationFrame));
    assert.equal(await page.evaluate(()=>localStorage.getItem('ttobok_v3_smallroom2_cur')),state,'zoom must not change persisted layout');
    if(mobile){
-    await page.locator('#z400').click();await reachable('#rot');
+    await page.locator('#z400').click();await reachable('#rot');await usablePlan();
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'0');
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'90');
     await page.locator('#fit').click();
    }
-   await page.screenshot({path:path.join(root,'test-results',`planner-${viewport.width}.png`),fullPage:false});
+   await page.screenshot({path:path.join(root,'test-results',`planner-${size}.png`),fullPage:false});
    if(mobile)await page.locator('#mobileView').click();
-   await page.locator('#roomSel').selectOption('house');
+   await chooseRoom('house');
    await page.waitForFunction(()=>document.querySelectorAll('.houseMarker').length===14);
    assert.equal(await page.locator('#houseLegend').isVisible(),true);
    assert.equal(await page.locator('#houseLegend').evaluate(e=>!document.querySelector('#room').contains(e)),true);
@@ -63,27 +144,29 @@ const server=http.createServer((req,res)=>{
    for(const selector of ['#suiteLayer','#fixedLayer','#edgeLayer'])assert.doesNotMatch(await page.locator(selector).innerText(),/[가-힣]/,'whole-house descriptions must be outside the plan');
    await page.locator('#fontSizeSel').selectOption('xlarge');
    await page.locator('#fit').click();
-   await page.locator('.plannerMain').screenshot({path:path.join(root,'test-results',`whole-house-${viewport.width}.png`)});
+   await usablePlan();
+   await page.locator('.plannerMain').screenshot({path:path.join(root,'test-results',`whole-house-${size}.png`)});
    assert.equal(await page.locator('#rot').isEnabled(),false);
    if(mobile){
     await page.locator('#mobileView').click();
     assert.equal(await page.locator('#houseLegend').isVisible(),true);
     await page.locator('#mobileView').click();
    }
-   await page.locator('#roomSel').selectOption('living');await page.locator('#roomSel').selectOption('smallroom2');assert.equal(await page.locator('.furn').count(),1);
+   await chooseRoom('living');await chooseRoom('smallroom2');assert.equal(await page.locator('.furn').count(),1);
    if(mobile)await page.locator('#mobileView').click();
    await page.locator('.furn').click();await page.locator('#del').click();assert.equal(await page.locator('.furn').count(),0);
    if(mobile)await page.locator('#mobileView').click();
-   for(const id of ['smallroom1','master','living','laundry','commonbath','ensuite','entry','house','smallroom2'])await page.locator('#roomSel').selectOption(id);
+   for(const id of ['smallroom1','master','living','laundry','commonbath','ensuite','entry','house','smallroom2'])await chooseRoom(id);
    await page.reload();await page.waitForFunction(()=>!!window.TTOBOK_APP);assert.equal(await page.locator('.furn').count(),0);
-   if(!mobile){
-    // Chromium can stall a full-page screenshot of a standalone SVG document.
-    // Decode the unchanged SVG in an HTML image before capturing its full size.
-    await page.setContent(`<html><body style="margin:0"><img src="${base}/docs/babyroom-v363-reference.svg" width="1120" height="1450" alt="아기방 기본 치수 검토도"></body></html>`);
-    await page.locator('img').evaluate(image=>image.decode());
-    await page.screenshot({path:path.join(root,'test-results','babyroom-reference.png'),fullPage:true});
-   }
+   await usablePlan();
    assert.deepEqual(errors,[],`${viewport.width}px JavaScript errors`);await context.close();console.log(`Browser passed: ${viewport.width}x${viewport.height}`);
   }
+  // Keep reference capture separate from the app: replacing the app document
+  // can fire its pending resize callbacks after its elements have been removed.
+  // Chromium can also stall a standalone SVG full-page capture, so use an image.
+  const reference=await browser.newPage({viewport:{width:1120,height:1450},deviceScaleFactor:1});
+  await reference.setContent(`<html><body style="margin:0"><img src="${base}/docs/babyroom-v363-reference.svg" width="1120" height="1450" alt="아기방 기본 치수 검토도"></body></html>`);
+  await reference.locator('img').evaluate(image=>image.decode());
+  await reference.screenshot({path:path.join(root,'test-results','babyroom-reference.png'),fullPage:true});await reference.close();
  }finally{await browser.close();server.close()}
 })().catch(error=>{console.error(error);server.close();process.exitCode=1});
