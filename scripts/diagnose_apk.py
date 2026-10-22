@@ -41,6 +41,12 @@ def app_crashed(crash_log):
         crash_log))
 
 
+def resumed_in(activities, packages):
+    resumed = "\n".join(line for line in activities.splitlines()
+                        if "mResumedActivity" in line or "topResumedActivity" in line)
+    return any(re.search(rf"\b{re.escape(package)}/", resumed) for package in packages)
+
+
 def snapshot(label):
     _, activities = capture(f"activities-{label}.txt", ["adb", "shell", "dumpsys", "activity", "activities"])
     capture(f"windows-{label}.txt", ["adb", "shell", "dumpsys", "window", "windows"])
@@ -76,16 +82,26 @@ def launch_scenario(activity, without_browser, require_recovery):
     activities = snapshot("15s")
     capture("ui-dump.txt", ["adb", "shell", "uiautomator", "dump", "/sdcard/ttobok-window.xml"])
     _, ui = capture("ui.xml", ["adb", "shell", "cat", "/sdcard/ttobok-window.xml"])
+    resumed = "\n".join(line for line in activities.splitlines()
+                        if "mResumedActivity" in line or "topResumedActivity" in line)
+    handoff = resumed_in(activities, providers) or bool(re.search(r"ResolverActivity|ChooserActivity", resumed))
+    back_returned = None
+    if require_recovery and not without_browser and handoff:
+        capture("press-back.txt", ["adb", "shell", "input", "keyevent", "KEYCODE_BACK"])
+        time.sleep(3)
+        after_back = snapshot("after-back")
+        back_returned = resumed_in(after_back, [PACKAGE])
     _, crash = capture("crash.txt", ["adb", "logcat", "-b", "crash", "-d", "-v", "threadtime"])
     capture("logcat.txt", ["adb", "logcat", "-b", "all", "-d", "-v", "threadtime"])
     capture("exit-info.txt", ["adb", "shell", "dumpsys", "activity", "exit-info", PACKAGE])
     _, process = capture("app-process.txt", ["adb", "shell", "pidof", PACKAGE])
     process_alive = bool(re.fullmatch(r"\d+(?:\s+\d+)*", process.strip()))
-    visible = bool(re.search(rf"(?:mResumedActivity|topResumedActivity).*{re.escape(PACKAGE)}", activities))
+    visible = resumed_in(activities, [PACKAGE])
     recovery = visible and all(text in ui for text in ["브라우저를 열지 못했습니다", "다시 열기", "브라우저로 열기"])
     result = {"without_browser": without_browser, "providers": providers,
               "native_activity_visible": visible, "app_process_present": process_alive,
-              "recovery_controls_visible": recovery}
+              "recovery_controls_visible": recovery, "browser_handoff_observed": handoff,
+              "returned_to_launcher_after_back": back_returned}
     if app_crashed(crash):
         result["result"] = "native_app_crash"
     elif start_code or re.search(r"(?m)^Error", start):
@@ -96,6 +112,10 @@ def launch_scenario(activity, without_browser, require_recovery):
         result["result"] = "inconclusive_no_browser_provider"
     elif without_browser and require_recovery and not recovery:
         result["result"] = "visible_recovery_ui_missing"
+    elif require_recovery and not without_browser and not handoff:
+        result["result"] = "browser_handoff_not_observed"
+    elif require_recovery and not without_browser and back_returned is not True:
+        result["result"] = "back_did_not_return_to_launcher"
     elif require_recovery and not process_alive:
         result["result"] = "native_launcher_process_missing"
     else:
