@@ -52,3 +52,18 @@
 APK SHA-256: `17a540ad11eea9dddc170837e0e60908bad3f8316e7628c08fa7a4533e321176`. 서명 인증서 SHA-256은 기존 APK와 같은 `5102c30b88e2c0d106910258ba64a40ca1ae4c3c19208de9df1a8d0bc40e2702`입니다.
 
 실물 Z Flip5에서의 최종 실행 확인은 사용자의 새 APK 설치 후 확인이 필요합니다. 에뮬레이터의 기존 APK 종료 원인은 확인했으며 사용자 기기 자체의 오류 로그는 수집하지 않았습니다.
+
+## V3.64.1: 상단 제거와 주소줄 없는 APK
+
+- 상단 제목·계정·설치 영역을 삭제하고 기존 계정/공동 저장 컨트롤을 편집 패널의 접이식 메뉴로 옮깁니다. 로그인·저장 이벤트와 데이터 키는 유지합니다.
+- 전체 집 도면에서는 편집·미세이동·전체 비우기 도구를 숨깁니다. 개별 방은 가구 선택 시 편집 도구가 나타납니다.
+- 확대·축소·맞춤·전체화면을 한 줄로 두고 글자/확대 배율은 보기 설정으로 옮깁니다.
+- 1280px 이하 전체 도면은 바깥 치수를 짧은 설명으로 옮기고 실제 여백을 계산해 맞춥니다. 360px 화면의 도면 폭은 약 220px에서 334px로 증가했습니다.
+- 브라우저 직접 이용 시 전체화면은 명시적 클릭으로만 요청하며 거부 시 도면 확대 보기와 복귀 기능을 유지합니다.
+- APK는 AndroidX 서비스/세션을 사용한 Trusted Web Activity로 실행합니다. 삼성 인터넷 등 지원되는 기본 브라우저를 우선하며, 검증 실패 시 브라우저 표시를 유지하고 실행 실패 시 재시도 화면을 제공합니다.
+- 기존 패키지와 배포 서명을 유지하며 APK versionCode=365, versionName=3.64.1입니다. 이전 크래시를 일으킨 Android Browser Helper LauncherActivity 구현은 사용하지 않고 기존 홈 화면 바로가기 이름만 alias로 보존합니다.
+- 사이트 루트의 공개 서명 연결 파일은 별도 Max-Parks.github.io 저장소에서 게시합니다. `https://max-parks.github.io/.well-known/assetlinks.json` HTTP200 및 Google Digital Asset Links 응답으로 기존 패키지/서명 연결을 확인했습니다. 비공개 서명 키는 게시하지 않습니다.
+- 서명된 APK 빌드 후 에뮬레이터에서 실제 사이트 검증 성공, 웹 콘텐츠 로딩, 브라우저 주소줄 부재, 뒤로 가기 및 브라우저 없음 복구를 검사하도록 배포 조건을 강화합니다. 인증 검증을 우회하는 플래그는 사용하지 않습니다.
+- 로컬 Node 회귀48개와 Edge/Chromium 엔진의17개 화면 크기 검사가 통과했습니다. 실제 삼성 기종의 앱 실행과 주소줄 유무는 기기에서 추가 확인이 필요합니다.
+
+참고: [Google 공식 TWA 브라우저 지원표](https://github.com/GoogleChrome/android-browser-helper/blob/main/docs/trusted-web-activity-browser-support.md), [AndroidX TWA](https://developer.android.com/reference/androidx/browser/trusted/TrustedWebActivityIntentBuilder).
