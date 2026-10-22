@@ -91,8 +91,8 @@ jobs:
                   applicationId 'com.maxparks.ttobokhome'
                   minSdk 23
                   targetSdk 35
-                  versionCode 364
-                  versionName '3.64'
+                  versionCode 365
+                  versionName '3.64.1'
               }
           
               signingConfigs {
@@ -125,6 +125,16 @@ jobs:
           cat > android-apk/app/src/main/AndroidManifest.xml <<'EOF'
           <manifest xmlns:android="http://schemas.android.com/apk/res/android">
               <uses-permission android:name="android.permission.INTERNET" />
+              <queries>
+                  <intent>
+                      <action android:name="android.intent.action.VIEW" />
+                      <category android:name="android.intent.category.BROWSABLE" />
+                      <data android:scheme="https" />
+                  </intent>
+                  <intent>
+                      <action android:name="android.support.customtabs.action.CustomTabsService" />
+                  </intent>
+              </queries>
           
               <application
                   android:allowBackup="false"
@@ -134,6 +144,7 @@ jobs:
                   android:theme="@android:style/Theme.Material.Light.NoActionBar"
                   android:usesCleartextTraffic="false">
           
+                  <meta-data android:name="asset_statements" android:resource="@string/asset_statements" />
                   <activity
                       android:name=".MainActivity"
                       android:exported="false"
@@ -158,7 +169,8 @@ jobs:
           <resources>
               <string name="app_name">또복이 집도면</string>
               <string name="launch_url" translatable="false">https://max-parks.github.io/Park-s-Fam/</string>
-              <string name="launch_hint">기본 브라우저로 집도면을 엽니다. 같은 브라우저의 로그인과 저장된 배치를 사용합니다.</string>
+              <string name="asset_statements" translatable="false">[{\"relation\":[\"delegate_permission/common.handle_all_urls\"],\"target\":{\"namespace\":\"web\",\"site\":\"https://max-parks.github.io\"}}]</string>
+              <string name="launch_hint">주소줄 없는 앱 화면으로 집도면을 엽니다. 같은 브라우저의 로그인과 저장된 배치를 사용합니다.</string>
               <string name="launch_opening">집도면을 여는 중입니다.</string>
               <string name="launch_returned">도면이 보이지 않으면 다시 열거나 브라우저로 열어주세요.</string>
               <string name="launch_failed">브라우저를 열지 못했습니다. 삼성 인터넷 등 사용 가능한 브라우저를 확인한 뒤 다시 시도해주세요.</string>
@@ -171,21 +183,39 @@ jobs:
           package com.maxparks.ttobokhome;
 
           import android.app.Activity;
+          import android.content.ComponentName;
           import android.content.Intent;
+          import android.content.pm.ApplicationInfo;
+          import android.content.pm.PackageManager;
+          import android.content.pm.ResolveInfo;
           import android.net.Uri;
           import android.os.Bundle;
+          import android.os.Handler;
+          import android.os.Looper;
           import android.util.Log;
           import android.view.View;
           import android.widget.Button;
           import android.widget.LinearLayout;
           import android.widget.ScrollView;
           import android.widget.TextView;
+          import androidx.browser.customtabs.CustomTabsCallback;
+          import androidx.browser.customtabs.CustomTabsClient;
           import androidx.browser.customtabs.CustomTabsIntent;
+          import androidx.browser.customtabs.CustomTabsService;
+          import androidx.browser.customtabs.CustomTabsServiceConnection;
+          import androidx.browser.customtabs.CustomTabsSession;
+          import androidx.browser.trusted.TrustedWebActivityIntentBuilder;
+          import java.util.List;
 
           public final class MainActivity extends Activity {
               private static final String TAG = "TtobokLauncher";
               private static final String STATUS_KEY = "launch_status";
+              private final Handler handler = new Handler(Looper.getMainLooper());
               private TextView status;
+              private CustomTabsServiceConnection connection;
+              private boolean bound;
+              private boolean pending;
+              private Runnable connectionTimeout;
 
               @Override
               protected void onCreate(Bundle savedInstanceState) {
@@ -235,15 +265,132 @@ jobs:
                   if (savedInstanceState == null) openPlanner(false);
               }
 
+              private Intent browserIntent(Uri url) {
+                  return new Intent(Intent.ACTION_VIEW, url).addCategory(Intent.CATEGORY_BROWSABLE);
+              }
+
+              private boolean supports(String provider, boolean trusted) {
+                  if (provider == null) return false;
+                  Intent service = new Intent(CustomTabsService.ACTION_CUSTOM_TABS_CONNECTION)
+                          .setPackage(provider);
+                  if (trusted) service.addCategory(CustomTabsService.TRUSTED_WEB_ACTIVITY_CATEGORY);
+                  return getPackageManager().resolveService(service, 0) != null;
+              }
+
+              private String pickProvider(Uri url) {
+                  PackageManager pm = getPackageManager();
+                  List<ResolveInfo> browsers = pm.queryIntentActivities(browserIntent(url), PackageManager.MATCH_ALL);
+                  ResolveInfo resolved = pm.resolveActivity(browserIntent(url), PackageManager.MATCH_DEFAULT_ONLY);
+                  String preferred = null;
+                  if (resolved != null && resolved.activityInfo != null) {
+                      String candidate = resolved.activityInfo.packageName;
+                      // Exclude the system resolver when the user has not selected a default.
+                      for (ResolveInfo browser : browsers) {
+                          if (browser.activityInfo != null && candidate.equals(browser.activityInfo.packageName)) {
+                              preferred = candidate;
+                              break;
+                          }
+                      }
+                  }
+                  // A supported default (including Samsung Internet) always wins, preserving its data.
+                  if (supports(preferred, true)) return preferred;
+                  for (ResolveInfo browser : browsers) {
+                      if (browser.activityInfo == null) continue;
+                      String candidate = browser.activityInfo.packageName;
+                      if (supports(candidate, true) && systemOrStoreInstalled(candidate)) return candidate;
+                  }
+                  return supports(preferred, false) ? preferred : null;
+              }
+
+              private boolean systemOrStoreInstalled(String provider) {
+                  try {
+                      PackageManager pm = getPackageManager();
+                      ApplicationInfo info = pm.getApplicationInfo(provider, 0);
+                      return (info.flags & (ApplicationInfo.FLAG_SYSTEM | ApplicationInfo.FLAG_UPDATED_SYSTEM_APP)) != 0
+                              || "com.android.vending".equals(pm.getInstallerPackageName(provider));
+                  } catch (PackageManager.NameNotFoundException | RuntimeException error) {
+                      Log.w(TAG, "Cannot verify fallback browser install source", error);
+                      return false;
+                  }
+              }
+
               private void openPlanner(boolean fullBrowser) {
+                  releaseConnection();
                   Uri url = Uri.parse(getString(R.string.launch_url));
                   status.setText(R.string.launch_opening);
+                  if (fullBrowser) {
+                      openFallback(url, null, true);
+                      return;
+                  }
+                  try {
+                      String provider = pickProvider(url);
+                      if (provider == null || !supports(provider, true)) {
+                          openFallback(url, provider, false);
+                          return;
+                      }
+                      Log.i(TAG, "Binding TWA provider=" + provider);
+                      pending = true;
+                      connection = new CustomTabsServiceConnection() {
+                          @Override
+                          public void onCustomTabsServiceConnected(ComponentName name, CustomTabsClient client) {
+                              if (connection != this || !pending || isFinishing() || isDestroyed()) return;
+                              if (connectionTimeout != null) handler.removeCallbacks(connectionTimeout);
+                              try {
+                                  client.warmup(0L);
+                                  CustomTabsSession session = client.newSession(new CustomTabsCallback() {
+                                      @Override
+                                      public void onRelationshipValidationResult(int relation, Uri requestedOrigin,
+                                              boolean result, Bundle extras) {
+                                          Log.i(TAG, "DAL relation=" + relation + " origin=" + requestedOrigin
+                                                  + " result=" + result);
+                                      }
+                                  });
+                                  if (session == null) throw new IllegalStateException("Browser did not create a session");
+                                  session.validateRelationship(CustomTabsService.RELATION_HANDLE_ALL_URLS,
+                                          Uri.parse("https://max-parks.github.io"), null);
+                                  pending = false;
+                                  // The browser independently verifies Digital Asset Links. Failed verification
+                                  // retains its address bar; this app never bypasses or impersonates that check.
+                                  new TrustedWebActivityIntentBuilder(url).build(session)
+                                          .launchTrustedWebActivity(MainActivity.this);
+                                  status.setText(R.string.launch_returned);
+                              } catch (RuntimeException error) {
+                                  Log.w(TAG, "TWA failed; trying the same browser as a Custom Tab", error);
+                                  openFallback(url, provider, false);
+                              }
+                          }
+
+                          @Override
+                          public void onServiceDisconnected(ComponentName name) {
+                              if (connection == this && pending) openFallback(url, provider, false);
+                          }
+                      };
+                      bound = CustomTabsClient.bindCustomTabsServicePreservePriority(this, provider, connection);
+                      if (!bound) {
+                          openFallback(url, provider, false);
+                          return;
+                      }
+                      CustomTabsServiceConnection attempt = connection;
+                      connectionTimeout = () -> {
+                          if (connection == attempt && pending && !isFinishing() && !isDestroyed()) {
+                              Log.w(TAG, "TWA service connection timed out");
+                              openFallback(url, provider, false);
+                          }
+                      };
+                      handler.postDelayed(connectionTimeout, 5000);
+                  } catch (RuntimeException error) {
+                      Log.w(TAG, "Browser discovery/binding failed", error);
+                      openFallback(url, null, false);
+                  }
+              }
+
+              private void openFallback(Uri url, String provider, boolean fullBrowser) {
+                  releaseConnection();
                   if (!fullBrowser) {
                       try {
-                          // An implicit intent respects the default browser, including Samsung
-                          // Internet. Do not bind to or prefer a separate Chrome/TWA provider.
-                          new CustomTabsIntent.Builder().setShowTitle(true).build()
-                                  .launchUrl(this, url);
+                          CustomTabsIntent tab = new CustomTabsIntent.Builder().setShowTitle(true).build();
+                          if (provider != null) tab.intent.setPackage(provider);
+                          tab.launchUrl(this, url);
                           status.setText(R.string.launch_returned);
                           return;
                       } catch (RuntimeException error) {
@@ -251,21 +398,50 @@ jobs:
                       }
                   }
                   try {
-                      Intent intent = new Intent(Intent.ACTION_VIEW, url);
-                      intent.addCategory(Intent.CATEGORY_BROWSABLE);
-                      startActivity(intent);
+                      startActivity(browserIntent(url));
                       status.setText(R.string.launch_returned);
                   } catch (RuntimeException error) {
                       Log.e(TAG, "Browser launch failed", error);
                       status.setText(R.string.launch_failed);
                   }
-                  // Keep this visible recovery screen behind the browser. Never silently finish
-                  // or retry from onResume if a provider closes or cannot handle the intent.
+                  // Keep this screen behind the browser; never finish or retry from onResume.
+              }
+
+              private void releaseConnection() {
+                  pending = false;
+                  if (connectionTimeout != null) handler.removeCallbacks(connectionTimeout);
+                  connectionTimeout = null;
+                  if (bound && connection != null) {
+                      try {
+                          unbindService(connection);
+                      } catch (RuntimeException error) {
+                          Log.w(TAG, "Browser service was already disconnected", error);
+                      }
+                  }
+                  bound = false;
+                  connection = null;
+              }
+
+              @Override
+              protected void onStop() {
+                  // Leaving before binding completes must not open a browser over another app.
+                  if (pending) {
+                      releaseConnection();
+                      status.setText(R.string.launch_returned);
+                  }
+                  super.onStop();
+              }
+
+              @Override
+              protected void onDestroy() {
+                  releaseConnection();
+                  super.onDestroy();
               }
 
               @Override
               protected void onSaveInstanceState(Bundle state) {
-                  state.putString(STATUS_KEY, status.getText().toString());
+                  state.putString(STATUS_KEY, pending ? getString(R.string.launch_returned)
+                          : status.getText().toString());
                   super.onSaveInstanceState(state);
               }
           }
@@ -297,7 +473,7 @@ jobs:
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
-      - name: Verify APK browser launch and no-browser recovery
+      - name: Verify real TWA and no-browser recovery
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 35
@@ -306,7 +482,7 @@ jobs:
           profile: pixel_6
           disable-animations: true
           emulator-options: -no-window -gpu swiftshader_indirect -no-snapshot -noaudio -no-boot-anim
-          script: python3 scripts/diagnose_apk.py --apk android-apk/app/build/outputs/apk/release/app-release.apk --output apk-diagnostics --require-recovery
+          script: python3 scripts/diagnose_apk.py --apk android-apk/app/build/outputs/apk/release/app-release.apk --output apk-diagnostics --require-twa
 
       - name: Upload APK launch diagnostics
         if: always()
