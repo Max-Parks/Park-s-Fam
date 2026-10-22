@@ -8,7 +8,7 @@ const server=http.createServer((req,res)=>{
 });
 (async()=>{
  await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
- const base=`http://127.0.0.1:${server.address().port}`,browser=await chromium.launch({headless:true});
+ const base=`http://127.0.0.1:${server.address().port}`,browser=await chromium.launch({headless:true,...(process.env.PLAYWRIGHT_CHANNEL?{channel:process.env.PLAYWRIGHT_CHANNEL}:{})});
  fs.mkdirSync(path.join(root,'test-results'),{recursive:true});
  try{
   // CSS viewport approximations for Galaxy Z Flip5, Tab S8 (SM-X700), and
@@ -29,11 +29,26 @@ const server=http.createServer((req,res)=>{
    page.on('pageerror',e=>errors.push(e.stack||e.message));page.on('dialog',d=>d.accept());
    await page.route('https://**/*',route=>route.abort()); // No production Firebase or user data.
    await page.goto(base);await page.waitForFunction(()=>!!window.TTOBOK_APP);
+   assert.equal(await page.locator('body > header').count(),0,`${size} must remove the persistent top header`);
    const panel=async open=>{
     const toggle=page.locator('#mobilePanel');
     if(await toggle.isVisible()&&(await toggle.getAttribute('aria-expanded')==='true')!==open)await toggle.click();
    };
    const chooseRoom=async id=>{await panel(true);await page.locator('#roomSel').selectOption(id);await panel(false)};
+   const viewOptions=async open=>{
+    const options=page.locator('#viewOptions');
+    if(await options.evaluate(e=>e.open)!==open)await options.locator('summary').click();
+   };
+   const focus=async on=>{
+    if(await page.locator('body').evaluate(e=>e.classList.contains('mobile-focus'))!==on)await page.locator('#mobileView').click();
+    await page.waitForFunction(on=>document.body.classList.contains('mobile-focus')===on&&(on||!document.fullscreenElement),on);
+   };
+   const layoutSnapshot=()=>page.evaluate(()=>Object.fromEntries(Object.keys(localStorage).filter(key=>/^ttobok_v3_.+_cur$/.test(key)).sort().map(key=>[key,localStorage.getItem(key)])));
+   const noEditRows=async()=>{
+    assert.equal(await page.locator('.editControls').isVisible(),false,`${size} must hide editing tools without an editable selection`);
+    assert.equal(await page.locator('#mobileMoveControls').isVisible(),false,`${size} must hide movement tools without an editable selection`);
+    assert.ok((await page.locator('.toolbar').boundingBox()).height<=76,`${size} viewing tools must fit in a single compact row`);
+   };
    const reachable=async selector=>{
     const info=await page.locator(selector).evaluate(e=>{
      const r=e.getBoundingClientRect(),hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
@@ -58,6 +73,20 @@ const server=http.createServer((req,res)=>{
     await reachable('#mobilePanel');
    }
    await usablePlan();
+   await noEditRows();
+   for(const selector of ['#zoomOut','#zoomIn','#fit','#mobileView','#viewOptions > summary'])await reachable(selector);
+   assert.match(await page.locator('#zoomOut').getAttribute('aria-label'),/축소/);
+   assert.match(await page.locator('#zoomIn').getAttribute('aria-label'),/확대/);
+   assert.equal(await page.locator('#viewOptions > summary').getAttribute('aria-label'),'보기 설정');
+   assert.equal(await page.locator('#viewOptions').evaluate(e=>e.open),false,'extra view settings must initially be collapsed');
+   await panel(true);
+   assert.equal(await page.locator('aside #appSettings #summary').count(),1,'app summary must be in the account panel');
+   await page.locator('#appSettings > summary').click();
+   for(const selector of ['#login','#syncPull','#installApp']){
+    assert.equal(await page.locator(`#appSettings ${selector}`).count(),1,`${selector} must remain in account settings`);
+    await page.locator(selector).scrollIntoViewIfNeeded();await reachable(selector);
+   }
+   await page.locator('#appSettings > summary').click();await panel(false);
    const names=await page.locator('#rw,#rh,#nn,#nw,#nd,#roomSel,#targetRoom').evaluateAll(elements=>elements.map(e=>{
     const labelled=(e.getAttribute('aria-labelledby')||'').split(/\s+/).map(id=>document.getElementById(id)?.textContent||'').join(' ');
     return {id:e.id,name:(labelled||e.getAttribute('aria-label')||Array.from(e.labels||[],label=>label.textContent).join(' ')||e.getAttribute('title')||e.getAttribute('placeholder')||'').trim()};
@@ -70,7 +99,7 @@ const server=http.createServer((req,res)=>{
      if(await page.locator('#mobilePanel').isVisible())assert.equal(await page.locator('#mobilePanel').getAttribute('aria-expanded'),'false',`${size} ${catalog} addition must close the panel`);
      assert.equal(await page.evaluate(()=>document.activeElement?.matches('.furn.sel')),true,`${size} catalog addition must focus the selected item`);
      await usablePlan();await reachable('#rot');await reachable('#del');
-     await page.locator('#del').click();assert.equal(await page.locator('.furn').count(),0);
+     await page.locator('#del').click();assert.equal(await page.locator('.furn').count(),0);await noEditRows();
     }
    }
    await panel(true);
@@ -105,18 +134,21 @@ const server=http.createServer((req,res)=>{
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'90');
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'0');
     await page.screenshot({path:path.join(root,'test-results',`mobile-normal-${size}.png`)});
-    await page.locator('#mobileView').click();await reachable('#rot');await usablePlan();
+    await focus(true);await reachable('#rot');await usablePlan();
     await page.keyboard.press('Escape');
-    await page.waitForFunction(()=>!document.body.classList.contains('mobile-focus'));
+    await page.waitForFunction(()=>!document.body.classList.contains('mobile-focus')&&!document.fullscreenElement);
     await reachable('#mobileView');await usablePlan();
-    // A phone rotated or resized while focused must restore the normal desktop UI.
-    await page.locator('#mobileView').click();await page.setViewportSize({width:1440,height:1000});
+    // When browser fullscreen is unavailable, resizing out of the compact layout
+    // must still restore the normal desktop panel and scrolling.
+    await page.evaluate(()=>{window.testRequestFullscreen=document.documentElement.requestFullscreen;document.documentElement.requestFullscreen=undefined});
+    await focus(true);await page.setViewportSize({width:1440,height:1000});
     await page.waitForFunction(()=>!document.body.classList.contains('mobile-focus'));
-    assert.equal(await page.locator('header').isVisible(),true);assert.equal(await page.locator('aside').isVisible(),true);
+    assert.equal(await page.locator('body > header').count(),0);assert.equal(await page.locator('aside').isVisible(),true);
     assert.match(await page.locator('.stage').evaluate(e=>getComputedStyle(e).overflowY),/auto|scroll/,'desktop plan must remain scrollable after leaving focus mode');
     await page.locator('#roomSel').selectOption('living');await page.locator('#roomSel').selectOption('smallroom2');
     await page.setViewportSize(viewport);await page.locator('.furn').click();await usablePlan();
-    await page.locator('#mobileView').click();await page.locator('#mvRight').click();
+    await page.evaluate(()=>{document.documentElement.requestFullscreen=window.testRequestFullscreen;delete window.testRequestFullscreen});
+    await focus(true);await page.locator('#mvRight').click();
    }
    else{
     await page.locator('.furn').scrollIntoViewIfNeeded();const box=await page.locator('.furn').boundingBox();
@@ -129,33 +161,44 @@ const server=http.createServer((req,res)=>{
    await page.locator('#zoomIn').click();await page.evaluate(()=>new Promise(requestAnimationFrame));
    assert.equal(await page.evaluate(()=>localStorage.getItem('ttobok_v3_smallroom2_cur')),state,'zoom must not change persisted layout');
    if(mobile){
-    await page.locator('#z400').click();await reachable('#rot');await usablePlan();
+    await viewOptions(true);await page.locator('#z400').click();await viewOptions(false);await reachable('#rot');await usablePlan();
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'0');
     await tapRotate();assert.equal(await page.locator('.furn').getAttribute('data-r'),'90');
     await page.locator('#fit').click();
    }
    await page.screenshot({path:path.join(root,'test-results',`planner-${size}.png`),fullPage:false});
-   if(mobile)await page.locator('#mobileView').click();
+   if(mobile)await focus(false);
+   const beforeHouse=await layoutSnapshot();
    await chooseRoom('house');
    await page.waitForFunction(()=>document.querySelectorAll('.houseMarker').length===14);
    assert.equal(await page.locator('#houseLegend').isVisible(),true);
    assert.equal(await page.locator('#houseLegend').evaluate(e=>!document.querySelector('#room').contains(e)),true);
    assert.match(await page.locator('#houseLegend').innerText(),/테스트 책상/);
    for(const selector of ['#suiteLayer','#fixedLayer','#edgeLayer'])assert.doesNotMatch(await page.locator(selector).innerText(),/[가-힣]/,'whole-house descriptions must be outside the plan');
-   await page.locator('#fontSizeSel').selectOption('xlarge');
+   await noEditRows();
+   await viewOptions(true);
+   assert.equal(await page.locator('#clear').isVisible(),false,'whole-house view must not expose the room-clear action');
+   await page.locator('#fontSizeSel').selectOption('xlarge');await viewOptions(false);
    await page.locator('#fit').click();
    await usablePlan();
+   if(viewport.width<=1280){
+    assert.equal(await page.locator('#measures').isVisible(),false,'compact whole-house view must not reserve outer dimension margins');
+    assert.equal(await page.locator('#houseSize').isVisible(),true);
+    assert.match(await page.locator('#houseSize').innerText(),/14,?220.*10,?930.*mm/);
+    const dimensions=await page.evaluate(()=>({plan:document.querySelector('#room').getBoundingClientRect().width,stage:document.querySelector('.stage').clientWidth}));
+    assert.ok(dimensions.plan>=dimensions.stage*.85,`${size} fitted whole-house plan must use at least 85% of stage width: ${JSON.stringify(dimensions)}`);
+   }
    await page.locator('.plannerMain').screenshot({path:path.join(root,'test-results',`whole-house-${size}.png`)});
    assert.equal(await page.locator('#rot').isEnabled(),false);
-   if(mobile){
-    await page.locator('#mobileView').click();
-    assert.equal(await page.locator('#houseLegend').isVisible(),true);
-    await page.locator('#mobileView').click();
-   }
+   await focus(true);await noEditRows();
+   assert.equal(await page.locator('#houseLegend').isVisible(),true);
+   await viewOptions(true);await reachable('#fontSizeSel');await viewOptions(false);
+   await focus(false);
+   assert.deepEqual(await layoutSnapshot(),beforeHouse,'whole-house viewing, fit and font size must not mutate saved room layouts');
    await chooseRoom('living');await chooseRoom('smallroom2');assert.equal(await page.locator('.furn').count(),1);
-   if(mobile)await page.locator('#mobileView').click();
-   await page.locator('.furn').click();await page.locator('#del').click();assert.equal(await page.locator('.furn').count(),0);
-   if(mobile)await page.locator('#mobileView').click();
+   if(mobile)await focus(true);
+   await page.locator('.furn').click();await page.locator('#del').click();assert.equal(await page.locator('.furn').count(),0);await noEditRows();
+   if(mobile)await focus(false);
    for(const id of ['smallroom1','master','living','laundry','commonbath','ensuite','entry','house','smallroom2'])await chooseRoom(id);
    await page.reload();await page.waitForFunction(()=>!!window.TTOBOK_APP);assert.equal(await page.locator('.furn').count(),0);
    await usablePlan();
