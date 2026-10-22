@@ -35,7 +35,7 @@ jobs:
           arch: x86_64
           profile: pixel_7_pro
           disable-animations: true
-          script: python3 scripts/diagnose_apk.py
+          script: python3 scripts/diagnose_apk.py --require-twa
       - name: Save launch logs and screenshots
         if: always()
         uses: actions/upload-artifact@v4
