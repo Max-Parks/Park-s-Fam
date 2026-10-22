@@ -60,3 +60,29 @@ test('Escape closes mobile diagram focus mode', () => {
  app.document.body.dispatch('keydown',{key:'Escape'});
  assert.equal(app.document.body.classList.contains('mobile-focus'),false);
 });
+
+test('Escape during pending browser fullscreen cancels a late entry without changing the saved layout', async () => {
+ const app=createApp({storage:{[key]:{items:[desk],savedAt:123}}});
+ let completeEntry,exitCalls=0;
+ app.document.documentElement={requestFullscreen:()=>new Promise(resolve=>{
+  completeEntry=()=>{
+   app.document.fullscreenElement=app.document.documentElement;
+   app.document.body.dispatch('fullscreenchange',{});
+   resolve();
+  };
+ })};
+ app.document.exitFullscreen=()=>{
+  exitCalls++;
+  app.document.fullscreenElement=null;
+  app.document.body.dispatch('fullscreenchange',{});
+  return Promise.resolve();
+ };
+ app.node('mobileView').onclick();
+ app.document.body.dispatch('keydown',{key:'Escape'});
+ assert.equal(app.document.body.classList.contains('mobile-focus'),false);
+ completeEntry();await Promise.resolve();
+ assert.equal(app.document.body.classList.contains('mobile-focus'),false,'late browser entry must not reopen canceled focus');
+ assert.equal(app.document.fullscreenElement,null,'late browser fullscreen must be exited');
+ assert.equal(exitCalls,1);
+ assert.deepEqual(JSON.parse(app.localStorage.getItem(key)).items,[desk]);
+});
