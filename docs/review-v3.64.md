@@ -64,6 +64,8 @@ APK SHA-256: `17a540ad11eea9dddc170837e0e60908bad3f8316e7628c08fa7a4533e321176`.
 - 기존 패키지와 배포 서명을 유지하며 APK versionCode=365, versionName=3.64.1입니다. 이전 크래시를 일으킨 Android Browser Helper LauncherActivity 구현은 사용하지 않고 기존 홈 화면 바로가기 이름만 alias로 보존합니다.
 - 사이트 루트의 공개 서명 연결 파일은 별도 Max-Parks.github.io 저장소에서 게시합니다. `https://max-parks.github.io/.well-known/assetlinks.json` HTTP200 및 Google Digital Asset Links 응답으로 기존 패키지/서명 연결을 확인했습니다. 비공개 서명 키는 게시하지 않습니다.
 - 서명된 APK 빌드 후 에뮬레이터에서 실제 사이트 검증 성공, 웹 콘텐츠 로딩, 브라우저 주소줄 부재, 뒤로 가기 및 브라우저 없음 복구를 검사하도록 배포 조건을 강화합니다. 인증 검증을 우회하는 플래그는 사용하지 않습니다.
-- 로컬 Node 회귀48개와 Edge/Chromium 엔진의17개 화면 크기 검사가 통과했습니다. 실제 삼성 기종의 앱 실행과 주소줄 유무는 기기에서 추가 확인이 필요합니다.
+- 로컬 Node 회귀 49개와 Edge/Chromium 엔진의 17개 화면 크기 검사가 통과했습니다. 지연된 전체화면 진입 중 Escape를 누른 경우에도 다시 열리지 않는 회귀 검사를 포함합니다. 실제 삼성 기종의 앱 실행과 주소줄 유무는 기기에서 추가 확인이 필요합니다.
 
 참고: [Google 공식 TWA 브라우저 지원표](https://github.com/GoogleChrome/android-browser-helper/blob/main/docs/trusted-web-activity-browser-support.md), [AndroidX TWA](https://developer.android.com/reference/androidx/browser/trusted/TrustedWebActivityIntentBuilder).
+
+[서명 APK 빌드와 실제 실행 검사](https://github.com/Max-Parks/Park-s-Fam/actions/runs/39724896056)가 통과했습니다. 실제 DAL 검증 성공, 도면 로딩, 주소줄 부재, 뒤로 가기 및 브라우저 없음 복구를 확인했습니다. 이 빌드는 배포 전 기존 V3.64 웹 UI로 검사했으며, 새 UI 배포 후 같은 엄격한 진단을 다시 실행합니다. APK SHA-256: `b02113e5d2538fa5f3e6aac0f830d574cfee72301670349fa588d433a93d860e`.
