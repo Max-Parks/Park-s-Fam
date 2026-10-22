@@ -41,8 +41,14 @@
 
 사용자는 Z Flip5에서 웹페이지의 APK를 재설치한 뒤 아이콘을 누르면 바로 종료되거나 반응이 없고, 삼성 인터넷에서는 같은 웹페이지가 정상 작동한다고 보고했습니다.
 
-기존 APK는 Android Browser Helper 2.7.3을 사용하며, 기본 브라우저보다 TWA 지원 브라우저를 우선 선택할 수 있습니다. 컴파일된 `asset_statements` 리소스의 JSON 따옴표가 손실된 설정 오류도 확인했습니다. 이 오류만으로 사용자 기기의 즉시 종료 원인을 확정하지는 않습니다.
+기존 APK에서 즉시 종료를 Android 15(API 35) 에뮬레이터로 재현했습니다. Chrome이 있는 경우와 브라우저를 비활성화한 경우 모두 `ManageDataLauncherActivity` 컴포넌트가 없다는 `IllegalArgumentException`이 발생합니다. Android Browser Helper의 `LauncherActivity.onCreate → launchTwa → addSiteSettingsShortcut → setComponentEnabledSetting` 호출에서 웹사이트를 열기 전에 종료됩니다. [기존 APK 진단 로그](https://github.com/Max-Parks/Park-s-Fam/actions/runs/39717031423)
+
+기존 APK는 Android Browser Helper 2.7.3을 사용하며, 기본 브라우저보다 TWA 지원 브라우저를 우선 선택할 수 있습니다. 컴파일된 `asset_statements` 리소스의 JSON 따옴표가 손실된 별도 설정 오류도 확인했습니다.
 
 새 APK는 기본 브라우저에서 Custom Tab으로 열고, 연결 실패 시 일반 브라우저 열기로 전환합니다. 열기에 실패하거나 브라우저에서 돌아오면 재시도와 브라우저에서 열기 화면을 제공합니다. 별도 WebView 저장소를 만들지 않으며 기존 패키지 `com.maxparks.ttobokhome`과 저장된 배포 서명으로 버전명 `3.64`, 버전 코드 `364`를 빌드합니다. 다운로드 주소에는 `v=364`를 사용합니다.
 
-실물 Z Flip5에서의 최종 실행 확인은 사용자의 새 APK 설치 후 확인이 필요합니다. 기기의 오류 로그 없이 기존 종료 원인을 단정하지 않습니다.
+[수정 APK 빌드 및 실행 검사](https://github.com/Max-Parks/Park-s-Fam/actions/runs/39721017914)가 통과했습니다. Android 15 에뮬레이터에서 브라우저로 전환, 뒤로 가기로 실행기 복귀, 브라우저 비활성화 시 안내·재시도 버튼 표시를 확인했고 두 경우 모두 네이티브 충돌이 없었습니다. 브라우저는 최초 설정 화면까지 열렸으며 이 검사는 로그인이나 웹페이지 조작을 포함하지 않습니다. 웹 UI는 별도 48개 회귀·17개 화면 크기 검사로 확인했습니다.
+
+APK SHA-256: `17a540ad11eea9dddc170837e0e60908bad3f8316e7628c08fa7a4533e321176`. 서명 인증서 SHA-256은 기존 APK와 같은 `5102c30b88e2c0d106910258ba64a40ca1ae4c3c19208de9df1a8d0bc40e2702`입니다.
+
+실물 Z Flip5에서의 최종 실행 확인은 사용자의 새 APK 설치 후 확인이 필요합니다. 에뮬레이터의 기존 APK 종료 원인은 확인했으며 사용자 기기 자체의 오류 로그는 수집하지 않았습니다.
