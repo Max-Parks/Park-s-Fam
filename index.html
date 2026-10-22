@@ -1823,7 +1823,11 @@ $('mobileView').onclick=()=>{
  }
 };
 document.addEventListener('fullscreenchange',()=>{
- if(document.fullscreenElement)setMobileFocus(true);
+ if(document.fullscreenElement){
+  // A delayed entry must respect Escape or a second tap that already canceled it.
+  if(document.body.classList.contains('mobile-focus'))setMobileFocus(true);
+  else if(document.exitFullscreen)document.exitFullscreen().catch(()=>{});
+ }
  else if(document.body.classList.contains('mobile-focus'))setMobileFocus(false);
 });
 document.addEventListener('keydown',event=>{if(event.key==='Escape'&&document.body.classList.contains('mobile-focus'))setMobileFocus(false)});
