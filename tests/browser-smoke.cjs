@@ -29,6 +29,17 @@ const server=http.createServer((req,res)=>{
    page.on('pageerror',e=>errors.push(e.stack||e.message));page.on('dialog',d=>d.accept());
    await page.route('https://**/*',route=>route.abort()); // No production Firebase or user data.
    await page.goto(base);await page.waitForFunction(()=>!!window.TTOBOK_APP);
+   // Keep the real browser API, but observe when its asynchronous entry settles.
+   // The separate deferred-entry regression covers Escape before that point.
+   await page.evaluate(()=>{
+    const request=document.documentElement.requestFullscreen;
+    window.testFullscreenPending=false;
+    if(request)document.documentElement.requestFullscreen=function(...args){
+     window.testFullscreenPending=true;
+     try{return request.apply(this,args).finally(()=>{window.testFullscreenPending=false})}
+     catch(error){window.testFullscreenPending=false;throw error}
+    };
+   });
    assert.equal(await page.locator('body > header').count(),0,`${size} must remove the persistent top header`);
    const panel=async open=>{
     const toggle=page.locator('#mobilePanel');
@@ -41,7 +52,7 @@ const server=http.createServer((req,res)=>{
    };
    const focus=async on=>{
     if(await page.locator('body').evaluate(e=>e.classList.contains('mobile-focus'))!==on)await page.locator('#mobileView').click();
-    await page.waitForFunction(on=>document.body.classList.contains('mobile-focus')===on&&(on||!document.fullscreenElement),on);
+    await page.waitForFunction(on=>!window.testFullscreenPending&&document.body.classList.contains('mobile-focus')===on&&(on||!document.fullscreenElement),on);
    };
    const layoutSnapshot=()=>page.evaluate(()=>Object.fromEntries(Object.keys(localStorage).filter(key=>/^ttobok_v3_.+_cur$/.test(key)).sort().map(key=>[key,localStorage.getItem(key)])));
    const noEditRows=async()=>{
